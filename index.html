@@ -743,8 +743,7 @@
                 HEV (Hybrid)
               </button>
             </div>
-
-          </div>
+        </div>
         </div>
 
         <!-- KPI SUMMARY CARDS -->
@@ -797,18 +796,6 @@
               Khusus 12 Kecamatan Kota Bekasi dilengkapi <strong>Polygon Wilayah & Tingkatan Paragon</strong>. Seluruh kecamatan lain di Jabodetabek tetap ditampilkan secara interaktif. <strong>Klik wilayah untuk rincian merk & tipe group.</strong>
             </p>
           </div>
-
-          <!-- Mode Switcher: Google Maps vs Infografis Gambar 1 -->
-          <div class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800 self-start lg:self-auto">
-            <button type="button" id="btnViewGmaps" onclick="setPolregMapView('gmaps')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-red-600 text-white shadow flex items-center gap-1.5">
-              <i data-lucide="map" class="w-3.5 h-3.5"></i>
-              <span>Google Maps (Semua Wilayah)</span>
-            </button>
-            <button type="button" id="btnViewInfografis" onclick="setPolregMapView('infografis')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5">
-              <i data-lucide="image" class="w-3.5 h-3.5 text-amber-400"></i>
-              <span>Infografis Kota Bekasi (Gambar 1)</span>
-            </button>
-          </div>
         </div>
 
         <!-- Legend Bar -->
@@ -859,26 +846,6 @@
               <span class="text-[#4285F4]">G</span><span class="text-[#EA4335]">o</span><span class="text-[#FBBC05]">o</span><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span class="text-[#EA4335]">e</span>
             </span>
             <span class="text-slate-600 font-medium text-[10px]">Maps Live Engine</span>
-          </div>
-        </div>
-
-        <!-- CONTAINER 2: THE INFOGRAPHIC VECTOR VIEW (GAMBAR NO. 1) -->
-        <div id="containerInfografisView" class="hidden relative w-full rounded-2xl overflow-hidden border border-slate-700/80 bg-slate-950 p-4 flex flex-col items-center justify-center min-h-[560px]">
-          <div class="text-center mb-4">
-            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center justify-center gap-2">
-              <i data-lucide="palette" class="w-4 h-4"></i>
-              Visual Infografis 12 Kecamatan Kota Bekasi (Sesuai Gambar No. 1)
-            </span>
-            <p class="text-[11px] text-slate-400 mt-1">Klik pada pin kecamatan untuk membuka rincian lengkap merk, tipe group & volume</p>
-          </div>
-          
-          <div class="relative max-w-[480px] w-full mx-auto select-none" id="infografisInteractiveWrapper">
-            <img src="img/peta_bekasi_infografis.png" alt="Peta Infografis 12 Kecamatan Kota Bekasi" class="w-full h-auto rounded-xl shadow-2xl pointer-events-none border border-slate-800">
-            
-            <!-- 12 Interactive Badges Injected by JS on top of the image -->
-            <div id="infografisBadgesOverlay" class="absolute inset-0">
-              <!-- Injected by JS -->
-            </div>
           </div>
         </div>
 
@@ -2095,22 +2062,6 @@
       ]
     };
 
-    // Positions on Gambar No. 1
-    const INFOGRAFIS_PINS = {
-      'Medan Satria': { top: '8%', left: '46%' },
-      'Bekasi Utara': { top: '10%', left: '74%' },
-      'Bekasi Barat': { top: '26%', left: '38%' },
-      'Bekasi Timur': { top: '27%', left: '76%' },
-      'Bekasi Selatan': { top: '39%', left: '52%' },
-      'Rawa Lumbu': { top: '50%', left: '64%' },
-      'Pondok Gede': { top: '46%', left: '21%' },
-      'Pondok Melati': { top: '58%', left: '20%' },
-      'Jatiasih': { top: '57%', left: '39%' },
-      'Jatisampurna': { top: '76%', left: '21%' },
-      'Mustika Jaya': { top: '57%', left: '77%' },
-      'Bantar Gebang': { top: '73%', left: '62%' }
-    };
-
     function initPolregMap() {
       if (polregMap) return;
       const mapContainer = document.getElementById('polregLeafletMap');
@@ -2174,35 +2125,11 @@
     }
 
     function setPolregMapView(viewMode) {
-      currentPolregViewMode = viewMode;
-      const gmapsContainer = document.getElementById('containerGmapsView');
-      const infografisContainer = document.getElementById('containerInfografisView');
-      const btnGmaps = document.getElementById('btnViewGmaps');
-      const btnInfografis = document.getElementById('btnViewInfografis');
-
-      if (viewMode === 'gmaps') {
-        if (gmapsContainer) gmapsContainer.classList.remove('hidden');
-        if (infografisContainer) infografisContainer.classList.add('hidden');
-        if (btnGmaps) {
-          btnGmaps.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-red-600 text-white shadow flex items-center gap-1.5";
-        }
-        if (btnInfografis) {
-          btnInfografis.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5";
-        }
+      if (polregMap) {
         setTimeout(() => {
-          if (polregMap) polregMap.invalidateSize();
+          polregMap.invalidateSize();
         }, 100);
-      } else {
-        if (gmapsContainer) gmapsContainer.classList.add('hidden');
-        if (infografisContainer) infografisContainer.classList.remove('hidden');
-        if (btnGmaps) {
-          btnGmaps.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5";
-        }
-        if (btnInfografis) {
-          btnInfografis.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow flex items-center gap-1.5";
-        }
       }
-      lucide.createIcons();
     }
 
     function recenterBekasiMap() {
@@ -2560,33 +2487,6 @@
           }
           lucide.createIcons();
         }
-      }
-
-      // 3. Update Interactive Badges on Infographic (Gambar No. 1)
-      const overlayDiv = document.getElementById('infografisBadgesOverlay');
-      if (overlayDiv) {
-        const isNeonMode = (currentPolregPowertrain !== 'ALL');
-        const normalColors = { 1: '#10B981', 2: '#06B6D4', 3: '#F59E0B', 4: '#F43F5E' };
-        const neonColors = { 1: '#00F0FF', 2: '#38BDF8', 3: '#3B82F6', 4: '#6366F1' };
-
-        overlayDiv.innerHTML = Object.entries(INFOGRAFIS_PINS).map(([name, pos]) => {
-          const info = kecData[name] || { qty: 0, rank: '-', tier: 4 };
-          const color = isNeonMode ? (neonColors[info.tier] || '#00F0FF') : (normalColors[info.tier] || '#10B981');
-          
-          return `
-            <div onclick="openKecamatanModal('${name}')" 
-                 class="absolute cursor-pointer transition transform hover:scale-110 z-10"
-                 style="top: ${pos.top}; left: ${pos.left}; transform: translate(-50%, -50%);"
-                 title="Klik untuk rincian ${name}">
-              <div class="px-2 py-1 rounded-full bg-slate-950/90 text-white border text-[10px] font-extrabold shadow-2xl flex items-center gap-1 whitespace-nowrap hover:bg-slate-900"
-                   style="border-color: ${color}; box-shadow: 0 0 10px ${color}80;">
-                <span class="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] text-slate-950 font-black" style="background:${color}">#${info.rank}</span>
-                <span>${name}</span>
-                <span style="color:${color}">(${info.qty})</span>
-              </div>
-            </div>
-          `;
-        }).join('');
       }
 
       // 4. Update 12 Kecamatan Quick Selector Grid (Kota Bekasi)
