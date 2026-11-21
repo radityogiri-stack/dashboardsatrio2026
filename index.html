@@ -214,7 +214,7 @@
       </button>
       <button onclick="switchTab('tabTradeIn')" id="nav-tabTradeIn" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
         <i data-lucide="repeat" class="w-4 h-4"></i>
-        <span>Trade-In (Tukar Tambah)</span>
+        <span>Trade In</span>
       </button>
       <button onclick="switchTab('tabAR')" id="nav-tabAR" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
         <i data-lucide="file-text" class="w-4 h-4"></i>
@@ -573,46 +573,117 @@
     <!-- ============================================================ -->
     <div id="tabTradeIn" class="tab-pane hidden space-y-6">
       
-      <!-- FUNNEL CARDS -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="tradeInFunnelCards">
+      <!-- HEADER & SUB-MENU CONTROLS -->
+      <div class="glass-card rounded-2xl p-5 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="repeat" class="w-5 h-5 text-red-500"></i>
+              Monitoring Performa Trade In (Tukar Tambah)
+            </h2>
+            <span id="tradeInSpvBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-500/20 text-red-400 border border-red-500/30">
+              SATRIYO KRESNO AJI
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">
+            Monitoring funnel dan realisasi tukar tambah kendaraan berdasarkan data sheet <strong>Trade In 2026</strong>.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-400 whitespace-nowrap">Filter Bulan:</span>
+          <select id="tradeInMonthFilter" onchange="renderTradeInTab()" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-red-500">
+            <option value="ALL">Semua Bulan (YTD 2026)</option>
+            <option value="Januari">Januari</option>
+            <option value="Februari">Februari</option>
+            <option value="Maret">Maret</option>
+            <option value="April">April</option>
+            <option value="Mei">Mei</option>
+            <option value="Juni">Juni</option>
+            <option value="Juli">Juli</option>
+            <option value="Agustus">Agustus</option>
+            <option value="September">September</option>
+            <option value="Oktober">Oktober</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- FUNNEL CARDS (1. Replacement Prospect, 2. Appraisal, 3. Deal) -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="tradeInFunnelCards">
         <!-- Injected via JS -->
       </div>
 
+      <!-- CHARTS -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Used Car Brands -->
-        <div class="glass-card rounded-2xl p-5">
-          <h3 class="text-sm font-bold text-white mb-2">Sebaran Merek Mobil Bekas Pelanggan</h3>
-          <p class="text-xs text-slate-400 mb-4">Merek kendaraan lama yang masuk dalam appraisal trade-in</p>
+        <!-- Used Car Brands with Percentage -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-800">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-red-400"></i>
+              Sebaran Merek Mobil Bekas Pelanggan
+            </h3>
+            <span class="text-[10px] text-slate-400 font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">Persentase (%)</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-4">Merek kendaraan lama yang masuk dalam appraisal trade-in beserta proporsi persentase.</p>
           <div class="h-64">
             <canvas id="chartTradeInBrands"></canvas>
           </div>
         </div>
 
         <!-- Deal vs Not Deal Reasons -->
-        <div class="glass-card rounded-2xl p-5">
-          <h3 class="text-sm font-bold text-white mb-2">Status Deal & Pembeli Akhir</h3>
-          <p class="text-xs text-slate-400 mb-4">Distribusi penjualan ke Rekanan Showroom vs OLXmobbi</p>
+        <div class="glass-card rounded-2xl p-5 border border-slate-800">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-400"></i>
+              Status Deal & Pembeli Akhir
+            </h3>
+            <span class="text-[10px] text-slate-400 font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">Unit</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-4">Distribusi penjualan unit ke Rekanan Showroom vs OLXmobbi vs Belum Deal.</p>
           <div class="h-64">
             <canvas id="chartTradeInStatus"></canvas>
           </div>
         </div>
       </div>
 
-      <!-- Trade In Recent Prospects Table -->
-      <div class="glass-card rounded-2xl p-5 overflow-hidden">
-        <h3 class="text-sm font-bold text-white mb-3">Daftar Prospek Tukar Tambah (Trade-In)</h3>
-        <div class="overflow-x-auto custom-scrollbar max-h-72">
+      <!-- DATA SELURUH LEADS TRADE IN SESUAI SPREADSHEET -->
+      <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="table" class="w-4 h-4 text-emerald-400"></i>
+              Data Seluruh Leads Trade In (Sesuai Spreadsheet)
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Menampilkan seluruh data prospek tukar tambah sesuai supervisor yang aktif pada spreadsheet.
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <input type="text" id="tradeInSearchInput" oninput="filterTradeInTable()" placeholder="Cari Sales, Mobil, Plat..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 pl-8 text-xs text-slate-200 focus:outline-none focus:border-red-500 w-48 sm:w-64">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5 pointer-events-none"></i>
+            </div>
+            <span id="tradeInLeadCountBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-200 whitespace-nowrap">
+              0 Leads
+            </span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto custom-scrollbar max-h-96 border border-slate-800/80 rounded-xl">
           <table class="w-full text-left text-xs border-collapse">
-            <thead class="bg-slate-900 text-slate-300 sticky top-0">
+            <thead class="bg-slate-900/95 text-slate-300 sticky top-0 backdrop-blur z-10 border-b border-slate-800">
               <tr>
-                <th class="py-2 px-3">Bulan</th>
-                <th class="py-2 px-3">SPV</th>
-                <th class="py-2 px-3">Sales</th>
-                <th class="py-2 px-3">Mobil Baru</th>
-                <th class="py-2 px-3">Mobil Bekas</th>
-                <th class="py-2 px-3">Tahun</th>
-                <th class="py-2 px-3">Status Deal</th>
-                <th class="py-2 px-3">Terjual Ke</th>
+                <th class="py-2.5 px-3">No</th>
+                <th class="py-2.5 px-3">Bulan</th>
+                <th class="py-2.5 px-3">Sales</th>
+                <th class="py-2.5 px-3">Supervisor</th>
+                <th class="py-2.5 px-3">Mobil Baru</th>
+                <th class="py-2.5 px-3">Mobil Bekas</th>
+                <th class="py-2.5 px-3">Tahun</th>
+                <th class="py-2.5 px-3">Plat Nomor</th>
+                <th class="py-2.5 px-3">Appraisal</th>
+                <th class="py-2.5 px-3">Harga Penawaran</th>
+                <th class="py-2.5 px-3">Status Deal</th>
+                <th class="py-2.5 px-3">Terjual Ke / Keterangan</th>
               </tr>
             </thead>
             <tbody id="tradeInTableBody" class="divide-y divide-slate-800 text-slate-300">
@@ -1729,121 +1800,262 @@
 
     // --- TAB 4: TRADE-IN MONITORING ---
     function renderTradeInTab() {
-      const records = appData.trade_in || [];
+      const allRecords = appData.trade_in || [];
       
-      let totalHot = 0;
+      // 1. Filter by Supervisor (currentSpv dari dropdown di pojok kiri atas)
+      let records = allRecords;
+      if (currentSpv && currentSpv !== 'ALL') {
+        records = records.filter(r => {
+          const s = (r.spv || '').toUpperCase();
+          if (currentSpv === 'SATRIYO KRESNO AJI') {
+            return s.includes('SATRIO') || s.includes('SATRIYO');
+          } else if (currentSpv === 'YAMES') {
+            return s.includes('YAMES') || s.includes('JAMES');
+          }
+          return s.includes(currentSpv.toUpperCase());
+        });
+      }
+
+      // 2. Filter by Bulan (jika user memilih filter bulan)
+      const mFilter = document.getElementById('tradeInMonthFilter');
+      const selMonth = mFilter ? mFilter.value : 'ALL';
+      if (selMonth && selMonth !== 'ALL') {
+        records = records.filter(r => (r.month || '').toLowerCase() === selMonth.toLowerCase());
+      }
+
+      // Update SPV badge pada header Trade In
+      const spvBadge = document.getElementById('tradeInSpvBadge');
+      if (spvBadge) {
+        spvBadge.textContent = currentSpv === 'ALL' ? 'SEMUA SUPERVISOR (CABANG BEKASI)' : currentSpv;
+      }
+
+      // Hitung Metrik Funnel (1. Replacement Prospect, 2. Appraisal, 3. Deal)
+      let totalProspect = records.length;
       let totalAppraisal = 0;
       let totalDeal = 0;
-      let totalDO = 0;
       const brandCounts = {};
-      const statusCounts = { 'Deal OLX': 0, 'Deal Showroom': 0, 'Lost/Batal': 0 };
+      const statusCounts = { 'Deal OLXmobbi': 0, 'Deal Rekanan': 0, 'Belum Deal / Proses': 0 };
 
       records.forEach(r => {
-        totalHot++;
-        if (r.appraisal && r.appraisal.toLowerCase().includes('sudah')) totalAppraisal++;
-        if (r.deal && r.deal.toLowerCase().includes('deal')) totalDeal++;
-        if (r.do && r.do.toLowerCase().includes('do')) totalDO++;
+        if (r.is_appraisal || (r.appraisal && r.appraisal.toUpperCase().includes('APPRAISAL'))) {
+          totalAppraisal++;
+        }
+        if (r.is_deal || (r.deal && r.deal.toLowerCase() === 'deal')) {
+          totalDeal++;
+          const soldTo = (r.sold_to || '').toLowerCase();
+          if (soldTo.includes('olx')) statusCounts['Deal OLXmobbi']++;
+          else statusCounts['Deal Rekanan']++;
+        } else {
+          statusCounts['Belum Deal / Proses']++;
+        }
 
         const brand = r.old_brand || 'Lainnya';
         brandCounts[brand] = (brandCounts[brand] || 0) + 1;
-
-        if (r.deal && r.deal.toLowerCase().includes('deal')) {
-          if (r.sold_to && r.sold_to.toLowerCase().includes('olx')) statusCounts['Deal OLX']++;
-          else statusCounts['Deal Showroom']++;
-        } else {
-          statusCounts['Lost/Batal']++;
-        }
       });
 
-      // Funnel Cards
+      const appraisalRate = totalProspect > 0 ? ((totalAppraisal / totalProspect) * 100).toFixed(0) : 0;
+      const closingRatio = totalAppraisal > 0 ? ((totalDeal / totalAppraisal) * 100).toFixed(0) : 0;
+
+      // Render 3 Funnel Cards: 1. Replacement Prospect, 2. Appraisal, 3. Deal
       const funnelDiv = document.getElementById('tradeInFunnelCards');
-      funnelDiv.innerHTML = `
-        <div class="glass-card rounded-2xl p-4">
-          <span class="text-xs text-slate-400">1. Replacement Prospek</span>
-          <div class="text-2xl font-extrabold text-white mt-1">${totalHot}</div>
-          <span class="text-[11px] text-blue-400">Total Prospek Masuk</span>
-        </div>
-        <div class="glass-card rounded-2xl p-4">
-          <span class="text-xs text-slate-400">2. Selesai Di-Appraise</span>
-          <div class="text-2xl font-extrabold text-amber-400 mt-1">${totalAppraisal}</div>
-          <span class="text-[11px] text-amber-500 font-semibold">${((totalAppraisal/totalHot)*100).toFixed(0)}% Appraisal Rate</span>
-        </div>
-        <div class="glass-card rounded-2xl p-4">
-          <span class="text-xs text-slate-400">3. Trade-In Deal</span>
-          <div class="text-2xl font-extrabold text-emerald-400 mt-1">${totalDeal}</div>
-          <span class="text-[11px] text-emerald-500 font-semibold">${((totalDeal/totalAppraisal)*100).toFixed(0)}% Closing Ratio</span>
-        </div>
-        <div class="glass-card rounded-2xl p-4">
-          <span class="text-xs text-slate-400">4. DO (Delivery Order)</span>
-          <div class="text-2xl font-extrabold text-red-400 mt-1">${totalDO}</div>
-          <span class="text-[11px] text-red-500 font-semibold">Tukar Tambah Sukses</span>
-        </div>
-      `;
+      if (funnelDiv) {
+        funnelDiv.innerHTML = `
+          <div class="glass-card rounded-2xl p-5 border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-400">1. Replacement Prospect</span>
+              <span class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"><i data-lucide="users" class="w-4 h-4"></i></span>
+            </div>
+            <div class="text-3xl font-black text-white mt-1">${totalProspect.toLocaleString('id-ID')}</div>
+            <span class="text-[11px] text-blue-400 font-semibold mt-1 inline-block">Total Prospek Masuk</span>
+          </div>
 
-      // Brand Pie
-      const ctxBrand = document.getElementById('chartTradeInBrands').getContext('2d');
-      if (chartTradeInBrands) chartTradeInBrands.destroy();
+          <div class="glass-card rounded-2xl p-5 border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-400">2. Appraisal</span>
+              <span class="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20"><i data-lucide="clipboard-check" class="w-4 h-4"></i></span>
+            </div>
+            <div class="text-3xl font-black text-amber-400 mt-1">${totalAppraisal.toLocaleString('id-ID')}</div>
+            <span class="text-[11px] text-amber-500 font-semibold mt-1 inline-block">${appraisalRate}% Appraisal Rate</span>
+          </div>
 
-      const sortedBrands = Object.entries(brandCounts).sort((a,b) => b[1] - a[1]);
-      chartTradeInBrands = new Chart(ctxBrand, {
-        type: 'pie',
-        data: {
-          labels: sortedBrands.slice(0, 5).map(x => x[0]),
-          datasets: [{
-            data: sortedBrands.slice(0, 5).map(x => x[1]),
-            backgroundColor: ['#D71920', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6']
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: 'right', labels: { color: '#CBD5E1' } } }
-        }
-      });
+          <div class="glass-card rounded-2xl p-5 border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-400">3. Deal</span>
+              <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="check-circle-2" class="w-4 h-4"></i></span>
+            </div>
+            <div class="text-3xl font-black text-emerald-400 mt-1">${totalDeal.toLocaleString('id-ID')}</div>
+            <span class="text-[11px] text-emerald-500 font-semibold mt-1 inline-block">${closingRatio}% Closing Ratio</span>
+          </div>
+        `;
+      }
 
-      // Status Bar
-      const ctxStat = document.getElementById('chartTradeInStatus').getContext('2d');
-      if (chartTradeInStatus) chartTradeInStatus.destroy();
+      // Diagram Lingkaran (Pie Chart) dengan Persentase Lengkap
+      const ctxBrand = document.getElementById('chartTradeInBrands')?.getContext('2d');
+      if (ctxBrand) {
+        if (chartTradeInBrands) chartTradeInBrands.destroy();
 
-      chartTradeInStatus = new Chart(ctxStat, {
-        type: 'bar',
-        data: {
-          labels: Object.keys(statusCounts),
-          datasets: [{
-            data: Object.values(statusCounts),
-            backgroundColor: ['#10B981', '#3B82F6', '#EF4444'],
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { grid: { display: false }, ticks: { color: '#94A3B8' } },
-            y: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } }
+        const sortedBrands = Object.entries(brandCounts).sort((a,b) => b[1] - a[1]);
+        const topBrands = sortedBrands.slice(0, 5);
+        const colors = ['#D71920', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6'];
+
+        chartTradeInBrands = new Chart(ctxBrand, {
+          type: 'pie',
+          data: {
+            labels: topBrands.map(x => x[0]),
+            datasets: [{
+              data: topBrands.map(x => x[1]),
+              backgroundColor: colors,
+              borderWidth: 2,
+              borderColor: '#0F172A'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: {
+                  color: '#CBD5E1',
+                  boxWidth: 12,
+                  font: { size: 11, weight: 'bold' },
+                  generateLabels: function(chart) {
+                    const data = chart.data;
+                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    return data.labels.map((label, i) => {
+                      const val = data.datasets[0].data[i];
+                      const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                      return {
+                        text: `${label}: ${val} (${pct}%)`,
+                        fillStyle: data.datasets[0].backgroundColor[i],
+                        strokeStyle: '#1E293B',
+                        lineWidth: 1,
+                        hidden: false,
+                        index: i
+                      };
+                    });
+                  }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const val = context.raw || 0;
+                    const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                    return ` ${context.label}: ${val} Unit (${pct}%)`;
+                  }
+                }
+              }
+            }
           }
-        }
-      });
+        });
+      }
 
-      // Prospects table
+      // Status Bar Chart
+      const ctxStat = document.getElementById('chartTradeInStatus')?.getContext('2d');
+      if (ctxStat) {
+        if (chartTradeInStatus) chartTradeInStatus.destroy();
+
+        chartTradeInStatus = new Chart(ctxStat, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(statusCounts),
+            datasets: [{
+              data: Object.values(statusCounts),
+              backgroundColor: ['#10B981', '#3B82F6', '#64748B'],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return ` ${context.label}: ${context.raw} Unit`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 11 } } },
+              y: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8', precision: 0 } }
+            }
+          }
+        });
+      }
+
+      // Simpan records aktif untuk fungsi pencarian & render tabel
+      window.currentFilteredTradeInRecords = records;
+      renderTradeInTableRows(records);
+      lucide.createIcons();
+    }
+
+    function renderTradeInTableRows(records) {
       const tbody = document.getElementById('tradeInTableBody');
-      tbody.innerHTML = records.slice(0, 25).map(r => `
-        <tr class="hover:bg-slate-800/40">
-          <td class="py-2 px-3">${r.month}</td>
-          <td class="py-2 px-3 font-semibold">${r.spv}</td>
-          <td class="py-2 px-3">${r.sales}</td>
-          <td class="py-2 px-3 text-slate-200 font-bold">${r.new_car}</td>
-          <td class="py-2 px-3 text-slate-300">${r.old_brand} ${r.old_model}</td>
-          <td class="py-2 px-3">${r.year || '-'}</td>
-          <td class="py-2 px-3">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.deal && r.deal.toLowerCase().includes('deal') ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}">
-              ${r.deal || 'Lost'}
-            </span>
-          </td>
-          <td class="py-2 px-3 text-slate-400">${r.sold_to || r.reason || '-'}</td>
-        </tr>
-      `).join('');
+      const countBadge = document.getElementById('tradeInLeadCountBadge');
+      if (countBadge) {
+        countBadge.textContent = `Total: ${records.length} Leads`;
+      }
+      if (!tbody) return;
+
+      if (records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="12" class="py-8 text-center text-slate-500 font-medium">Tidak ada data leads Trade In untuk supervisor / filter ini.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = records.map((r, idx) => {
+        const isDeal = (r.deal && r.deal.toLowerCase() === 'deal');
+        const isApp = (r.appraisal && r.appraisal.toUpperCase().includes('APPRAISAL'));
+        const penawaranFmt = r.penawaran ? 'Rp ' + Number(r.penawaran).toLocaleString('id-ID') : '-';
+        
+        const dealBadge = isDeal 
+          ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Deal</span>'
+          : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">Proses / Batal</span>';
+
+        const appBadge = isApp
+          ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">Appraised</span>'
+          : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400">Belum</span>';
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="py-2.5 px-3 text-slate-400">${r.no || (idx + 1)}</td>
+            <td class="py-2.5 px-3 font-medium text-slate-300">${r.month || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-200 font-semibold">${r.sales || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-400">${r.spv || '-'}</td>
+            <td class="py-2.5 px-3 text-white font-bold">${r.new_car || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-200 font-medium">${r.old_brand || ''} ${r.old_model || ''}</td>
+            <td class="py-2.5 px-3 text-slate-400">${r.year || '-'}</td>
+            <td class="py-2.5 px-3 font-mono text-[11px] text-amber-300">${r.plate || '-'}</td>
+            <td class="py-2.5 px-3">${appBadge}</td>
+            <td class="py-2.5 px-3 text-slate-300 font-medium">${penawaranFmt}</td>
+            <td class="py-2.5 px-3">${dealBadge}</td>
+            <td class="py-2.5 px-3 text-slate-400 truncate max-w-[200px]" title="${r.sold_to || r.reason || '-'}">${r.sold_to || r.reason || '-'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterTradeInTable() {
+      const search = (document.getElementById('tradeInSearchInput')?.value || '').toLowerCase();
+      const base = window.currentFilteredTradeInRecords || [];
+      if (!search) {
+        renderTradeInTableRows(base);
+        return;
+      }
+      const filtered = base.filter(r => {
+        return (r.sales && r.sales.toLowerCase().includes(search)) ||
+               (r.new_car && r.new_car.toLowerCase().includes(search)) ||
+               (r.old_brand && r.old_brand.toLowerCase().includes(search)) ||
+               (r.old_model && r.old_model.toLowerCase().includes(search)) ||
+               (r.plate && r.plate.toLowerCase().includes(search)) ||
+               (r.spv && r.spv.toLowerCase().includes(search)) ||
+               (r.month && r.month.toLowerCase().includes(search));
+      });
+      renderTradeInTableRows(filtered);
     }
 
     // --- TAB 5: AR & AGING MONITORING ---
