@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Dashboard Monitoring Sales Supervisor - Tunas Toyota Bekasi</title>
   
   <!-- Tailwind CSS -->
@@ -81,7 +84,7 @@
   </style>
 
   <!-- Preloaded Data from Excel / GDrive -->
-  <script src="dataset.js"></script>
+  <script src="dataset.js?v=20261121_gmaps"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col custom-scrollbar">
 
@@ -829,9 +832,9 @@
               <i data-lucide="globe" class="w-3.5 h-3.5"></i>
               <span>Satelit</span>
             </button>
-            <button type="button" id="btnMapDark" onclick="setPolregMapLayer('dark')" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-1.5">
-              <i data-lucide="moon" class="w-3.5 h-3.5"></i>
-              <span>Mode Gelap</span>
+            <button type="button" id="btnMapTerrain" onclick="setPolregMapLayer('google_terrain')" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-1.5">
+              <i data-lucide="mountain" class="w-3.5 h-3.5"></i>
+              <span>Medan (Terrain)</span>
             </button>
           </div>
 
@@ -2005,9 +2008,9 @@
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
       });
 
-      polregBaseLayers['dark'] = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 18,
-        subdomains: 'abcd'
+      polregBaseLayers['google_terrain'] = L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
       });
 
       // Default: Google Maps Streets View
@@ -2027,9 +2030,9 @@
 
       const btnStreets = document.getElementById('btnMapStreets');
       const btnHybrid = document.getElementById('btnMapHybrid');
-      const btnDark = document.getElementById('btnMapDark');
+      const btnTerrain = document.getElementById('btnMapTerrain');
 
-      [btnStreets, btnHybrid, btnDark].forEach(btn => {
+      [btnStreets, btnHybrid, btnTerrain].forEach(btn => {
         if (!btn) return;
         btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-1.5";
       });
@@ -2038,14 +2041,14 @@
         btnStreets.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow flex items-center gap-1.5";
       } else if (type === 'google_hybrid' && btnHybrid) {
         btnHybrid.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow flex items-center gap-1.5";
-      } else if (type === 'dark' && btnDark) {
-        btnDark.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow flex items-center gap-1.5";
+      } else if (type === 'google_terrain' && btnTerrain) {
+        btnTerrain.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow flex items-center gap-1.5";
       }
     }
 
     function recenterBekasiMap() {
       if (polregMap) {
-        polregMap.setView([-6.2483, 106.9856], 12, { animate: true });
+        polregMap.setView([-6.2666, 106.9800], 12, { animate: true });
       }
     }
 
