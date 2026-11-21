@@ -119,11 +119,17 @@ Jika di masa mendatang spreadsheet ingin dibuat privat atau membutuhkan endpoint
    - Monitoring *Revenue* aktual vs target.
    - Monitoring *Gross Profit (GP)* aktual vs target serta rasio GP.
    - Tracking *Operating Expenses (Opex)* dan *Profit Before Tax (PBT)*.
-5. **Pangsa Pasar & Polreg (Data GID 1815908456)**:
-   - Posisi kepemimpinan Toyota sebagai market leader (**41.503 unit / 25,1% market share**).
-   - Perbandingan dengan kompetitor terdekat: BYD (**20.926 unit**), Daihatsu (**16.623 unit**), Mitsubishi (**12.142 unit**), Jaecoo (**10.502 unit**), Suzuki (**9.698 unit**), Honda (**6.203 unit**), dll.
-   - Komposisi teknologi mesin: Bensin Konvensional (ICE 74,2%), Baterai Murni Listrik (BEV 18,6%), dan Hybrid Electric (HEV 7,2%).
-   - Sebaran wilayah registrasi Samsat di DKI Jakarta, Depok, dan Bekasi.
+5. **Market Share & Polreg 2026 (Data GID 1815908456)**:
+   - **Tampilan Peta Ganda (*Dual-View*)**:
+     - 🗺️ **Google Maps Live (Semua Wilayah)**: Menampilkan 12 Polygon Kecamatan Kota Bekasi dengan tingkatan Paragon + pin interaktif untuk seluruh 119 kecamatan se-Jabodetabek (Kab. Bekasi, Jakarta, Tangerang, Depok).
+     - 🎨 **Peta Infografis 12 Kecamatan (Sesuai Gambar No. 1)**: Visualisasi infografis warna-warni 12 kecamatan Kota Bekasi dengan pin badge angka penjualan aktual yang interaktif.
+   - **Sistem Paragon & Biru Neon EV/HEV**:
+     - Mode Normal: Paragon 4 Tier (Tier 1 Emerald `#10B981`, Tier 2 Cyan `#06B6D4`, Tier 3 Amber `#F59E0B`, Tier 4 Rose `#F43F5E`).
+     - Sub-Menu EV & HEV: Mengunci Kolom E (`EV Vehicle`) & Kolom F (`HEV Vehicle`), polygon dan pin berubah otomatis menjadi warna **Biru Neon Elektrik**.
+   - **Modal Rincian per Kecamatan**:
+     - Klik pada polygon atau pin mana pun (baik Kota Bekasi maupun kecamatan luar) untuk menampilkan rincian merk mobil, tipe group terlaris, persentase pangsa, dan porsi BEV/HEV.
+   - **Peringkat 10 Besar Merk & Market Share**:
+     - Tabel 10 besar penjualan mobil dari tertinggi ke terendah, persentase pangsa pasar (*Market Share*), progress bar, dan kotak rumus transparansi perhitungan.
 
 ---
 
@@ -132,8 +138,11 @@ Jika di masa mendatang spreadsheet ingin dibuat privat atau membutuhkan endpoint
 ```
 dashboard_satrio_2026/
 ├── Buka_Dashboard.bat        # Skrip 1-klik untuk langsung membuka dashboard di browser
-├── index.html                # Aplikasi web dashboard lengkap & responsif (Tailwind + Chart.js)
-├── dataset.js                # Preloaded dataset offline fallback (914 record RS AFI, KPI, Trade-In, AR)
+├── index.html                # Aplikasi web dashboard utama (Tailwind + Leaflet Google Maps)
+├── dataset.js                # Preloaded dataset (119 kecamatan Polreg, RS AFI, KPI, Trade-In, AR)
+├── dashboard_standalone.html # Versi mandiri 1-file tanpa dependensi eksternal (siap offline)
+├── img/
+│   └── peta_bekasi_infografis.png # Peta visual infografis 12 Kecamatan Kota Bekasi (Gambar No. 1)
 ├── Code_Dashboard_Sync.gs    # Google Apps Script untuk integrasi Web App jika diperlukan
 ├── serve.py                  # Server lokal Python opsional (http://localhost:8088)
 └── README_DASHBOARD.md       # Dokumentasi teknis & panduan lengkap

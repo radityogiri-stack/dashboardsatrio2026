@@ -784,42 +784,45 @@
 
       </div>
 
-      <!-- MAP SECTION: PETA INTERAKTIF KOTA BEKASI -->
-      <div class="glass-card rounded-2xl p-5 border border-slate-800">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+      <!-- MAP SECTION: PETA INTERAKTIF KOTA BEKASI & SELURUH WILAYAH -->
+      <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+        
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div>
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
               <i data-lucide="map" class="w-4 h-4 text-emerald-400"></i>
-              Peta Sebaran Penjualan 12 Kecamatan Kota Bekasi
+              <span>Peta Sebaran Registrasi Kendaraan (Polreg 2026)</span>
             </h3>
-            <p class="text-xs text-slate-400">
-              Warna marker/pin dikelompokkan berdasarkan tingkatan (*paragon*) volume penjualan dari tertinggi ke terendah. <strong>Klik marker untuk melihat rincian merk dan model.</strong>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Khusus 12 Kecamatan Kota Bekasi dilengkapi <strong>Polygon Wilayah & Tingkatan Paragon</strong>. Seluruh kecamatan lain di Jabodetabek tetap ditampilkan secara interaktif. <strong>Klik wilayah untuk rincian merk & tipe group.</strong>
             </p>
           </div>
 
-          <!-- Color Legend -->
-          <div id="polregLegend" class="flex flex-wrap items-center gap-3 text-xs bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-800">
-            <span class="flex items-center gap-1.5">
-              <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block shadow-sm shadow-emerald-500/50"></span>
-              <span class="text-slate-300">Tier 1 (Tertinggi)</span>
-            </span>
-            <span class="flex items-center gap-1.5">
-              <span class="w-3 h-3 rounded-full bg-cyan-500 inline-block"></span>
-              <span class="text-slate-300">Tier 2 (Tinggi)</span>
-            </span>
-            <span class="flex items-center gap-1.5">
-              <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
-              <span class="text-slate-300">Tier 3 (Sedang)</span>
-            </span>
-            <span class="flex items-center gap-1.5">
-              <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
-              <span class="text-slate-300">Tier 4 (Rendah)</span>
-            </span>
+          <!-- Mode Switcher: Google Maps vs Infografis Gambar 1 -->
+          <div class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800 self-start lg:self-auto">
+            <button type="button" id="btnViewGmaps" onclick="setPolregMapView('gmaps')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-red-600 text-white shadow flex items-center gap-1.5">
+              <i data-lucide="map" class="w-3.5 h-3.5"></i>
+              <span>Google Maps (Semua Wilayah)</span>
+            </button>
+            <button type="button" id="btnViewInfografis" onclick="setPolregMapView('infografis')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5">
+              <i data-lucide="image" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>Infografis Kota Bekasi (Gambar 1)</span>
+            </button>
           </div>
         </div>
 
-        <!-- The Google Maps Leaflet Map Container -->
-        <div class="relative w-full h-[520px] rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl z-0 group">
+        <!-- Legend Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-xs">
+          <div id="polregLegend" class="flex flex-wrap items-center gap-3">
+            <!-- Injected by JS -->
+          </div>
+          <div class="text-[11px] text-slate-400 flex items-center gap-2">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block shadow-sm"></span> Pin Biru: Kecamatan Luar Kota Bekasi</span>
+          </div>
+        </div>
+
+        <!-- CONTAINER 1: THE GOOGLE MAP -->
+        <div id="containerGmapsView" class="relative w-full h-[540px] rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl z-0 group">
           <div id="polregLeafletMap" class="w-full h-full"></div>
 
           <!-- Floating Google Maps Layer Switcher -->
@@ -834,15 +837,19 @@
             </button>
             <button type="button" id="btnMapTerrain" onclick="setPolregMapLayer('google_terrain')" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-1.5">
               <i data-lucide="mountain" class="w-3.5 h-3.5"></i>
-              <span>Medan (Terrain)</span>
+              <span>Medan</span>
             </button>
           </div>
 
-          <!-- Floating Re-Center Focus Button -->
-          <div class="absolute bottom-4 right-3 z-[400]">
+          <!-- Floating Re-Center Focus Buttons -->
+          <div class="absolute bottom-4 right-3 z-[400] flex items-center gap-1.5">
             <button type="button" onclick="recenterBekasiMap()" class="px-3 py-1.5 bg-slate-900/95 backdrop-blur-md text-white text-xs font-bold rounded-xl border border-slate-700 shadow-xl hover:bg-slate-800 transition flex items-center gap-1.5">
               <i data-lucide="crosshair" class="w-3.5 h-3.5 text-red-400"></i>
               <span>Fokus Kota Bekasi</span>
+            </button>
+            <button type="button" onclick="fitAllKecamatanMap()" class="px-3 py-1.5 bg-slate-900/95 backdrop-blur-md text-white text-xs font-bold rounded-xl border border-slate-700 shadow-xl hover:bg-slate-800 transition flex items-center gap-1.5">
+              <i data-lucide="maximize" class="w-3.5 h-3.5 text-blue-400"></i>
+              <span>Semua Wilayah</span>
             </button>
           </div>
 
@@ -855,7 +862,27 @@
           </div>
         </div>
 
-        <!-- 12 Kecamatan Quick Selector Grid -->
+        <!-- CONTAINER 2: THE INFOGRAPHIC VECTOR VIEW (GAMBAR NO. 1) -->
+        <div id="containerInfografisView" class="hidden relative w-full rounded-2xl overflow-hidden border border-slate-700/80 bg-slate-950 p-4 flex flex-col items-center justify-center min-h-[560px]">
+          <div class="text-center mb-4">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center justify-center gap-2">
+              <i data-lucide="palette" class="w-4 h-4"></i>
+              Visual Infografis 12 Kecamatan Kota Bekasi (Sesuai Gambar No. 1)
+            </span>
+            <p class="text-[11px] text-slate-400 mt-1">Klik pada pin kecamatan untuk membuka rincian lengkap merk, tipe group & volume</p>
+          </div>
+          
+          <div class="relative max-w-[480px] w-full mx-auto select-none" id="infografisInteractiveWrapper">
+            <img src="img/peta_bekasi_infografis.png" alt="Peta Infografis 12 Kecamatan Kota Bekasi" class="w-full h-auto rounded-xl shadow-2xl pointer-events-none border border-slate-800">
+            
+            <!-- 12 Interactive Badges Injected by JS on top of the image -->
+            <div id="infografisBadgesOverlay" class="absolute inset-0">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 12 Kecamatan Kota Bekasi Quick Selector Grid -->
         <div class="mt-5">
           <div class="flex items-center justify-between mb-3">
             <h4 class="text-xs font-bold text-slate-200 flex items-center gap-2">
@@ -868,6 +895,21 @@
             <!-- Injected by JS -->
           </div>
         </div>
+
+        <!-- Quick Search for Other Regions (Kabupaten Bekasi, Jakarta, Tangerang, Depok) -->
+        <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2">
+            <i data-lucide="compass" class="w-4 h-4 text-blue-400"></i>
+            <span class="font-bold text-slate-200">Cari Rincian Kecamatan Lain (Kab. Bekasi, Jakarta, Tangerang, Depok):</span>
+          </div>
+          <div class="flex items-center gap-2 flex-1 max-w-md">
+            <select id="selectOtherKecamatan" onchange="onSelectOtherKecamatan(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-medium">
+              <option value="">-- Pilih Kecamatan di Luar Kota Bekasi --</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
 
       </div>
 
@@ -1960,28 +2002,113 @@
 
 
     
-    // --- STATE MARKET SHARE & POLREG 2026 ---
+        // --- STATE MARKET SHARE & POLREG 2026 ---
     let currentPolregMonth = 'ALL';
     let currentPolregPowertrain = 'ALL'; // 'ALL', 'EV_HEV', 'BEV', 'HEV'
+    let currentPolregViewMode = 'gmaps'; // 'gmaps', 'infografis'
     let polregMap = null;
     let polregBaseLayers = {};
     let currentMapType = 'google_streets';
     let polregMarkers = [];
 
-    // Coordinates Kota Bekasi Kecamatan
+    // Coordinates Kota Bekasi Kecamatan (Centers)
     const KEC_LOCATIONS = {
-      'Bekasi Utara': { lat: -6.2083, lng: 107.0000, desc: 'Teluk Pucung, Harapan Baru, Perwira, Kaliabang' },
-      'Bekasi Selatan': { lat: -6.2575, lng: 106.9856, desc: 'Pekayon Jaya, Jaka Mulya, Jaka Setia, Kayuringin' },
-      'Rawa Lumbu': { lat: -6.2722, lng: 107.0000, desc: 'Bojong Rawalumbu, Pengasinan, Sepanjang Jaya' },
-      'Pondok Gede': { lat: -6.2778, lng: 106.9139, desc: 'Jatiwaringin, Jatibening, Jaticempaka' },
-      'Jatiasih': { lat: -6.2972, lng: 106.9639, desc: 'Jatikramat, Jatiluhur, Jatisari, Jatirasa' },
-      'Medan Satria': { lat: -6.1833, lng: 106.9833, desc: 'Pejuang, Harapan Mulya, Kali Baru' },
-      'Jati Sampurna': { lat: -6.3500, lng: 106.9278, desc: 'Jatiraden, Jatikarya, Jatirangga' },
-      'Bekasi Barat': { lat: -6.2361, lng: 106.9744, desc: 'Kranji, Kota Baru, Bintara, Jakasampurna' },
-      'Bekasi Timur': { lat: -6.2528, lng: 107.0167, desc: 'Duren Jaya, Aren Jaya, Margahayu' },
-      'Mustika Jaya': { lat: -6.2861, lng: 107.0278, desc: 'Pedurenan, Mustikasari, Cimuning' },
-      'Pondok Melati': { lat: -6.3139, lng: 106.9278, desc: 'Jatirahayu, Jatimelati, Jatiwarna' },
-      'Bantar Gebang': { lat: -6.3194, lng: 106.9917, desc: 'Cikiwul, Ciketing Udik, Sumur Batu' }
+      'Bekasi Utara': { lat: -6.2083, lng: 107.0000 },
+      'Bekasi Selatan': { lat: -6.2575, lng: 106.9856 },
+      'Rawa Lumbu': { lat: -6.2722, lng: 107.0000 },
+      'Pondok Gede': { lat: -6.2778, lng: 106.9139 },
+      'Jatiasih': { lat: -6.2972, lng: 106.9639 },
+      'Medan Satria': { lat: -6.1833, lng: 106.9833 },
+      'Jatisampurna': { lat: -6.3500, lng: 106.9278 },
+      'Bekasi Barat': { lat: -6.2361, lng: 106.9744 },
+      'Bekasi Timur': { lat: -6.2528, lng: 107.0167 },
+      'Mustika Jaya': { lat: -6.2861, lng: 107.0278 },
+      'Pondok Melati': { lat: -6.3139, lng: 106.9278 },
+      'Bantar Gebang': { lat: -6.3194, lng: 106.9917 }
+    };
+
+    // Kelurahan lists exactly matching Gambar No. 1
+    const KEC_KELURAHAN = {
+      'Medan Satria': 'Kel. Medan Satria, Kel. Harapan Mulya, Kel. Kali Baru, Kel. Pejuang',
+      'Bekasi Utara': 'Kel. Harapan Baru, Kel. Kaliabang Tengah, Kel. Marga Mulya, Kel. Perwira, Kel. Teluk Pucung, Kel. Harapan Jaya',
+      'Bekasi Barat': 'Kel. Kota Baru, Kel. Bintara, Kel. Kranji, Kel. Bintara Jaya, Kel. Jakasampurna',
+      'Bekasi Timur': 'Kel. Bekasi Jaya, Kel. Duren Jaya, Kel. Aren Jaya, Kel. Margahayu',
+      'Bekasi Selatan': 'Kel. Jaka Mulya, Kel. Jaka Setia, Kel. Pekayon Jaya, Kel. Marga Jaya, Kel. Kayuringin Jaya',
+      'Rawa Lumbu': 'Kel. Sepanjang Jaya, Kel. Pengasinan, Kel. Bojong Rawalumbu, Kel. Bojong Menteng',
+      'Pondok Gede': 'Kel. Jati Cempaka, Kel. Jatibening Baru, Kel. Jatibening, Kel. Jatiwaringin, Kel. Jatimakmur',
+      'Pondok Melati': 'Kel. Jatiwarna, Kel. Jatimurni, Kel. Jatirahayu, Kel. Jatimelati',
+      'Jatiasih': 'Kel. Jatiasih, Kel. Jatikramat, Kel. Jatiluhur, Kel. Jatimekar, Kel. Jatirasa, Kel. Jatisari',
+      'Jatisampurna': 'Kel. Jatikarya, Kel. Jatiraden, Kel. Jatirangga, Kel. Jatiranggon, Kel. Jatisampurna',
+      'Mustika Jaya': 'Kel. Cimuning, Kel. Mustikajaya, Kel. Mustikasari, Kel. Padurenan',
+      'Bantar Gebang': 'Kel. Bantargebang, Kel. Ciketing Udik, Kel. Cikiwul, Kel. Sumur Batu'
+    };
+
+    // Accurate Polygon Boundaries for Kota Bekasi 12 Kecamatan (Paragin/Paragon Wilayah)
+    const KEC_POLYGONS = {
+      'Medan Satria': [
+        [-6.1550, 106.9680], [-6.1580, 106.9940], [-6.1820, 106.9960],
+        [-6.1980, 106.9820], [-6.1920, 106.9620], [-6.1680, 106.9620]
+      ],
+      'Bekasi Utara': [
+        [-6.1580, 106.9940], [-6.1720, 107.0340], [-6.2150, 107.0380],
+        [-6.2320, 107.0120], [-6.2220, 106.9860], [-6.1820, 106.9960]
+      ],
+      'Bekasi Barat': [
+        [-6.2100, 106.9540], [-6.2220, 106.9860], [-6.2460, 106.9860],
+        [-6.2580, 106.9580], [-6.2360, 106.9480]
+      ],
+      'Bekasi Timur': [
+        [-6.2320, 107.0000], [-6.2360, 107.0420], [-6.2640, 107.0420],
+        [-6.2720, 107.0080], [-6.2480, 106.9980]
+      ],
+      'Bekasi Selatan': [
+        [-6.2460, 106.9640], [-6.2460, 107.0000], [-6.2740, 107.0000],
+        [-6.2780, 106.9640]
+      ],
+      'Rawa Lumbu': [
+        [-6.2640, 107.0000], [-6.2640, 107.0340], [-6.2940, 107.0340],
+        [-6.2940, 107.0000]
+      ],
+      'Pondok Gede': [
+        [-6.2580, 106.8980], [-6.2580, 106.9420], [-6.2940, 106.9420],
+        [-6.2940, 106.9020]
+      ],
+      'Pondok Melati': [
+        [-6.2940, 106.9020], [-6.2940, 106.9420], [-6.3340, 106.9420],
+        [-6.3340, 106.9080]
+      ],
+      'Jatiasih': [
+        [-6.2780, 106.9420], [-6.2780, 106.9840], [-6.3280, 106.9840],
+        [-6.3280, 106.9420]
+      ],
+      'Jatisampurna': [
+        [-6.3340, 106.9040], [-6.3340, 106.9520], [-6.3760, 106.9420],
+        [-6.3760, 106.9080]
+      ],
+      'Mustika Jaya': [
+        [-6.2740, 107.0340], [-6.2740, 107.0640], [-6.3180, 107.0640],
+        [-6.3180, 107.0240], [-6.2940, 107.0240], [-6.2940, 107.0340]
+      ],
+      'Bantar Gebang': [
+        [-6.2940, 106.9840], [-6.2940, 107.0240], [-6.3480, 107.0240],
+        [-6.3480, 106.9840]
+      ]
+    };
+
+    // Positions on Gambar No. 1
+    const INFOGRAFIS_PINS = {
+      'Medan Satria': { top: '8%', left: '46%' },
+      'Bekasi Utara': { top: '10%', left: '74%' },
+      'Bekasi Barat': { top: '26%', left: '38%' },
+      'Bekasi Timur': { top: '27%', left: '76%' },
+      'Bekasi Selatan': { top: '39%', left: '52%' },
+      'Rawa Lumbu': { top: '50%', left: '64%' },
+      'Pondok Gede': { top: '46%', left: '21%' },
+      'Pondok Melati': { top: '58%', left: '20%' },
+      'Jatiasih': { top: '57%', left: '39%' },
+      'Jatisampurna': { top: '76%', left: '21%' },
+      'Mustika Jaya': { top: '57%', left: '77%' },
+      'Bantar Gebang': { top: '73%', left: '62%' }
     };
 
     function initPolregMap() {
@@ -1991,13 +2118,13 @@
 
       // Center map on Kota Bekasi
       polregMap = L.map('polregLeafletMap', {
-        center: [-6.2483, 106.9856],
+        center: [-6.2666, 106.9800],
         zoom: 12,
         zoomControl: true,
         attributionControl: false
       });
 
-      // Authentic Google Maps Tile Layers
+      // Authentic Google Maps Tile Layers (100% Free, No Watermark)
       polregBaseLayers['google_streets'] = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
@@ -2046,9 +2173,65 @@
       }
     }
 
+    function setPolregMapView(viewMode) {
+      currentPolregViewMode = viewMode;
+      const gmapsContainer = document.getElementById('containerGmapsView');
+      const infografisContainer = document.getElementById('containerInfografisView');
+      const btnGmaps = document.getElementById('btnViewGmaps');
+      const btnInfografis = document.getElementById('btnViewInfografis');
+
+      if (viewMode === 'gmaps') {
+        if (gmapsContainer) gmapsContainer.classList.remove('hidden');
+        if (infografisContainer) infografisContainer.classList.add('hidden');
+        if (btnGmaps) {
+          btnGmaps.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-red-600 text-white shadow flex items-center gap-1.5";
+        }
+        if (btnInfografis) {
+          btnInfografis.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5";
+        }
+        setTimeout(() => {
+          if (polregMap) polregMap.invalidateSize();
+        }, 100);
+      } else {
+        if (gmapsContainer) gmapsContainer.classList.add('hidden');
+        if (infografisContainer) infografisContainer.classList.remove('hidden');
+        if (btnGmaps) {
+          btnGmaps.className = "px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5";
+        }
+        if (btnInfografis) {
+          btnInfografis.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950 shadow flex items-center gap-1.5";
+        }
+      }
+      lucide.createIcons();
+    }
+
     function recenterBekasiMap() {
       if (polregMap) {
         polregMap.setView([-6.2666, 106.9800], 12, { animate: true });
+      }
+    }
+
+    function fitAllKecamatanMap() {
+      if (polregMap) {
+        polregMap.fitBounds([
+          [-6.45, 106.40],
+          [-6.05, 107.30]
+        ], { animate: true });
+      }
+    }
+
+    function onSelectOtherKecamatan(kecName) {
+      if (!kecName) return;
+      openKecamatanModal(kecName);
+      const summaryLookup = appData.polreg_summary || {};
+      const key = `${currentPolregMonth}_${currentPolregPowertrain}`;
+      const fallbackKey = `ALL_ALL`;
+      const data = summaryLookup[key] || summaryLookup[fallbackKey] || {};
+      const kecData = data.kecamatan_data || {};
+      const info = kecData[kecName];
+      if (info && polregMap) {
+        setPolregMapView('gmaps');
+        polregMap.setView([info.lat, info.lng], 14, { animate: true });
       }
     }
 
@@ -2121,6 +2304,7 @@
       const data = summaryLookup[key] || summaryLookup[fallbackKey] || {};
 
       const totalMarket = data.total_market_bekasi || 16224;
+      const totalAllMarket = data.total_market_all || 80000;
       const top10 = data.top10_brands || [];
       const kecData = data.kecamatan_data || {};
 
@@ -2147,11 +2331,11 @@
       const compShareEl = document.getElementById('statPolregCompShare');
       if (compShareEl) compShareEl.textContent = compEntry.market_share + '% Share';
 
-      // Peak Kecamatan
+      // Peak Kecamatan in Kota Bekasi
       let peakKec = '-';
       let peakQty = -1;
       Object.entries(kecData).forEach(([name, info]) => {
-        if (info.qty > peakQty) {
+        if (info.is_bekasi_city && info.qty > peakQty) {
           peakQty = info.qty;
           peakKec = name;
         }
@@ -2167,7 +2351,7 @@
         formulaBox.innerHTML = `Contoh Aktif: Toyota (${toyotaEntry.qty.toLocaleString('id-ID')}) ÷ All Market (${totalMarket.toLocaleString('id-ID')}) = <strong class="text-red-400 font-bold">${toyotaEntry.market_share}% Market Share</strong>`;
       }
 
-      // 2. Update Map Markers
+      // 2. Update Map Markers & Polygons
       if (polregMap) {
         polregMarkers.forEach(m => polregMap.removeLayer(m));
         polregMarkers = [];
@@ -2181,90 +2365,153 @@
         const neonColors = { 1: '#00F0FF', 2: '#38BDF8', 3: '#3B82F6', 4: '#6366F1' };
 
         Object.entries(kecData).forEach(([kecName, info]) => {
-          const loc = KEC_LOCATIONS[kecName] || info.coords;
-          if (!loc) return;
+          const lat = info.lat || -6.25;
+          const lng = info.lng || 107.00;
+          const isCity = info.is_bekasi_city;
 
-          const color = isNeonMode ? (neonColors[info.tier] || '#00F0FF') : (normalColors[info.tier] || '#10B981');
-          
-          // A. Soft Glowing Radar Zone for Kecamatan Territory
-          const circleZone = L.circle([loc.lat, loc.lng], {
-            radius: 1350,
-            color: color,
-            fillColor: color,
-            fillOpacity: isNeonMode ? 0.22 : 0.16,
-            weight: 2
-          }).addTo(polregMap);
-          circleZone.on('click', () => openKecamatanModal(kecName));
-          polregMarkers.push(circleZone);
+          if (isCity) {
+            // === KOTA BEKASI: PARAGON POLYGON + TEARDROP PIN ===
+            const color = isNeonMode ? (neonColors[info.tier] || '#00F0FF') : (normalColors[info.tier] || '#10B981');
+            const kelText = KEC_KELURAHAN[kecName] || '';
 
-          // B. Authentic Google Maps Teardrop SVG Pin
-          const neonGlow = isNeonMode 
-            ? `filter: drop-shadow(0 0 10px #00F0FF) drop-shadow(0 0 18px rgba(0,240,255,0.6));` 
-            : `filter: drop-shadow(0 3px 6px rgba(0,0,0,0.45));`;
+            // 1. Polygon Region (Paragin)
+            const polyCoords = KEC_POLYGONS[kecName];
+            if (polyCoords) {
+              const poly = L.polygon(polyCoords, {
+                color: color,
+                weight: isNeonMode ? 2.5 : 2,
+                fillColor: color,
+                fillOpacity: isNeonMode ? 0.32 : 0.22,
+                dashArray: isNeonMode ? '4, 4' : null
+              }).addTo(polregMap);
 
-          const pinSvg = `
-            <svg width="34" height="44" viewBox="0 0 34 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="${neonGlow}">
-              <path d="M17 0C7.611 0 0 7.611 0 17C0 29.5 17 44 17 44C17 44 34 29.5 34 17C34 7.611 26.389 0 17 0Z" fill="${color}" stroke="#FFFFFF" stroke-width="2"/>
-              <circle cx="17" cy="17" r="9.5" fill="#FFFFFF"/>
-              <text x="17" y="21" font-size="11" font-family="system-ui, -apple-system, sans-serif" font-weight="900" text-anchor="middle" fill="#0F172A">#${info.rank}</text>
-            </svg>
-          `;
+              poly.on('click', () => openKecamatanModal(kecName));
+              poly.bindTooltip(`<strong>Kec. ${kecName} (#${info.rank})</strong><br><span class="text-[10px] text-slate-300">${kelText}</span>`, {
+                sticky: true,
+                className: 'gmaps-polygon-tooltip'
+              });
+              polregMarkers.push(poly);
+            }
 
-          const htmlContent = `
-            <div onclick="openKecamatanModal('${kecName}')" class="group cursor-pointer flex flex-col items-center" style="transform: translate(-50%, -100%);">
-              <div class="transition-transform duration-200 transform group-hover:scale-125">
-                ${pinSvg}
-              </div>
-              <div class="mt-1 px-2.5 py-0.5 rounded-full bg-slate-950/95 text-white text-[11px] font-bold border border-slate-700 shadow-xl flex items-center gap-1.5 whitespace-nowrap group-hover:border-white transition">
-                <span>${kecName}</span>
-                <span style="color: ${color}; font-weight: 800;">(${info.qty})</span>
-              </div>
-            </div>
-          `;
+            // 2. Google Maps Teardrop SVG Pin
+            const neonGlow = isNeonMode 
+              ? `filter: drop-shadow(0 0 10px #00F0FF) drop-shadow(0 0 18px rgba(0,240,255,0.6));` 
+              : `filter: drop-shadow(0 3px 6px rgba(0,0,0,0.45));`;
 
-          const customIcon = L.divIcon({
-            html: htmlContent,
-            className: 'gmaps-marker-pin',
-            iconSize: [34, 44],
-            iconAnchor: [17, 44],
-            popupAnchor: [0, -46]
-          });
+            const pinSvg = `
+              <svg width="34" height="44" viewBox="0 0 34 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="${neonGlow}">
+                <path d="M17 0C7.611 0 0 7.611 0 17C0 29.5 17 44 17 44C17 44 34 29.5 34 17C34 7.611 26.389 0 17 0Z" fill="${color}" stroke="#FFFFFF" stroke-width="2"/>
+                <circle cx="17" cy="17" r="9.5" fill="#FFFFFF"/>
+                <text x="17" y="21" font-size="11" font-family="system-ui, -apple-system, sans-serif" font-weight="900" text-anchor="middle" fill="#0F172A">#${info.rank}</text>
+              </svg>
+            `;
 
-          const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(polregMap);
-
-          // Google Maps InfoWindow Popup
-          const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: '-', qty: 0 };
-          const popupHtml = `
-            <div class="p-2 min-w-[190px] font-sans text-slate-900">
-              <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-200">
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${color};"></span>
-                  <strong class="font-extrabold text-xs text-slate-950">Kec. ${kecName}</strong>
+            const htmlContent = `
+              <div onclick="openKecamatanModal('${kecName}')" class="group cursor-pointer flex flex-col items-center" style="transform: translate(-50%, -100%);">
+                <div class="transition-transform duration-200 transform group-hover:scale-125">
+                  ${pinSvg}
                 </div>
-                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold" style="background: ${color}25; color: ${color}; border: 1px solid ${color}60;">#${info.rank}</span>
+                <div class="mt-1 px-2.5 py-0.5 rounded-full bg-slate-950/95 text-white text-[11px] font-bold border border-slate-700 shadow-xl flex items-center gap-1.5 whitespace-nowrap group-hover:border-white transition">
+                  <span>${kecName}</span>
+                  <span style="color: ${color}; font-weight: 800;">(${info.qty})</span>
+                </div>
               </div>
-              <div class="text-[11px] text-slate-600 mb-1">
-                Volume: <strong class="text-slate-950 font-bold">${info.qty.toLocaleString('id-ID')} Unit</strong>
-              </div>
-              <div class="text-[11px] text-slate-600 mb-2">
-                Brand #1: <strong class="text-red-600 font-bold">${topBrand.brand}</strong> (${topBrand.qty} unit)
-              </div>
-              <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100">
-                <button onclick="openKecamatanModal('${kecName}')" class="flex-1 py-1 px-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded transition shadow text-center">
-                  Rincian Merk & Tipe
-                </button>
-                <a href="https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}+Kota+Bekasi" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[10px] rounded transition border border-slate-300 flex items-center gap-0.5" title="Buka di Google Maps Web">
-                  <span>GMaps</span> ↗
-                </a>
-              </div>
-            </div>
-          `;
-          marker.bindPopup(popupHtml);
+            `;
 
-          polregMarkers.push(marker);
+            const customIcon = L.divIcon({
+              html: htmlContent,
+              className: 'gmaps-marker-pin',
+              iconSize: [34, 44],
+              iconAnchor: [17, 44],
+              popupAnchor: [0, -46]
+            });
+
+            const marker = L.marker([lat, lng], { icon: customIcon }).addTo(polregMap);
+
+            // Google Maps InfoWindow Popup
+            const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: '-', qty: 0 };
+            const popupHtml = `
+              <div class="p-2 min-w-[210px] font-sans text-slate-900">
+                <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-200">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${color};"></span>
+                    <strong class="font-extrabold text-xs text-slate-950">Kec. ${kecName}</strong>
+                  </div>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-bold" style="background: ${color}25; color: ${color}; border: 1px solid ${color}60;">#${info.rank} Kota Bekasi</span>
+                </div>
+                <div class="text-[11px] text-slate-600 mb-1">
+                  Volume: <strong class="text-slate-950 font-bold">${info.qty.toLocaleString('id-ID')} Unit</strong>
+                </div>
+                <div class="text-[11px] text-slate-600 mb-2">
+                  Brand #1: <strong class="text-red-600 font-bold">${topBrand.brand}</strong> (${topBrand.qty} unit)
+                </div>
+                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100">
+                  <button onclick="openKecamatanModal('${kecName}')" class="flex-1 py-1 px-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded transition shadow text-center">
+                    Rincian Merk & Tipe
+                  </button>
+                  <a href="https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}+Kota+Bekasi" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[10px] rounded transition border border-slate-300 flex items-center gap-0.5" title="Buka di Google Maps Web">
+                    <span>GMaps</span> ↗
+                  </a>
+                </div>
+              </div>
+            `;
+            marker.bindPopup(popupHtml);
+            polregMarkers.push(marker);
+
+          } else {
+            // === KECAMATAN LAIN (LUAR KOTA BEKASI - JABODETABEK) ===
+            const otherIcon = L.divIcon({
+              html: `
+                <div onclick="openKecamatanModal('${kecName}')" class="group cursor-pointer flex flex-col items-center" style="transform: translate(-50%, -100%);">
+                  <div class="transition-transform duration-200 transform group-hover:scale-125 filter drop-shadow">
+                    <svg width="24" height="32" viewBox="0 0 34 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M17 0C7.611 0 0 7.611 0 17C0 29.5 17 44 17 44C17 44 34 29.5 34 17C34 7.611 26.389 0 17 0Z" fill="#3B82F6" stroke="#FFFFFF" stroke-width="2"/>
+                      <circle cx="17" cy="17" r="7" fill="#FFFFFF"/>
+                    </svg>
+                  </div>
+                  <div class="mt-0.5 px-2 py-0.5 rounded-full bg-slate-900/90 text-slate-200 text-[10px] font-semibold border border-slate-700 shadow-md flex items-center gap-1 whitespace-nowrap group-hover:border-blue-400 group-hover:text-white transition">
+                    <span>${kecName}</span>
+                    <span class="text-blue-400 font-bold">(${info.qty})</span>
+                  </div>
+                </div>
+              `,
+              className: 'gmaps-other-pin',
+              iconSize: [24, 32],
+              iconAnchor: [12, 32],
+              popupAnchor: [0, -34]
+            });
+
+            const otherMarker = L.marker([lat, lng], { icon: otherIcon }).addTo(polregMap);
+            const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: '-', qty: 0 };
+
+            const otherPopupHtml = `
+              <div class="p-2 min-w-[200px] font-sans text-slate-900">
+                <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-200">
+                  <strong class="font-extrabold text-xs text-slate-950">Kec. ${kecName}</strong>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">${info.wilayah || 'Luar Bekasi'}</span>
+                </div>
+                <div class="text-[11px] text-slate-600 mb-1">
+                  Volume Terdaftar: <strong class="text-slate-950 font-bold">${info.qty.toLocaleString('id-ID')} Unit</strong>
+                </div>
+                <div class="text-[11px] text-slate-600 mb-2">
+                  Brand #1: <strong class="text-blue-600 font-bold">${topBrand.brand}</strong> (${topBrand.qty} unit)
+                </div>
+                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100">
+                  <button onclick="openKecamatanModal('${kecName}')" class="flex-1 py-1 px-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded transition shadow text-center">
+                    Rincian Merk & Tipe
+                  </button>
+                  <a href="https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}+${encodeURIComponent(info.wilayah || '')}" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[10px] rounded transition border border-slate-300 flex items-center gap-0.5">
+                    <span>GMaps</span> ↗
+                  </a>
+                </div>
+              </div>
+            `;
+            otherMarker.bindPopup(otherPopupHtml);
+            polregMarkers.push(otherMarker);
+          }
         });
 
-        // Update Legend Title / Styling
+        // Update Legend
         const legendDiv = document.getElementById('polregLegend');
         if (legendDiv) {
           if (isNeonMode) {
@@ -2287,10 +2534,38 @@
         }
       }
 
-      // 3. Update 12 Kecamatan Quick Selector Grid
+      // 3. Update Interactive Badges on Infographic (Gambar No. 1)
+      const overlayDiv = document.getElementById('infografisBadgesOverlay');
+      if (overlayDiv) {
+        const isNeonMode = (currentPolregPowertrain !== 'ALL');
+        const normalColors = { 1: '#10B981', 2: '#06B6D4', 3: '#F59E0B', 4: '#F43F5E' };
+        const neonColors = { 1: '#00F0FF', 2: '#38BDF8', 3: '#3B82F6', 4: '#6366F1' };
+
+        overlayDiv.innerHTML = Object.entries(INFOGRAFIS_PINS).map(([name, pos]) => {
+          const info = kecData[name] || { qty: 0, rank: '-', tier: 4 };
+          const color = isNeonMode ? (neonColors[info.tier] || '#00F0FF') : (normalColors[info.tier] || '#10B981');
+          
+          return `
+            <div onclick="openKecamatanModal('${name}')" 
+                 class="absolute cursor-pointer transition transform hover:scale-110 z-10"
+                 style="top: ${pos.top}; left: ${pos.left}; transform: translate(-50%, -50%);"
+                 title="Klik untuk rincian ${name}">
+              <div class="px-2 py-1 rounded-full bg-slate-950/90 text-white border text-[10px] font-extrabold shadow-2xl flex items-center gap-1 whitespace-nowrap hover:bg-slate-900"
+                   style="border-color: ${color}; box-shadow: 0 0 10px ${color}80;">
+                <span class="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] text-slate-950 font-black" style="background:${color}">#${info.rank}</span>
+                <span>${name}</span>
+                <span style="color:${color}">(${info.qty})</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 4. Update 12 Kecamatan Quick Selector Grid (Kota Bekasi)
       const gridContainer = document.getElementById('polregKecamatanGrid');
       if (gridContainer) {
-        const sortedKecs = Object.entries(kecData).sort((a, b) => a[1].rank - b[1].rank);
+        const bekasiKecs = Object.entries(kecData).filter(([_, kInfo]) => kInfo.is_bekasi_city);
+        const sortedKecs = bekasiKecs.sort((a, b) => a[1].rank - b[1].rank);
         const isNeonMode = (currentPolregPowertrain !== 'ALL');
         
         gridContainer.innerHTML = sortedKecs.map(([name, kInfo]) => {
@@ -2327,7 +2602,20 @@
         }).join('');
       }
 
-      // 4. Update Top 10 Table
+      // 5. Populate Other Kecamatan Select Dropdown
+      const selectOther = document.getElementById('selectOtherKecamatan');
+      if (selectOther) {
+        const otherList = Object.entries(kecData)
+          .filter(([_, kInfo]) => !kInfo.is_bekasi_city)
+          .sort((a, b) => b[1].qty - a[1].qty);
+
+        selectOther.innerHTML = '<option value="">-- Pilih Kecamatan di Luar Kota Bekasi (${otherList.length} Kecamatan) --</option>' +
+          otherList.map(([name, kInfo]) => `
+            <option value="${name}">[${kInfo.wilayah || 'Jabodetabek'}] Kec. ${name} — ${kInfo.qty.toLocaleString('id-ID')} Unit</option>
+          `).join('');
+      }
+
+      // 6. Update Top 10 Table
       const tbody = document.getElementById('polregTop10TableBody');
       if (tbody) {
         tbody.innerHTML = top10.map((item, idx) => {
@@ -2374,7 +2662,7 @@
       }
     }
 
-    // Modal Kecamatan Drilldown
+    // Modal Kecamatan Drilldown (Supports both Kota Bekasi & Non-Kota Bekasi)
     function openKecamatanModal(kecName) {
       const summaryLookup = appData.polreg_summary || {};
       const key = `${currentPolregMonth}_${currentPolregPowertrain}`;
@@ -2385,29 +2673,39 @@
 
       if (!info) return;
 
+      const isCity = info.is_bekasi_city;
       const totalKota = data.total_market_bekasi || 16224;
-      const shareKota = totalKota > 0 ? ((info.qty / totalKota) * 100).toFixed(1) : 0;
+      const totalAll = data.total_market_all || 80000;
+      const share = isCity ? (totalKota > 0 ? ((info.qty / totalKota) * 100).toFixed(1) : 0) : (totalAll > 0 ? ((info.qty / totalAll) * 100).toFixed(1) : 0);
 
       document.getElementById('modalKecName').textContent = `Kecamatan ${kecName}`;
-      document.getElementById('modalKecRankBadge').textContent = `Peringkat #${info.rank} di Kota Bekasi`;
-      document.getElementById('modalKecRankBadge').className = info.rank <= 3 
-        ? "px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-        : "px-2 py-0.5 rounded text-[11px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30";
+      
+      const rankBadge = document.getElementById('modalKecRankBadge');
+      if (isCity && info.rank > 0) {
+        rankBadge.textContent = `Peringkat #${info.rank} di Kota Bekasi (Tier ${info.tier})`;
+        rankBadge.className = info.rank <= 3 
+          ? "px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+          : "px-2 py-0.5 rounded text-[11px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30";
+      } else {
+        rankBadge.textContent = `Wilayah: ${info.wilayah || 'Luar Kota Bekasi'}`;
+        rankBadge.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40";
+      }
 
-      const loc = KEC_LOCATIONS[kecName] || info.coords;
-      document.getElementById('modalKecDesc').textContent = `Area / Kelurahan: ${loc.desc || '-'}`;
+      const kelDesc = KEC_KELURAHAN[kecName] || `Wilayah Registrasi: ${info.wilayah || 'Jabodetabek'}`;
+      document.getElementById('modalKecDesc').textContent = kelDesc;
       document.getElementById('modalKecTotalQty').textContent = info.qty.toLocaleString('id-ID') + ' Unit';
-      document.getElementById('modalKecShareKota').textContent = shareKota + '%';
+      document.getElementById('modalKecShareKota').textContent = share + '%';
 
       const gmapsBtn = document.getElementById('modalGmapsBtn');
       if (gmapsBtn) {
-        gmapsBtn.href = `https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}+Kota+Bekasi`;
+        const queryRegion = isCity ? 'Kota+Bekasi' : encodeURIComponent(info.wilayah || 'Jabodetabek');
+        gmapsBtn.href = `https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}+${queryRegion}`;
       }
 
       // Brands List
       const brandsList = document.getElementById('modalKecBrandsList');
       if (brandsList) {
-        brandsList.innerHTML = info.top_brands.map((b, idx) => `
+        brandsList.innerHTML = (info.top_brands || []).map((b, idx) => `
           <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 border border-slate-800/80 text-xs">
             <div class="flex items-center gap-2">
               <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center text-[10px]">${idx + 1}</span>
@@ -2418,13 +2716,13 @@
               <strong class="text-white">${b.qty.toLocaleString('id-ID')} Unit</strong>
             </div>
           </div>
-        `).join('');
+        `).join('') || '<div class="text-xs text-slate-500 p-2">Tidak ada data merk pada filter ini</div>';
       }
 
       // Groups List
       const groupsList = document.getElementById('modalKecGroupsList');
       if (groupsList) {
-        groupsList.innerHTML = info.top_groups.map((g, idx) => `
+        groupsList.innerHTML = (info.top_groups || []).map((g, idx) => `
           <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 border border-slate-800/80 text-xs">
             <div class="flex items-center gap-2">
               <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center text-[10px]">${idx + 1}</span>
@@ -2435,7 +2733,7 @@
               <strong class="text-white">${g.qty.toLocaleString('id-ID')} Unit</strong>
             </div>
           </div>
-        `).join('');
+        `).join('') || '<div class="text-xs text-slate-500 p-2">Tidak ada data tipe pada filter ini</div>';
       }
 
       document.getElementById('kecamatanModal').classList.remove('hidden');
