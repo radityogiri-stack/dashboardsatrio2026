@@ -27,6 +27,18 @@ function doGet(e) {
       return createJsonResponse({ status: 'success', message: 'Tunas Toyota Sync Engine Active', timestamp: new Date() });
     }
 
+    // Update eNCOmpare selection directly in spreadsheet (Two-Way Sync)
+    if (action === 'update_encompare') {
+      const encSheet = ss.getSheetByName('eNCOmpare') || ss.getSheetByName('encompare');
+      if (encSheet) {
+        if (e.parameter.usage) encSheet.getRange('C1').setValue(Number(e.parameter.usage));
+        if (e.parameter.mileage) encSheet.getRange('C2').setValue(Number(e.parameter.mileage));
+        if (e.parameter.toyota) encSheet.getRange('C3').setValue(e.parameter.toyota);
+        if (e.parameter.non_toyota) encSheet.getRange('D3').setValue(e.parameter.non_toyota);
+        return createJsonResponse({ status: 'success', message: 'eNCOmpare updated in spreadsheet successfully' });
+      }
+    }
+
     // Ambil data dari seluruh sheet terkait
     const payload = {
       status: 'success',

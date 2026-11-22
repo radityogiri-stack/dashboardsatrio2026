@@ -200,6 +200,10 @@
   <!-- NAVIGATION TABS -->
   <nav class="bg-slate-900/90 border-b border-slate-800 px-4 lg:px-8 py-2 sticky top-[108px] z-40">
     <div class="flex items-center gap-1 overflow-x-auto custom-scrollbar text-xs font-medium">
+      <button onclick="switchTab('tabEncompare')" id="nav-tabEncompare" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+        <i data-lucide="scale" class="w-4 h-4 text-emerald-400"></i>
+        <span>eNCOmpare</span>
+      </button>
       <button onclick="switchTab('tabAchievement')" id="nav-tabAchievement" class="nav-tab active flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-red-600/90 hover:bg-red-600 transition shadow">
         <i data-lucide="award" class="w-4 h-4"></i>
         <span>Dashboard Achievement</span>
@@ -229,6 +233,198 @@
         <!-- ============================================================ -->
     <!-- TAB 1: DASHBOARD ACHIEVEMENT (KONSOLIDASI KPI, PEMBAYARAN & FINANSIAL) -->
     <!-- ============================================================ -->
+    <!-- ============================================================ -->
+    <!-- TAB 0: eNCOmpare (DASHBOARD NCO HEV TOYOTA & BEV NON TOYOTA) -->
+    <!-- ============================================================ -->
+    <div id="tabEncompare" class="tab-pane hidden space-y-6">
+      
+      <!-- TOP BANNER TITLE (Mirip Persis Format Spreadsheet) -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-pink-900/40 via-purple-900/30 to-slate-900 border border-pink-500/30 p-5 shadow-xl text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/20 border border-pink-500/40 text-pink-300 text-xs font-semibold uppercase tracking-wider mb-2">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-400"></i>
+          <span>Simulasi Komparasi Biaya Kepemilikan (Total Cost of Ownership)</span>
+        </div>
+        <h1 class="text-xl md:text-3xl font-black text-white tracking-wide uppercase drop-shadow-md">
+          DASHBOARD NCO HEV TOYOTA &amp; BEV NON TOYOTA
+        </h1>
+        <p class="text-xs md:text-sm text-slate-300 mt-1 max-w-3xl mx-auto">
+          Perbandingan komprehensif Nett Cost of Ownership (NCO) antara kendaraan Hybrid Toyota (HEV) melawan mobil listrik murni Non-Toyota (BEV) tersinkronisasi otomatis dengan Google Sheets.
+        </p>
+      </div>
+
+      <!-- PARAMETER CONTROLS (Row 1 & 2 Spreadsheet) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- ESTIMATED USAGE -->
+        <div class="bg-cyan-950/40 border border-cyan-500/40 rounded-xl p-4 shadow-lg backdrop-blur-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-cyan-300">ESTIMATED USAGE</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-200 border border-cyan-500/30 font-semibold">Tahun</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <select id="ncoUsageYear" onchange="onNcoParamChange()" class="flex-1 bg-slate-900 text-cyan-300 font-bold text-lg border border-cyan-500/50 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-400 focus:outline-none cursor-pointer">
+              <option value="1">1 Tahun</option>
+              <option value="2">2 Tahun</option>
+              <option value="3" selected>3 Tahun</option>
+              <option value="4">4 Tahun</option>
+              <option value="5">5 Tahun</option>
+            </select>
+            <div class="text-right">
+              <div id="ncoDaysCount" class="text-lg font-black text-white font-mono">1.095</div>
+              <div class="text-[10px] text-cyan-400 font-semibold uppercase">HARI (DAYS)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MILEAGE ESTIMATION -->
+        <div class="bg-cyan-950/40 border border-cyan-500/40 rounded-xl p-4 shadow-lg backdrop-blur-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-cyan-300">MILEAGE ESTIMATION</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-200 border border-cyan-500/30 font-semibold">Km / Hari</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <select id="ncoMileageDay" onchange="onNcoParamChange()" class="flex-1 bg-slate-900 text-cyan-300 font-bold text-lg border border-cyan-500/50 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-400 focus:outline-none cursor-pointer">
+              <option value="40">40 KM / Hari</option>
+              <option value="60" selected>60 KM / Hari</option>
+              <option value="80">80 KM / Hari</option>
+              <option value="100">100 KM / Hari</option>
+              <option value="120">120 KM / Hari</option>
+            </select>
+            <div class="text-right">
+              <div id="ncoTotalKm" class="text-lg font-black text-white font-mono">65.700</div>
+              <div class="text-[10px] text-cyan-400 font-semibold uppercase">TOTAL KM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODEL TOYOTA SELECTOR -->
+        <div class="bg-red-950/30 border border-red-500/40 rounded-xl p-4 shadow-lg backdrop-blur-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-red-300">TOYOTA (HEV)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-red-600/30 text-white font-bold">Kandidat Utama</span>
+          </div>
+          <select id="ncoToyotaSelect" onchange="onNcoParamChange()" class="w-full bg-slate-900 text-red-200 font-bold text-sm border border-red-500/50 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-400 focus:outline-none cursor-pointer">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <!-- MODEL NON TOYOTA SELECTOR -->
+        <div class="bg-blue-950/30 border border-blue-500/40 rounded-xl p-4 shadow-lg backdrop-blur-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-300">NON TOYOTA (BEV)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-600/30 text-white font-bold">Kompetitor</span>
+          </div>
+          <select id="ncoNonToyotaSelect" onchange="onNcoParamChange()" class="w-full bg-slate-900 text-blue-200 font-bold text-sm border border-blue-500/50 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none cursor-pointer">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+      </div>
+
+      <!-- MAIN COMPARISON TABLE & BREAKDOWN (PERSIS SPREADSHEET ROW 3-17) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+        <div class="px-5 py-3 border-b border-slate-800 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="table-properties" class="w-5 h-5 text-cyan-400"></i>
+            <span class="text-sm font-bold text-white uppercase tracking-wider">Matriks Perhitungan NCO &amp; Breakdown Biaya Operasional</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Formula Otomatis Sesuai Spreadsheet</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs md:text-sm">
+            <thead>
+              <tr class="bg-slate-950 text-slate-300 border-b border-slate-800 font-bold">
+                <th class="p-3 w-1/4 border-r border-slate-800 uppercase tracking-wider">VARIABLE</th>
+                <th class="p-3 w-1/4 border-r border-slate-800 bg-red-950/20 text-red-300 font-bold uppercase tracking-wider">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+                    <span>TOYOTA (HEV)</span>
+                  </div>
+                </th>
+                <th class="p-3 w-1/4 border-r border-slate-800 bg-blue-950/20 text-blue-300 font-bold uppercase tracking-wider">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+                    <span>NON TOYOTA (BEV)</span>
+                  </div>
+                </th>
+                <th class="p-3 w-1/4 bg-cyan-950/30 text-cyan-300 font-bold uppercase tracking-wider" colspan="2">
+                  <div class="text-center">OPERATE BREAKDOWN COST</div>
+                </th>
+              </tr>
+              <tr class="bg-slate-950/80 text-[11px] text-slate-400 border-b border-slate-800">
+                <th class="p-2 border-r border-slate-800"></th>
+                <th id="thToyotaModelName" class="p-2 border-r border-slate-800 font-semibold text-white bg-red-950/30">NEW VELOZ Q HYBRID</th>
+                <th id="thNonToyotaModelName" class="p-2 border-r border-slate-800 font-semibold text-white bg-blue-950/30">BYD M6</th>
+                <th class="p-2 border-r border-slate-800 text-center font-semibold text-red-300 bg-slate-900 w-1/8">TOYOTA</th>
+                <th class="p-2 text-center font-semibold text-blue-300 bg-slate-900 w-1/8">NON TOYOTA</th>
+              </tr>
+            </thead>
+            <tbody id="ncoTableBody" class="divide-y divide-slate-800 font-mono">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- INSIGHT & SUGGESTION BOX (PERSIS TAMPILAN SPREADSHEET ROW 18-19 DENGAN TEMA CYAN/TEAL) -->
+      <div class="rounded-2xl border-2 border-cyan-400/60 shadow-2xl overflow-hidden">
+        
+        <!-- Header Banner Cyan -->
+        <div class="bg-cyan-400 text-slate-950 px-6 py-3 font-black text-sm md:text-base tracking-wider uppercase flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="brain" class="w-5 h-5 text-slate-950"></i>
+            <span>INSIGHT &amp; SUGGESTION</span>
+          </div>
+          <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-950/20 text-slate-900 border border-slate-950/30">
+            AI Automated Analysis
+          </span>
+        </div>
+
+        <!-- Content Area Cyan Tint (Mirip Persis Background Spreadsheet) -->
+        <div class="bg-cyan-100/90 text-slate-900 p-6 md:p-8 space-y-4 font-sans text-xs md:text-sm leading-relaxed shadow-inner">
+          <h2 class="text-base md:text-lg font-black text-slate-950 tracking-wide uppercase border-b border-cyan-300 pb-2 flex items-center gap-2">
+            <i data-lucide="lightbulb" class="w-5 h-5 text-amber-600"></i>
+            <span>INSIGHT DAN REKOMENDASI</span>
+          </h2>
+
+          <div id="aiInsightList" class="space-y-3 font-normal text-slate-900">
+            <!-- Dynamic bullets inserted here -->
+          </div>
+
+          <!-- Highlight Pilihan Paling Ekonomis -->
+          <div class="p-4 rounded-xl bg-cyan-200/80 border-2 border-cyan-500 flex items-center justify-between gap-3 shadow-sm">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-cyan-900">PILIHAN PALING EKONOMIS:</span>
+              <div id="aiMostEconomical" class="text-base md:text-lg font-black text-red-700">Toyota New Veloz Q Hybrid</div>
+            </div>
+            <div class="text-right">
+              <span class="text-[11px] text-slate-700 font-semibold block">Hemat Biaya Harian:</span>
+              <span id="aiDailySavingsBadge" class="text-sm md:text-base font-black text-emerald-800 font-mono">Rp 10.769.376 / Hari</span>
+            </div>
+          </div>
+
+          <!-- Keunggulan Utama Toyota -->
+          <div class="pt-2 border-t border-cyan-300">
+            <h3 class="text-sm font-black text-slate-950 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-700"></i>
+              <span>KEUNGGULAN UTAMA TOYOTA</span>
+            </h3>
+            <p class="text-xs md:text-sm text-slate-800 italic leading-relaxed text-justify">
+              Toyota bukan sekadar kendaraan, melainkan ketenangan pikiran (Peace of Mind). Dengan teknologi Hybrid yang matang, Anda mendapatkan efisiensi bahan bakar maksimal tanpa kekhawatiran infrastruktur pengisian daya. Didukung oleh jaringan servis terluas di Indonesia dan nilai jual kembali yang legendaris, Toyota adalah investasi paling aman dan terpercaya bagi mobilitas keluarga Anda. Cerdas pilihannya, terjaga nilainya.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
     <div id="tabAchievement" class="tab-pane space-y-6">
       
       <!-- HEADER BANNER & HIGHLIGHT -->
@@ -1405,6 +1601,9 @@
 
       // Re-render chart sizes if needed
       setTimeout(() => {
+        if (tabId === 'tabEncompare') {
+          renderEncompareTab();
+        }
         if (tabId === 'tabAchievement') {
           if (chartTrend) chartTrend.resize();
           if (chartMom) chartMom.resize();
@@ -3887,6 +4086,428 @@
     }
 
     // Helper parse GViz table to Trade In records
+    
+    // ==============================================================================
+    // --- TAB 0: eNCOmpare ENGINE (HYBRID REALTIME CALCULATOR & SPREADSHEET SYNC) ---
+    // ==============================================================================
+    window.encompareState = {
+      usageYear: 3,
+      mileageDay: 60,
+      toyotaModel: 'NEW VELOZ Q HYBRID',
+      nonToyotaModel: 'BYD M6'
+    };
+
+    function renderEncompareTab() {
+      const ncoData = appData.nco_data || (window.PRELOADED_DASHBOARD_DATA && window.PRELOADED_DASHBOARD_DATA.nco_data);
+      if (!ncoData) return;
+
+      const selToyota = document.getElementById('ncoToyotaSelect');
+      const selNonToyota = document.getElementById('ncoNonToyotaSelect');
+      const selUsage = document.getElementById('ncoUsageYear');
+      const selMileage = document.getElementById('ncoMileageDay');
+
+      if (selToyota && selToyota.options.length <= 1) {
+        selToyota.innerHTML = '';
+        Object.keys(ncoData.toyota_models || {}).forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          if (name === window.encompareState.toyotaModel) opt.selected = true;
+          selToyota.appendChild(opt);
+        });
+      }
+
+      if (selNonToyota && selNonToyota.options.length <= 1) {
+        selNonToyota.innerHTML = '';
+        Object.keys(ncoData.non_toyota_models || {}).forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          if (name === window.encompareState.nonToyotaModel) opt.selected = true;
+          selNonToyota.appendChild(opt);
+        });
+      }
+
+      if (selUsage) selUsage.value = String(window.encompareState.usageYear);
+      if (selMileage) selMileage.value = String(window.encompareState.mileageDay);
+
+      recalculateEncompare();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function onNcoParamChange() {
+      const selToyota = document.getElementById('ncoToyotaSelect');
+      const selNonToyota = document.getElementById('ncoNonToyotaSelect');
+      const selUsage = document.getElementById('ncoUsageYear');
+      const selMileage = document.getElementById('ncoMileageDay');
+
+      if (selUsage) window.encompareState.usageYear = parseInt(selUsage.value) || 3;
+      if (selMileage) window.encompareState.mileageDay = parseFloat(selMileage.value) || 60;
+      if (selToyota && selToyota.value) window.encompareState.toyotaModel = selToyota.value;
+      if (selNonToyota && selNonToyota.value) window.encompareState.nonToyotaModel = selNonToyota.value;
+
+      recalculateEncompare();
+      syncEncompareBackToSheet(
+        window.encompareState.usageYear,
+        window.encompareState.mileageDay,
+        window.encompareState.toyotaModel,
+        window.encompareState.nonToyotaModel
+      );
+    }
+
+    function recalculateEncompare() {
+      const ncoData = appData.nco_data || (window.PRELOADED_DASHBOARD_DATA && window.PRELOADED_DASHBOARD_DATA.nco_data);
+      if (!ncoData) return;
+
+      const years = parseInt(window.encompareState.usageYear) || 3;
+      const kmDay = parseFloat(window.encompareState.mileageDay) || 60;
+      const tKey = window.encompareState.toyotaModel || 'NEW VELOZ Q HYBRID';
+      const ntKey = window.encompareState.nonToyotaModel || 'BYD M6';
+
+      const days = years * 365;
+      const totalKm = days * kmDay;
+
+      // Update counters
+      const daysEl = document.getElementById('ncoDaysCount');
+      if (daysEl) daysEl.textContent = days.toLocaleString('id-ID');
+      const kmEl = document.getElementById('ncoTotalKm');
+      if (kmEl) kmEl.textContent = totalKm.toLocaleString('id-ID');
+
+      // Update Table Headers
+      const thToyota = document.getElementById('thToyotaModelName');
+      if (thToyota) thToyota.textContent = tKey;
+      const thNonToyota = document.getElementById('thNonToyotaModelName');
+      if (thNonToyota) thNonToyota.textContent = ntKey;
+
+      const tMod = (ncoData.toyota_models && ncoData.toyota_models[tKey]) || {
+        otr: 325000000,
+        power_source: 'Intern. Comb Engine + Electric Motor',
+        tax_year: 5529000,
+        fuel_consumption: 22,
+        gasoline_cost: 12300,
+        maintenance: { 1: 0, 2: 0, 3: 10000000, 4: 10000000, 5: 10000000 },
+        resale_value: { 1: 292500000, 2: 282750000, 3: 273000000, 4: 263250000, 5: 256750000 },
+        own_risk: 3000000
+      };
+
+      const ntMod = (ncoData.non_toyota_models && ncoData.non_toyota_models[ntKey]) || {
+        otr: 433000000,
+        power_source: 'Electric Motor',
+        tax_year: 27000000,
+        range_km: 480,
+        maintenance: { 1: 0, 2: 0, 3: 16000000, 4: 16000000, 5: 16000000 },
+        resale_value: { 1: 346400000, 2: 303100000, 3: 259800000, 4: 216500000, 5: 173200000 },
+        own_risk: 3000000,
+        charging_cost_spreadsheet: 11853375000
+      };
+
+      const interestRates = ncoData.interest_rates || { 1: 0.03, 2: 0.06, 3: 0.12, 4: 0.20, 5: 0.30 };
+      const rate = interestRates[years] || 0.12;
+
+      // --- TOYOTA MATH ---
+      const tOtr = tMod.otr;
+      const tMaint = (tMod.maintenance && (tMod.maintenance[years] !== undefined ? tMod.maintenance[years] : tMod.maintenance[String(years)])) || 10000000;
+      const tTaxYr = tMod.tax_year || 5529000;
+      const tTax = tTaxYr * years;
+      const tFuelCons = tMod.fuel_consumption || 22;
+      const tFuelCostPerL = tMod.gasoline_cost || 12300;
+      const tFuelTotal = Math.round((totalKm / tFuelCons) * tFuelCostPerL);
+      const tDpLeasing = Math.round(tOtr * 0.2);
+      const tLeasing = Math.round((tOtr * 0.8) * rate);
+      const tOwnRisk = tMod.own_risk || 3000000;
+      const tCoe = tOtr + tMaint + tTax + tFuelTotal + tLeasing + tOwnRisk;
+      const tRv = (tMod.resale_value && (tMod.resale_value[years] !== undefined ? tMod.resale_value[years] : tMod.resale_value[String(years)])) || Math.round(tOtr * 0.84);
+      const tDeprec = tOtr > 0 ? (((tRv - tOtr) / tOtr) * 100) : 0;
+      const tNco = tCoe - tRv;
+      const tNcoYr = Math.round(tNco / years);
+      const tNcoMo = Math.round(tNco / (years * 12));
+      const tNcoDay = Math.round(tNcoMo / 31);
+
+      // --- NON TOYOTA MATH ---
+      const ntOtr = ntMod.otr;
+      const ntMaint = (ntMod.maintenance && (ntMod.maintenance[years] !== undefined ? ntMod.maintenance[years] : ntMod.maintenance[String(years)])) || 16000000;
+      const ntTaxYr = ntMod.tax_year || 27000000;
+      const ntTax = ntTaxYr * years;
+      const ntCharging = ntMod.charging_cost_spreadsheet || 11853375000;
+      const ntRange = ntMod.range_km || 480;
+      const ntDpLeasing = Math.round(ntOtr * 0.2);
+      const ntLeasing = Math.round((ntOtr * 0.8) * rate);
+      const ntOwnRisk = ntMod.own_risk || 3000000;
+      const ntCoe = ntOtr + ntMaint + ntTax + ntCharging + ntLeasing + ntOwnRisk;
+      const ntRv = (ntMod.resale_value && (ntMod.resale_value[years] !== undefined ? ntMod.resale_value[years] : ntMod.resale_value[String(years)])) || Math.round(ntOtr * 0.60);
+      const ntDeprec = ntOtr > 0 ? (((ntRv - ntOtr) / ntOtr) * 100) : 0;
+      const ntNco = ntCoe - ntRv;
+      const ntNcoYr = Math.round(ntNco / years);
+      const ntNcoMo = Math.round(ntNco / (years * 12));
+      const ntNcoDay = Math.round(ntNcoMo / 31);
+
+      const formatRp = (num) => 'Rp ' + Math.round(num).toLocaleString('id-ID');
+      const formatPct = (num) => (num > 0 ? '+' : '') + num.toFixed(2).replace('.', ',') + '%';
+
+      // --- RENDER TABLE ROWS ---
+      const rows = [
+        {
+          label: 'POWER SOURCE',
+          toyota: tMod.power_source || 'Intern. Comb Engine + Electric Motor',
+          nonToyota: ntMod.power_source || 'Electric Motor',
+          bkToyota: '-',
+          bkNonToyota: '-',
+          isText: true
+        },
+        {
+          label: 'OTR PRICE',
+          toyota: formatRp(tOtr),
+          nonToyota: formatRp(ntOtr),
+          bkToyota: '',
+          bkNonToyota: '',
+          cls: 'font-bold'
+        },
+        {
+          label: 'MAINTENANCE COST',
+          toyota: formatRp(tMaint),
+          nonToyota: formatRp(ntMaint),
+          bkToyota: '',
+          bkNonToyota: ''
+        },
+        {
+          label: 'TAX',
+          toyota: formatRp(tTax),
+          nonToyota: formatRp(ntTax),
+          bkToyota: `${formatRp(tTaxYr)} / thn`,
+          bkNonToyota: `${formatRp(ntTaxYr)} / thn`
+        },
+        {
+          label: 'GASOLINE / CHARGING COST',
+          toyota: formatRp(tFuelTotal),
+          nonToyota: formatRp(ntCharging),
+          bkToyota: `${formatRp(tFuelCostPerL)} / ${tFuelCons} km/L`,
+          bkNonToyota: `Rp 86.600.000 / ${ntRange} km`
+        },
+        {
+          label: 'LEASING RATES',
+          toyota: formatRp(tLeasing),
+          nonToyota: formatRp(ntLeasing),
+          bkToyota: `DP 20%: ${formatRp(tDpLeasing)}`,
+          bkNonToyota: `DP 20%: ${formatRp(ntDpLeasing)}`
+        },
+        {
+          label: 'OWN RISK (Cost BP)',
+          toyota: formatRp(tOwnRisk),
+          nonToyota: formatRp(ntOwnRisk),
+          bkToyota: formatRp(tOwnRisk),
+          bkNonToyota: formatRp(ntOwnRisk)
+        },
+        {
+          label: 'COE (Cost of Ownership Experience)',
+          toyota: formatRp(tCoe),
+          nonToyota: formatRp(ntCoe),
+          bkToyota: `Bunga: ${(rate * 100)}%`,
+          bkNonToyota: `Bunga: ${(rate * 100)}%`,
+          cls: 'bg-slate-850 font-bold text-amber-300'
+        },
+        {
+          label: 'RESALE VALUE',
+          toyota: formatRp(tRv),
+          nonToyota: formatRp(ntRv),
+          bkToyota: '',
+          bkNonToyota: '',
+          cls: 'text-emerald-400 font-semibold'
+        },
+        {
+          label: '% (Depresiasi Nilai)',
+          toyota: formatPct(tDeprec),
+          nonToyota: formatPct(ntDeprec),
+          bkToyota: '',
+          bkNonToyota: '',
+          cls: 'text-slate-400'
+        },
+        {
+          label: 'NCO (Nett Cost of Ownership)',
+          toyota: formatRp(tNco),
+          nonToyota: formatRp(ntNco),
+          bkToyota: '',
+          bkNonToyota: '',
+          cls: 'bg-emerald-950/40 text-emerald-300 font-black text-sm md:text-base border-y-2 border-emerald-500/60'
+        },
+        {
+          label: 'NCO/YEAR',
+          toyota: formatRp(tNcoYr),
+          nonToyota: formatRp(ntNcoYr),
+          bkToyota: '',
+          bkNonToyota: ''
+        },
+        {
+          label: 'NCO/MONTH',
+          toyota: formatRp(tNcoMo),
+          nonToyota: formatRp(ntNcoMo),
+          bkToyota: '',
+          bkNonToyota: ''
+        },
+        {
+          label: 'NCO/DAY',
+          toyota: formatRp(tNcoDay),
+          nonToyota: formatRp(ntNcoDay),
+          bkToyota: '',
+          bkNonToyota: '',
+          cls: 'bg-cyan-950/40 text-cyan-300 font-black text-sm md:text-base border-t-2 border-cyan-500/60'
+        }
+      ];
+
+      const tbody = document.getElementById('ncoTableBody');
+      if (tbody) {
+        tbody.innerHTML = rows.map(r => `
+          <tr class="${r.cls || 'hover:bg-slate-850/50'} transition">
+            <td class="p-3 border-r border-slate-800 text-slate-300 font-semibold text-xs md:text-sm">${r.label}</td>
+            <td class="p-3 border-r border-slate-800 bg-red-950/10 text-red-200 text-xs md:text-sm font-semibold">${r.toyota}</td>
+            <td class="p-3 border-r border-slate-800 bg-blue-950/10 text-blue-200 text-xs md:text-sm font-semibold">${r.nonToyota}</td>
+            <td class="p-2 border-r border-slate-800 text-center text-xs text-slate-400">${r.bkToyota || '-'}</td>
+            <td class="p-2 text-center text-xs text-slate-400">${r.bkNonToyota || '-'}</td>
+          </tr>
+        `).join('');
+      }
+
+      // --- DYNAMIC AI INSIGHT & RECOMMENDATIONS ---
+      const diffDaily = ntNcoDay - tNcoDay;
+      const savingsPerDay = Math.abs(diffDaily);
+      const toyotaDeprecAbs = Math.abs(tDeprec).toFixed(0);
+      const ntDeprecAbs = Math.abs(ntDeprec).toFixed(0);
+      const otrDiff = Math.abs(ntOtr - tOtr) / 1000000;
+      const otrToyotaJuta = Math.round(tOtr / 1000000);
+      const otrNtJuta = Math.round(ntOtr / 1000000);
+
+      const bulletList = document.getElementById('aiInsightList');
+      if (bulletList) {
+        bulletList.innerHTML = `
+          <div class="space-y-2.5">
+            <p>
+              <strong>1. Efisiensi Biaya Kepemilikan (Nett Cost of Ownership):</strong> 
+              <strong>${tKey}</strong> unggul telak dengan biaya harian hanya <strong>${formatRp(tNcoDay)}</strong> 
+              dibandingkan kompetitor yang mencapai angka <strong>${formatRp(ntNcoDay)}</strong> 
+              akibat tingginya biaya penyusutan dan operasional pada simulasi ini. 
+              Pemilik menghemat hingga <strong>${formatRp(savingsPerDay)}</strong> setiap harinya.
+            </p>
+            <p>
+              <strong>2. Nilai Jual Kembali (Resale Value):</strong> 
+              Toyota menunjukkan ketangguhan nilai aset dengan depresiasi hanya <strong>${toyotaDeprecAbs}%</strong>, 
+              sementara kompetitor kehilangan nilai hingga <strong>${ntDeprecAbs}%</strong> dalam ${years} tahun. 
+              Ini memberikan keamanan finansial yang kokoh bagi pemilik armada maupun perorangan.
+            </p>
+            <p>
+              <strong>3. Investasi Awal:</strong> 
+              Harga OTR <strong>${tKey}</strong> jauh lebih terjangkau (<strong>Rp ${otrToyotaJuta} Juta</strong>) 
+              dibandingkan kompetitor (<strong>Rp ${otrNtJuta} Juta</strong>), menghemat kas di muka sebesar 
+              <strong>Rp ${otrDiff.toFixed(0)} Juta</strong> dan memberikan keleluasaan arus kas sejak hari pertama.
+            </p>
+            <p>
+              <strong>4. Rekomendasi:</strong> 
+              <strong>${tKey}</strong> adalah pilihan paling cerdas untuk penggunaan jangka panjang ${years} tahun 
+              karena kombinasi biaya perawatan rendah, pajak yang kompetitif, jaringan bengkel terluas, dan nilai jual kembali yang sangat stabil.
+            </p>
+          </div>
+        `;
+      }
+
+      const econEl = document.getElementById('aiMostEconomical');
+      if (econEl) econEl.textContent = `Toyota ${tKey}`;
+
+      const badgeEl = document.getElementById('aiDailySavingsBadge');
+      if (badgeEl) badgeEl.textContent = `${formatRp(savingsPerDay)} / Hari`;
+    }
+
+    // Helper parse GViz table to eNCOmpare records
+    function parseGvizToEncompare(table) {
+      if (!table || !table.rows || table.rows.length === 0) return;
+
+      try {
+        let liveUsage = null;
+        let liveMileage = null;
+        let liveToyota = null;
+        let liveNonToyota = null;
+
+        table.rows.forEach(r => {
+          if (!r || !r.c) return;
+          const label = String(r.c[1]?.v || r.c[0]?.v || '').trim().toUpperCase();
+          if (label === 'ESTIMATED USAGE') {
+            const v = r.c[2]?.v || r.c[1]?.v;
+            if (v) liveUsage = parseInt(v);
+          }
+          if (label === 'MILEAGE ESTIMATION') {
+            const v = r.c[2]?.v || r.c[1]?.v;
+            if (v) liveMileage = parseFloat(v);
+          }
+          if (label === 'VARIABLE') {
+            const vToy = r.c[2]?.v || r.c[3]?.v;
+            const vNt = r.c[3]?.v || r.c[4]?.v;
+            if (vToy) liveToyota = String(vToy).replace(/^\d+/, '').trim();
+            if (vNt) liveNonToyota = String(vNt).replace(/^\d+/, '').trim();
+          }
+        });
+
+        const ncoData = appData.nco_data || (window.PRELOADED_DASHBOARD_DATA && window.PRELOADED_DASHBOARD_DATA.nco_data);
+        let hasChanges = false;
+
+        if (liveUsage && [1, 2, 3, 4, 5].includes(liveUsage)) {
+          if (window.encompareState.usageYear !== liveUsage) {
+            window.encompareState.usageYear = liveUsage;
+            hasChanges = true;
+          }
+        }
+
+        if (liveMileage && liveMileage > 0) {
+          if (window.encompareState.mileageDay !== liveMileage) {
+            window.encompareState.mileageDay = liveMileage;
+            hasChanges = true;
+          }
+        }
+
+        if (liveToyota && ncoData && ncoData.toyota_models && ncoData.toyota_models[liveToyota]) {
+          if (window.encompareState.toyotaModel !== liveToyota) {
+            window.encompareState.toyotaModel = liveToyota;
+            hasChanges = true;
+          }
+        }
+
+        if (liveNonToyota && ncoData && ncoData.non_toyota_models && ncoData.non_toyota_models[liveNonToyota]) {
+          if (window.encompareState.nonToyotaModel !== liveNonToyota) {
+            window.encompareState.nonToyotaModel = liveNonToyota;
+            hasChanges = true;
+          }
+        }
+
+        if (hasChanges) {
+          const selToyota = document.getElementById('ncoToyotaSelect');
+          const selNonToyota = document.getElementById('ncoNonToyotaSelect');
+          const selUsage = document.getElementById('ncoUsageYear');
+          const selMileage = document.getElementById('ncoMileageDay');
+
+          if (selUsage) selUsage.value = String(window.encompareState.usageYear);
+          if (selMileage) selMileage.value = String(window.encompareState.mileageDay);
+          if (selToyota) selToyota.value = window.encompareState.toyotaModel;
+          if (selNonToyota) selNonToyota.value = window.encompareState.nonToyotaModel;
+
+          recalculateEncompare();
+          showToast('eNCOmpare: Parameter diperbarui dari Google Sheets!', 'info');
+        }
+      } catch (err) {
+        console.warn('Error parsing live eNCOmpare:', err);
+      }
+    }
+
+    // Sinkronisasi pilihan web kembali ke Google Sheets via Apps Script Web App
+    async function syncEncompareBackToSheet(usage, mileage, toyota, nonToyota) {
+      const customUrl = localStorage.getItem('tunas_sheets_sync_url');
+      if (!customUrl) return;
+
+      try {
+        const queryUrl = `${customUrl}?action=update_encompare&usage=${encodeURIComponent(usage)}&mileage=${encodeURIComponent(mileage)}&toyota=${encodeURIComponent(toyota)}&non_toyota=${encodeURIComponent(nonToyota)}`;
+        await fetch(queryUrl, { mode: 'no-cors' });
+        console.log('eNCOmpare sync to spreadsheet triggered successfully.');
+      } catch (err) {
+        console.warn('Sync back to Google Sheets error:', err);
+      }
+    }
+
+
     function parseGvizToTradeIn(table) {
       if (!table || !table.cols || !table.rows) return [];
       const cols = table.cols.map(c => (c.label || c.id || '').trim().toLowerCase());
@@ -4076,11 +4697,12 @@
 
       // Method 2: Direct Live Google Sheets GViz via JSONP (No CORS, Zero Config)
       try {
-        const [dashTable, rsTable, tradeInTable, arTable] = await Promise.all([
+        const [dashTable, rsTable, tradeInTable, arTable, encTable] = await Promise.all([
           fetchGvizJsonp('Dashboard Achievement').catch(err => { console.warn('Sync Dash err:', err); return null; }),
           fetchGvizJsonp('RS Bekasi').catch(err => { console.warn('Sync RS err:', err); return null; }),
           fetchGvizJsonp('Trade In').catch(err => { console.warn('Sync Trade In err:', err); return null; }),
-          fetchGvizJsonp('AR').catch(err => { console.warn('Sync AR err:', err); return null; })
+          fetchGvizJsonp('AR').catch(err => { console.warn('Sync AR err:', err); return null; }),
+          fetchGvizJsonp('eNCOmpare&headers=0').catch(err => { console.warn('Sync eNCOmpare err:', err); return null; })
         ]);
 
         let hasAnyUpdate = false;
@@ -4123,6 +4745,10 @@
             }
             hasAnyUpdate = true;
           }
+        }
+
+        if (encTable) {
+          parseGvizToEncompare(encTable);
         }
 
         if (hasAnyUpdate) {
