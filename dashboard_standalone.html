@@ -39,29 +39,44 @@
   </script>
   
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
+    
+    :root {
+      --bg-main: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+      --primary-red: #D71920;
+    }
+
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-main) !important;
+      color: var(--text-main) !important;
     }
+
+    /* Scrollbars */
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: #0f172a;
+      background: #F1F5F9;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #334155;
+      background: #CBD5E1;
       border-radius: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #475569;
+      background: #94A3B8;
     }
-    /* Google Maps Leaflet Custom Styles */
+
+    /* Leaflet Google Maps Popup Styles */
     .leaflet-popup-content-wrapper {
       background: #FFFFFF !important;
-      border-radius: 12px !important;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.2) !important;
+      border-radius: 14px !important;
+      box-shadow: 0 14px 28px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
       border: 1px solid #E2E8F0 !important;
       padding: 0 !important;
     }
@@ -76,19 +91,40 @@
       background: transparent !important;
       border: none !important;
     }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(51, 65, 85, 0.6);
+    .gmaps-tooltip {
+      background: #FFFFFF !important;
+      border: 1px solid #CBD5E1 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+      border-radius: 8px !important;
+      color: #0F172A !important;
     }
-  
-    select, select option {
-      background-color: #0F172A !important;
-      color: #F8FAFC !important;
+
+    /* Modern Clean Glass & Card Effects */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(12px);
+      border: 1px solid #E2E8F0 !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.02) !important;
+    }
+
+    /* Form Controls: Select & Options */
+    select {
+      background-color: #FFFFFF !important;
+      color: #0F172A !important;
+      border-color: #CBD5E1 !important;
+    }
+    select option {
+      background-color: #FFFFFF !important;
+      color: #0F172A !important;
     }
     select option:hover, select option:checked {
-      background-color: #DC2626 !important;
-      color: #FFFFFF !important;
+      background-color: #FEE2E2 !important;
+      color: #DC2626 !important;
+    }
+
+    /* Table Hover States */
+    table tbody tr:hover {
+      background-color: #F8FAFC !important;
     }
 
   </style>
@@ -99,10 +135,10 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
 </script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col custom-scrollbar">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col custom-scrollbar">
 
   <!-- TOP HEADER -->
-  <header class="sticky top-0 z-50 glass-card border-b border-slate-800 px-4 lg:px-8 py-3">
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 lg:px-8 py-3 shadow-sm">
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
       
       <!-- Brand & Title -->
@@ -112,10 +148,10 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-lg font-bold text-white tracking-wide">TUNAS TOYOTA BEKASI</h1>
+            <h1 class="text-lg font-extrabold text-slate-900 tracking-wide">TUNAS TOYOTA BEKASI</h1>
             
           </div>
-          <p class="text-xs text-slate-400">Dashboard Monitoring Sales Supervisor & Kinerja Penjualan Unit</p>
+          <p class="text-xs text-slate-500 font-medium">Dashboard Monitoring Sales Supervisor & Kinerja Penjualan Unit</p>
         </div>
       </div>
 
@@ -123,24 +159,24 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
         
         <!-- Live Sync Status Badge -->
-        <div id="syncBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium">
+        <div id="syncBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold shadow-sm">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
           <span id="syncStatusText">Data Preloaded Aktif</span>
-          <span class="text-slate-500">|</span>
-          <span id="syncLastTime" class="text-slate-400 text-[11px]">Baru saja</span>
+          <span class="text-slate-300">|</span>
+          <span id="syncLastTime" class="text-slate-500 text-[11px] font-medium">Baru saja</span>
         </div>
 
         <!-- Sync Button -->
-        <button onclick="triggerSync()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 transition active:scale-95">
+        <button onclick="triggerSync()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-xs font-semibold text-slate-700 shadow-sm transition active:scale-95">
           <i data-lucide="refresh-cw" id="syncIcon" class="w-3.5 h-3.5"></i>
           <span>Sinkronkan</span>
         </button>
 
         <!-- Sync Config Trigger -->
-        <button onclick="openSyncModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 transition active:scale-95" title="Konfigurasi Google Sheets">
+        <button onclick="openSyncModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-xs font-semibold text-slate-700 shadow-sm transition active:scale-95" title="Konfigurasi Google Sheets">
           <i data-lucide="settings" class="w-3.5 h-3.5"></i>
           <span>Google Sheets</span>
         </button>
@@ -149,48 +185,48 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
     </div>
 
     <!-- FILTER BAR -->
-    <div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+    <div class="mt-3 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
       
       <!-- Left Filters: SPV, Period Mode, Period Select -->
       <div class="flex flex-wrap items-center gap-3">
         
         <!-- SPV Filter -->
-        <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
-          <i data-lucide="user-check" class="w-4 h-4 text-red-400"></i>
-          <span class="text-xs text-slate-400">Supervisor:</span>
-          <select id="filterSpv" onchange="applyFilters()" class="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer">
-            <option value="ALL" class="bg-slate-900">SEMUA SPV (CABANG BEKASI)</option>
-            <option value="SATRIYO KRESNO AJI" class="bg-slate-900" selected>SATRIYO KRESNO AJI</option>
-            <option value="YAMES" class="bg-slate-900">YAMES REIMOND</option>
+        <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-300 shadow-sm">
+          <i data-lucide="user-check" class="w-4 h-4 text-red-600"></i>
+          <span class="text-xs font-semibold text-slate-600">Supervisor:</span>
+          <select id="filterSpv" onchange="applyFilters()" class="bg-transparent text-xs font-bold text-slate-900 focus:outline-none cursor-pointer">
+            <option value="ALL">SEMUA SPV (CABANG BEKASI)</option>
+            <option value="SATRIYO KRESNO AJI" selected>SATRIYO KRESNO AJI</option>
+            <option value="YAMES">YAMES REIMOND</option>
           </select>
         </div>
 
         <!-- Mode Periode (Bulanan, YTM, Kuartal) -->
-        <div class="flex items-center bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-xs">
-          <button id="btnModeMonth" onclick="setPeriodMode('MONTH')" class="px-3 py-1 rounded-md font-medium transition bg-red-600 text-white shadow">
+        <div class="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-300 text-xs font-semibold shadow-inner">
+          <button id="btnModeMonth" onclick="setPeriodMode('MONTH')" class="px-3 py-1 rounded-md font-bold transition bg-red-600 text-white shadow">
             Bulanan
           </button>
-          <button id="btnModeYTM" onclick="setPeriodMode('YTM')" class="px-3 py-1 rounded-md font-medium transition text-slate-400 hover:text-white">
+          <button id="btnModeYTM" onclick="setPeriodMode('YTM')" class="px-3 py-1 rounded-md font-medium transition text-slate-600 hover:text-slate-900">
             YTM (Year-To-Month)
           </button>
-          <button id="btnModeQuarter" onclick="setPeriodMode('QUARTER')" class="px-3 py-1 rounded-md font-medium transition text-slate-400 hover:text-white">
+          <button id="btnModeQuarter" onclick="setPeriodMode('QUARTER')" class="px-3 py-1 rounded-md font-medium transition text-slate-600 hover:text-slate-900">
             Kuartal (Q1–Q4)
           </button>
         </div>
 
         <!-- Dynamic Period Dropdown -->
-        <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
-          <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
-          <span id="periodFilterLabel" class="text-xs text-slate-400 whitespace-nowrap">Bulan:</span>
+        <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-300 shadow-sm">
+          <i data-lucide="calendar" class="w-4 h-4 text-amber-500"></i>
+          <span id="periodFilterLabel" class="text-xs font-semibold text-slate-600 whitespace-nowrap">Bulan:</span>
           
           <!-- Start Month for YTM Range (Dari Bulan) -->
-          <select id="filterYtmStart" onchange="applyFilters()" style="display: none; background-color: #0F172A; color: #F8FAFC;" class="bg-slate-900 border border-slate-700 text-xs font-semibold text-white rounded-lg px-2 py-1 focus:outline-none focus:border-red-500 cursor-pointer">
+          <select id="filterYtmStart" onchange="applyFilters()" style="display: none; background-color: #FFFFFF; color: #0F172A;" class="bg-white border border-slate-300 text-xs font-bold text-slate-900 rounded-lg px-2 py-1 focus:outline-none focus:border-red-500 cursor-pointer shadow-sm">
             <!-- Populated via JS -->
           </select>
-          <span id="ytmSeparator" class="text-xs text-slate-400 font-semibold" style="display: none;">s/d</span>
+          <span id="ytmSeparator" class="text-xs text-slate-500 font-bold" style="display: none;">s/d</span>
 
           <!-- Main Period Dropdown (Sampai Bulan / Bulan Tunggal / Kuartal) -->
-          <select id="filterPeriod" onchange="applyFilters()" style="background-color: #0F172A; color: #F8FAFC;" class="bg-slate-900 border border-slate-700 text-xs font-semibold text-white rounded-lg px-2.5 py-1 focus:outline-none focus:border-red-500 cursor-pointer">
+          <select id="filterPeriod" onchange="applyFilters()" style="background-color: #FFFFFF; color: #0F172A;" class="bg-white border border-slate-300 text-xs font-bold text-slate-900 rounded-lg px-2.5 py-1 focus:outline-none focus:border-red-500 cursor-pointer shadow-sm">
             <!-- Populated via JS based on mode -->
           </select>
         </div>
@@ -198,18 +234,18 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       </div>
 
       <!-- Quick KPI Pill Badge on Header -->
-      <div id="quickHeaderStats" class="hidden sm:flex items-center gap-4 text-xs">
-        <div class="flex items-center gap-1.5 text-slate-400">
-          <span>Target:</span>
-          <span id="quickTarget" class="font-bold text-white">0 unit</span>
+      <div id="quickHeaderStats" class="hidden sm:flex items-center gap-4 text-xs bg-slate-100/80 px-3 py-1.5 rounded-lg border border-slate-200">
+        <div class="flex items-center gap-1.5 text-slate-500">
+          <span class="font-medium">Target:</span>
+          <span id="quickTarget" class="font-black text-slate-900">0 unit</span>
         </div>
-        <div class="flex items-center gap-1.5 text-slate-400">
-          <span>RS AFI:</span>
-          <span id="quickActual" class="font-bold text-emerald-400">0 unit</span>
+        <div class="flex items-center gap-1.5 text-slate-500">
+          <span class="font-medium">RS AFI:</span>
+          <span id="quickActual" class="font-black text-emerald-600">0 unit</span>
         </div>
-        <div class="flex items-center gap-1.5 text-slate-400">
-          <span>Ach:</span>
-          <span id="quickAch" class="font-bold text-amber-400">0%</span>
+        <div class="flex items-center gap-1.5 text-slate-500">
+          <span class="font-medium">Ach:</span>
+          <span id="quickAch" class="font-black text-amber-600">0%</span>
         </div>
       </div>
 
@@ -217,29 +253,29 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
   </header>
 
   <!-- NAVIGATION TABS -->
-  <nav class="bg-slate-900/90 border-b border-slate-800 px-4 lg:px-8 py-2 sticky top-[108px] z-40">
-    <div class="flex items-center gap-1 overflow-x-auto custom-scrollbar text-xs font-medium">
-      <button onclick="switchTab('tabEncompare')" id="nav-tabEncompare" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
-        <i data-lucide="scale" class="w-4 h-4 text-emerald-400"></i>
+  <nav class="bg-white/95 border-b border-slate-200 px-4 lg:px-8 py-2 sticky top-[108px] z-40 shadow-sm backdrop-blur-md">
+    <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar text-xs font-semibold">
+      <button onclick="switchTab('tabEncompare')" id="nav-tabEncompare" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <i data-lucide="scale" class="w-4 h-4 text-emerald-600"></i>
         <span>eNCOmpare</span>
       </button>
-      <button onclick="switchTab('tabAchievement')" id="nav-tabAchievement" class="nav-tab active flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-red-600/90 hover:bg-red-600 transition shadow">
+      <button onclick="switchTab('tabAchievement')" id="nav-tabAchievement" class="nav-tab active flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition shadow font-bold">
         <i data-lucide="award" class="w-4 h-4"></i>
         <span>Dashboard Achievement</span>
       </button>
-      <button onclick="switchTab('tabVehicles')" id="nav-tabVehicles" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+      <button onclick="switchTab('tabVehicles')" id="nav-tabVehicles" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
         <i data-lucide="car" class="w-4 h-4"></i>
         <span>RS AFI & Tipe Kendaraan</span>
       </button>
-      <button onclick="switchTab('tabTradeIn')" id="nav-tabTradeIn" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+      <button onclick="switchTab('tabTradeIn')" id="nav-tabTradeIn" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
         <i data-lucide="repeat" class="w-4 h-4"></i>
         <span>Trade In</span>
       </button>
-      <button onclick="switchTab('tabAR')" id="nav-tabAR" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+      <button onclick="switchTab('tabAR')" id="nav-tabAR" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
         <i data-lucide="file-text" class="w-4 h-4"></i>
         <span>AR Invoice</span>
       </button>
-      <button onclick="switchTab('tabPolreg')" id="nav-tabPolreg" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+      <button onclick="switchTab('tabPolreg')" id="nav-tabPolreg" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
         <i data-lucide="map" class="w-4 h-4"></i>
         <span>Market Share & Polreg 2026</span>
       </button>
@@ -341,8 +377,8 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       </div>
 
       <!-- MAIN COMPARISON TABLE & BREAKDOWN (PERSIS SPREADSHEET ROW 3-17) -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-        <div class="px-5 py-3 border-b border-slate-800 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 flex flex-wrap items-center justify-between gap-3">
+      <div class="bg-slate-900/90 border border-slate-200 rounded-2xl overflow-hidden shadow-2xl">
+        <div class="px-5 py-3 border-b border-slate-200 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2">
             <i data-lucide="table-properties" class="w-5 h-5 text-cyan-400"></i>
             <span class="text-sm font-bold text-white uppercase tracking-wider">Matriks Perhitungan NCO &amp; Breakdown Biaya Operasional</span>
@@ -358,15 +394,15 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs md:text-sm">
             <thead>
-              <tr class="bg-slate-950 text-slate-300 border-b border-slate-800 font-bold">
-                <th class="p-3 w-1/4 border-r border-slate-800 uppercase tracking-wider">VARIABLE</th>
-                <th class="p-3 w-1/4 border-r border-slate-800 bg-red-950/20 text-red-300 font-bold uppercase tracking-wider">
+              <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold text-xs uppercase tracking-wider">
+                <th class="p-3 w-1/4 border-r border-slate-200 uppercase tracking-wider">VARIABLE</th>
+                <th class="p-3 w-1/4 border-r border-slate-200 bg-red-950/20 text-red-300 font-bold uppercase tracking-wider">
                   <div class="flex items-center gap-1.5">
                     <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
                     <span>TOYOTA (HEV)</span>
                   </div>
                 </th>
-                <th class="p-3 w-1/4 border-r border-slate-800 bg-blue-950/20 text-blue-300 font-bold uppercase tracking-wider">
+                <th class="p-3 w-1/4 border-r border-slate-200 bg-blue-950/20 text-blue-300 font-bold uppercase tracking-wider">
                   <div class="flex items-center gap-1.5">
                     <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
                     <span>NON TOYOTA (BEV)</span>
@@ -376,11 +412,11 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                   <div class="text-center">OPERATE BREAKDOWN COST</div>
                 </th>
               </tr>
-              <tr class="bg-slate-950/80 text-[11px] text-slate-400 border-b border-slate-800">
-                <th class="p-2 border-r border-slate-800"></th>
-                <th id="thToyotaModelName" class="p-2 border-r border-slate-800 font-semibold text-white bg-red-950/30">NEW VELOZ Q HYBRID</th>
-                <th id="thNonToyotaModelName" class="p-2 border-r border-slate-800 font-semibold text-white bg-blue-950/30">BYD M6</th>
-                <th class="p-2 border-r border-slate-800 text-center font-semibold text-red-300 bg-slate-900 w-1/8">TOYOTA</th>
+              <tr class="bg-slate-950/80 text-[11px] text-slate-400 border-b border-slate-200">
+                <th class="p-2 border-r border-slate-200"></th>
+                <th id="thToyotaModelName" class="p-2 border-r border-slate-200 font-semibold text-white bg-red-950/30">NEW VELOZ Q HYBRID</th>
+                <th id="thNonToyotaModelName" class="p-2 border-r border-slate-200 font-semibold text-white bg-blue-950/30">BYD M6</th>
+                <th class="p-2 border-r border-slate-200 text-center font-semibold text-red-300 bg-slate-900 w-1/8">TOYOTA</th>
                 <th class="p-2 text-center font-semibold text-blue-300 bg-slate-900 w-1/8">NON TOYOTA</th>
               </tr>
             </thead>
@@ -417,15 +453,9 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           </div>
 
           <!-- Highlight Pilihan Paling Ekonomis -->
-          <div class="p-4 rounded-xl bg-cyan-200/80 border-2 border-cyan-500 flex items-center justify-between gap-3 shadow-sm">
-            <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-cyan-900">PILIHAN PALING EKONOMIS:</span>
-              <div id="aiMostEconomical" class="text-base md:text-lg font-black text-red-700">Toyota New Veloz Q Hybrid</div>
-            </div>
-            <div class="text-right">
-              <span class="text-[11px] text-slate-700 font-semibold block">Hemat Biaya Harian:</span>
-              <span id="aiDailySavingsBadge" class="text-sm md:text-base font-black text-emerald-800 font-mono">Rp 10.769.376 / Hari</span>
-            </div>
+          <div class="p-4 rounded-xl bg-cyan-200/80 border-2 border-cyan-500 shadow-sm">
+            <span class="text-xs font-bold uppercase tracking-wider text-cyan-900 block mb-1">PILIHAN PALING EKONOMIS:</span>
+            <div id="aiMostEconomical" class="text-base md:text-lg font-black text-red-700">Toyota New Veloz Q Hybrid</div>
           </div>
 
           <!-- Keunggulan Utama Toyota -->
@@ -447,16 +477,16 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
     <div id="tabAchievement" class="tab-pane space-y-6">
       
       <!-- HEADER BANNER & HIGHLIGHT -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 p-4 rounded-2xl border border-slate-800 shadow-lg">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 p-4 rounded-2xl border border-slate-200 shadow-lg">
         <div>
-          <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
             <i data-lucide="award" class="w-5 h-5 text-amber-400"></i>
             Dashboard Achievement — Konsolidasi Kinerja & Pencapaian
           </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Monitoring komprehensif pencapaian RS AFI vs Target Unit, Komposisi Cash/Kredit & Leasing, serta Realisasi Finansial (Revenue & Gross Profit).</p>
+          <p class="text-xs text-slate-600 mt-0.5 font-medium">Monitoring komprehensif pencapaian RS AFI vs Target Unit, Komposisi Cash/Kredit & Leasing, serta Realisasi Finansial (Revenue & Gross Profit).</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap text-xs">
-          <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1.5 font-medium">
+          <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-300 flex items-center gap-1.5 font-medium">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             Data Aktif: <strong id="chipActiveSpv" class="text-white">SATRIYO KRESNO AJI</strong>
           </span>
@@ -472,7 +502,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <!-- Card 1: RS AFI vs Target Unit -->
         <div class="glass-card rounded-2xl p-5 relative overflow-hidden group">
           <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-red-600/10 rounded-full blur-xl group-hover:bg-red-600/20 transition"></div>
-          <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
             <span class="font-medium">Pencapaian RS AFI</span>
             <div class="p-2 rounded-lg bg-red-500/10 text-red-400">
               <i data-lucide="car" class="w-4 h-4"></i>
@@ -482,7 +512,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             <span id="scActualUnit" class="text-3xl font-extrabold text-white">0</span>
             <span class="text-xs text-slate-400 font-semibold">UNIT</span>
           </div>
-          <div class="mt-3 flex items-center justify-between text-xs pt-3 border-t border-slate-800">
+          <div class="mt-3 flex items-center justify-between text-xs pt-3 border-t border-slate-200">
             <span class="text-slate-400">Target: <strong id="scTargetUnit" class="text-slate-200">0</strong> Unit</span>
             <span id="scAchRate" class="px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               0% Ach
@@ -493,7 +523,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <!-- Card 2: MoM Growth -->
         <div class="glass-card rounded-2xl p-5 relative overflow-hidden group">
           <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-600/10 rounded-full blur-xl group-hover:bg-blue-600/20 transition"></div>
-          <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
             <span class="font-medium">Pertumbuhan Bulanan (MoM)</span>
             <div class="p-2 rounded-lg bg-blue-500/10 text-blue-400">
               <i data-lucide="activity" class="w-4 h-4"></i>
@@ -503,7 +533,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             <span id="scMomGrowth" class="text-3xl font-extrabold text-emerald-400">+0.0%</span>
             <span id="scMomArrow" class="text-xs font-bold text-emerald-400">▲</span>
           </div>
-          <div class="mt-3 flex items-center justify-between text-xs pt-3 border-t border-slate-800">
+          <div class="mt-3 flex items-center justify-between text-xs pt-3 border-t border-slate-200">
             <span class="text-slate-400">Bulan Sebelumnya:</span>
             <span id="scPrevUnit" class="font-semibold text-slate-200">0 Unit</span>
           </div>
@@ -512,7 +542,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <!-- Card 3: Cash vs Credit & Leasing -->
         <div class="glass-card rounded-2xl p-5 relative overflow-hidden group">
           <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-amber-600/10 rounded-full blur-xl group-hover:bg-amber-600/20 transition"></div>
-          <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
             <span class="font-medium">Porsi Kredit & Leasing</span>
             <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400">
               <i data-lucide="percent" class="w-4 h-4"></i>
@@ -522,7 +552,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             <span id="scCreditRatio" class="text-3xl font-extrabold text-amber-400">0%</span>
             <span class="text-xs text-slate-400">KREDIT</span>
           </div>
-          <div class="mt-3 flex items-center justify-between text-xs pt-3 border-t border-slate-800">
+          <div class="mt-3 flex items-center justify-between text-xs pt-3 border-t border-slate-200">
             <span class="text-slate-400">Cash: <strong id="scCashUnit" class="text-slate-200">0</strong> Unit</span>
             <span class="text-slate-400">Kredit: <strong id="scCreditUnit" class="text-slate-200">0</strong> Unit</span>
           </div>
@@ -531,7 +561,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <!-- Card 4: Kinerja Finansial (Revenue & GP) -->
         <div class="glass-card rounded-2xl p-5 relative overflow-hidden group">
           <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-purple-600/10 rounded-full blur-xl group-hover:bg-purple-600/20 transition"></div>
-          <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+          <div class="flex items-center justify-between text-slate-500 text-xs mb-2">
             <span class="font-medium">Total Revenue Aktual</span>
             <div class="p-2 rounded-lg bg-purple-500/10 text-purple-400">
               <i data-lucide="wallet" class="w-4 h-4"></i>
@@ -541,7 +571,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             <span class="text-sm font-bold text-slate-400">Rp</span>
             <span id="scRevenue" class="text-2xl font-extrabold text-white">0 M</span>
           </div>
-          <div class="mt-3 flex items-center justify-between text-xs pt-3 border-t border-slate-800">
+          <div class="mt-3 flex items-center justify-between text-xs pt-3 border-t border-slate-200">
             <span class="text-slate-400">GP: <strong id="scGrossProfit" class="text-emerald-400">Rp 0 M</strong></span>
             <span id="scGpRatio" class="text-slate-400 font-semibold">(0% Ratio)</span>
           </div>
@@ -556,7 +586,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <div class="lg:col-span-2 glass-card rounded-2xl p-5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
             <div>
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <i data-lucide="bar-chart-3" class="w-4 h-4 text-red-500"></i>
                 Pencapaian Volume Unit: RS AFI vs Target (Jan - Okt 2026)
               </h3>
@@ -584,7 +614,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between mb-2">
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
                 Laju Pertumbuhan MoM (%)
               </h3>
@@ -595,7 +625,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               <canvas id="chartMomGrowth"></canvas>
             </div>
           </div>
-          <div class="mt-3 pt-3 border-t border-slate-800 text-xs space-y-2">
+          <div class="mt-3 pt-3 border-t border-slate-200 text-xs space-y-2">
             <div class="flex justify-between items-center text-slate-300">
               <span class="text-slate-400">Bulan Penjualan Tertinggi:</span>
               <span id="statPeakMonth" class="font-bold text-white">April (66 Unit)</span>
@@ -615,7 +645,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <!-- Chart 3: Cash vs Credit Breakdown -->
         <div class="glass-card rounded-2xl p-5">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="credit-card" class="w-4 h-4 text-blue-400"></i>
               Komposisi Metode Pembayaran: Cash vs Kredit
             </h3>
@@ -630,7 +660,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <!-- Chart 4: Leasing Share Breakdown -->
         <div class="glass-card rounded-2xl p-5">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="pie-chart" class="w-4 h-4 text-amber-400"></i>
               Pangsa Perusahaan Pembiayaan (Leasing Share)
             </h3>
@@ -651,7 +681,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <div class="glass-card rounded-2xl p-5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
             <div>
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <i data-lucide="dollar-sign" class="w-4 h-4 text-purple-400"></i>
                 Pencapaian Revenue: Aktual vs Target (Rp Miliar)
               </h3>
@@ -670,7 +700,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <div class="glass-card rounded-2xl p-5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
             <div>
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
                 <i data-lucide="line-chart" class="w-4 h-4 text-emerald-400"></i>
                 Pencapaian Gross Profit (GP): Aktual vs Target (Rp Juta)
               </h3>
@@ -691,7 +721,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       <div class="glass-card rounded-2xl p-5 overflow-hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="table" class="w-4 h-4 text-amber-400"></i>
               Matriks Komprehensif Pencapaian KPI & Finansial (Sesuai Spreadsheet SATRIO)
             </h3>
@@ -705,7 +735,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
-              <tr class="bg-slate-900/90 text-slate-300 border-b border-slate-800 font-semibold">
+              <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold text-xs uppercase tracking-wider">
                 <th class="py-2.5 px-3 min-w-[200px]">Indikator KPI / Kinerja</th>
                 <th class="py-2.5 px-2 text-center">Jan</th>
                 <th class="py-2.5 px-2 text-center">Feb</th>
@@ -729,7 +759,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
       <!-- SECTION 6: EXECUTIVE INSIGHTS & PENJELASAN DETAIL -->
       <div class="glass-card rounded-2xl p-5">
-        <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+        <h3 class="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
           <i data-lucide="file-check-2" class="w-4 h-4 text-emerald-400"></i>
           Penjelasan Detail & Analisis Pencapaian Eksekutif (Executive Insights)
         </h3>
@@ -737,7 +767,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Insight 1 -->
-          <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800">
+          <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-200">
             <h4 class="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-2">
               <i data-lucide="target" class="w-4 h-4"></i>
               1. Analisis Pencapaian Target Volume (RS AFI)
@@ -748,7 +778,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           </div>
 
           <!-- Insight 2 -->
-          <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800">
+          <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-200">
             <h4 class="text-xs font-bold text-blue-400 flex items-center gap-1.5 mb-2">
               <i data-lucide="credit-card" class="w-4 h-4"></i>
               2. Struktur Pembayaran & Penetrasi Pembiayaan
@@ -759,7 +789,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           </div>
 
           <!-- Insight 3 -->
-          <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800">
+          <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-200">
             <h4 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5 mb-2">
               <i data-lucide="trending-up" class="w-4 h-4"></i>
               3. Profitabilitas & Kinerja Finansial (Revenue & GP)
@@ -770,7 +800,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           </div>
 
           <!-- Insight 4 -->
-          <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800">
+          <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-200">
             <h4 class="text-xs font-bold text-purple-400 flex items-center gap-1.5 mb-2">
               <i data-lucide="lightbulb" class="w-4 h-4"></i>
               4. Rekomendasi Strategis & Action Plan
@@ -792,14 +822,14 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       <!-- HEADER TAB 2 -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
             <i data-lucide="car" class="w-5 h-5 text-red-500"></i>
             RS AFI Berdasarkan Tipe Kendaraan & Model
           </h2>
           <p class="text-xs text-slate-400">Sebaran kuantitas unit (Qty) terjual per model / tipe kendaraan dan kontribusi SPV</p>
         </div>
         <div class="flex items-center gap-2">
-          <input type="text" id="vehicleSearch" oninput="renderVehicleTables()" placeholder="Cari model mobil..." class="bg-slate-900 border border-slate-800 text-xs rounded-lg px-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-red-500">
+          <input type="text" id="vehicleSearch" oninput="renderVehicleTables()" placeholder="Cari model mobil..." class="bg-slate-900 border border-slate-200 text-xs rounded-lg px-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-red-500">
         </div>
       </div>
 
@@ -808,7 +838,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         
         <!-- Horizontal Bar Chart: Qty per Model (2 Cols) -->
         <div class="lg:col-span-2 glass-card rounded-2xl p-5">
-          <h3 class="text-sm font-bold text-white mb-2 flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-900 mb-2 flex items-center justify-between">
             <span>Peringkat Volume Kendaraan (TYPE GRP)</span>
             <span class="text-xs font-normal text-slate-400">Total Unit Terjual</span>
           </h3>
@@ -821,13 +851,13 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <!-- Donut Chart: Komposisi Segmen Kendaraan -->
         <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
           <div>
-            <h3 class="text-sm font-bold text-white mb-2">Proporsi Pangsa Model</h3>
+            <h3 class="text-sm font-bold text-slate-900 mb-2">Proporsi Pangsa Model</h3>
             <p class="text-xs text-slate-400 mb-4">Persentase kontribusi per tipe kendaraan</p>
             <div class="h-60 w-full relative">
               <canvas id="chartVehiclePie"></canvas>
             </div>
           </div>
-          <div id="vehicleTopSummary" class="text-xs text-slate-300 mt-2 space-y-1.5 pt-3 border-t border-slate-800">
+          <div id="vehicleTopSummary" class="text-xs text-slate-300 mt-2 space-y-1.5 pt-3 border-t border-slate-200">
             <!-- Injected by JS -->
           </div>
         </div>
@@ -837,7 +867,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       <!-- MATRIX TABLE: MODEL x BULAN / KUARTAL -->
       <div class="glass-card rounded-2xl p-5 overflow-hidden">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
             <i data-lucide="table" class="w-4 h-4 text-amber-400"></i>
             Matriks Distribusi Tipe Kendaraan per Bulan
           </h3>
@@ -846,7 +876,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
-              <tr class="bg-slate-900/90 text-slate-300 border-b border-slate-800 font-semibold">
+              <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold text-xs uppercase tracking-wider">
                 <th class="py-2.5 px-3">Tipe Kendaraan (TYPE GRP)</th>
                 <th class="py-2.5 px-2 text-center">Jan</th>
                 <th class="py-2.5 px-2 text-center">Feb</th>
@@ -861,7 +891,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                 <th class="py-2.5 px-3 text-right bg-red-600/20 text-red-300 font-bold">Grand Total</th>
               </tr>
             </thead>
-            <tbody id="vehicleMatrixBody" class="divide-y divide-slate-800/60 text-slate-300">
+            <tbody id="vehicleMatrixBody" class="divide-y divide-slate-200 text-slate-800">
               <!-- Injected by JS -->
             </tbody>
           </table>
@@ -870,7 +900,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
       <!-- SALESMAN LEADERBOARD UNDER SPV -->
       <div class="glass-card rounded-2xl p-5">
-        <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+        <h3 class="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
           <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
           Peringkat Kontribusi Salesman (di Bawah Supervisor Terpilih)
         </h3>
@@ -888,10 +918,10 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
     <div id="tabTradeIn" class="tab-pane hidden space-y-6">
       
       <!-- HEADER & SUB-MENU CONTROLS -->
-      <div class="glass-card rounded-2xl p-5 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="glass-card rounded-2xl p-5 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div class="flex items-center gap-2">
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="repeat" class="w-5 h-5 text-red-500"></i>
               Monitoring Performa Trade In (Tukar Tambah)
             </h2>
@@ -905,7 +935,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         </div>
         <div class="flex items-center gap-2">
           <span class="text-xs text-slate-400 whitespace-nowrap">Filter Bulan:</span>
-          <select id="tradeInMonthFilter" onchange="renderTradeInTab()" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-red-500">
+          <select id="tradeInMonthFilter" onchange="renderTradeInTab()" class="bg-slate-950 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-red-500">
             <option value="ALL">Semua Bulan (YTD 2026)</option>
             <option value="Januari">Januari</option>
             <option value="Februari">Februari</option>
@@ -929,13 +959,13 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       <!-- CHARTS -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Used Car Brands with Percentage -->
-        <div class="glass-card rounded-2xl p-5 border border-slate-800">
+        <div class="glass-card rounded-2xl p-5 border border-slate-200">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="pie-chart" class="w-4 h-4 text-red-400"></i>
               Sebaran Merek Mobil Bekas Pelanggan
             </h3>
-            <span class="text-[10px] text-slate-400 font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">Persentase (%)</span>
+            <span class="text-[10px] text-slate-400 font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-200">Persentase (%)</span>
           </div>
           <p class="text-xs text-slate-400 mb-4">Merek kendaraan lama yang masuk dalam appraisal trade-in beserta proporsi persentase.</p>
           <div class="h-64">
@@ -944,13 +974,13 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         </div>
 
         <!-- Deal vs Not Deal Reasons -->
-        <div class="glass-card rounded-2xl p-5 border border-slate-800">
+        <div class="glass-card rounded-2xl p-5 border border-slate-200">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-400"></i>
               Status Deal & Pembeli Akhir
             </h3>
-            <span class="text-[10px] text-slate-400 font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">Unit</span>
+            <span class="text-[10px] text-slate-400 font-semibold bg-slate-900 px-2 py-0.5 rounded border border-slate-200">Unit</span>
           </div>
           <p class="text-xs text-slate-400 mb-4">Distribusi penjualan unit ke Rekanan Showroom vs OLXmobbi vs Belum Deal.</p>
           <div class="h-64">
@@ -960,10 +990,10 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       </div>
 
       <!-- DATA SELURUH LEADS TRADE IN SESUAI SPREADSHEET -->
-      <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+      <div class="glass-card rounded-2xl p-5 border border-slate-200 space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="table" class="w-4 h-4 text-emerald-400"></i>
               Data Seluruh Leads Trade In (Sesuai Spreadsheet)
             </h3>
@@ -973,18 +1003,18 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           </div>
           <div class="flex items-center gap-3">
             <div class="relative">
-              <input type="text" id="tradeInSearchInput" oninput="filterTradeInTable()" placeholder="Cari Sales, Mobil, Plat..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 pl-8 text-xs text-slate-200 focus:outline-none focus:border-red-500 w-48 sm:w-64">
+              <input type="text" id="tradeInSearchInput" oninput="filterTradeInTable()" placeholder="Cari Sales, Mobil, Plat..." class="bg-slate-950 border border-slate-300 rounded-lg px-3 py-1.5 pl-8 text-xs text-slate-200 focus:outline-none focus:border-red-500 w-48 sm:w-64">
               <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5 pointer-events-none"></i>
             </div>
-            <span id="tradeInLeadCountBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-200 whitespace-nowrap">
+            <span id="tradeInLeadCountBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-300 text-slate-200 whitespace-nowrap">
               0 Leads
             </span>
           </div>
         </div>
 
-        <div class="overflow-x-auto custom-scrollbar max-h-96 border border-slate-800/80 rounded-xl">
+        <div class="overflow-x-auto custom-scrollbar max-h-96 border border-slate-200/80 rounded-xl">
           <table class="w-full text-left text-xs border-collapse">
-            <thead class="bg-slate-900/95 text-slate-300 sticky top-0 backdrop-blur z-10 border-b border-slate-800">
+            <thead class="bg-slate-100/95 text-slate-700 sticky top-0 backdrop-blur z-10 border-b border-slate-200 font-bold text-xs uppercase tracking-wider">
               <tr>
                 <th class="py-2.5 px-3">No</th>
                 <th class="py-2.5 px-3">Bulan</th>
@@ -1000,7 +1030,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                 <th class="py-2.5 px-3">Terjual Ke / Keterangan</th>
               </tr>
             </thead>
-            <tbody id="tradeInTableBody" class="divide-y divide-slate-800 text-slate-300">
+            <tbody id="tradeInTableBody" class="divide-y divide-slate-200 text-slate-800">
               <!-- Injected by JS -->
             </tbody>
           </table>
@@ -1014,7 +1044,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
     <!-- ============================================================ -->
     <div id="tabAR" class="tab-pane hidden space-y-6">
       <!-- AR Header & Sub-Menu Filters -->
-      <div class="glass-card rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 border border-slate-800">
+      <div class="glass-card rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 border border-slate-200">
         <div>
           <div class="flex items-center gap-3">
             <span class="p-2.5 rounded-xl bg-red-600/15 text-red-400 border border-red-500/30 flex items-center justify-center">
@@ -1035,17 +1065,17 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         </div>
 
         <!-- Sub-Menu Filter: ALL, Released, Closed -->
-        <div class="flex flex-wrap items-center gap-2 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800">
+        <div class="flex flex-wrap items-center gap-2 bg-slate-900/80 p-1.5 rounded-xl border border-slate-200">
           <button onclick="setARStateFilter('ALL')" id="arBtnFilterAll" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-red-600 text-white shadow-md shadow-red-600/30">
             <span>Semua Status (ALL)</span>
             <span id="arBadgeCountAll" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-bold">0</span>
           </button>
-          <button onclick="setARStateFilter('Released')" id="arBtnFilterReleased" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5">
+          <button onclick="setARStateFilter('Released')" id="arBtnFilterReleased" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
             <span>Released (Belum Terbayarkan)</span>
             <span id="arBadgeCountReleased" class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/20 text-amber-300 font-bold">0</span>
           </button>
-          <button onclick="setARStateFilter('Closed')" id="arBtnFilterClosed" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5">
+          <button onclick="setARStateFilter('Closed')" id="arBtnFilterClosed" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             <span>Closed (Sudah Terbayar)</span>
             <span id="arBadgeCountClosed" class="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-bold">0</span>
@@ -1056,25 +1086,25 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       <!-- 3 Metric Cards (Gambar 2) -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <!-- Card 1: Total Invoice Nilai Tagihan -->
-        <div class="glass-card rounded-2xl p-5 border border-slate-800 hover:border-slate-700 transition">
+        <div class="glass-card rounded-2xl p-5 border border-slate-200 hover:border-slate-300 transition">
           <div class="flex items-center justify-between">
             <span class="text-xs font-medium text-slate-400">Total Invoice Nilai Tagihan</span>
             <span class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
               <i data-lucide="receipt" class="w-4 h-4"></i>
             </span>
           </div>
-          <div class="text-2xl font-black text-white mt-2 tracking-tight" id="arTotalInv">Rp 0</div>
+          <div class="text-2xl font-black text-slate-950 mt-2 tracking-tight" id="arTotalInv">Rp 0</div>
           <div class="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
             <span>Akumulasi invoice penagihan</span>
             <span id="arTotalInvCount" class="font-bold text-slate-300">0 Invoice</span>
           </div>
-          <div id="arInvBreakdown" class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-800/80">
+          <div id="arInvBreakdown" class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-200/80">
             DP Cust: Rp 0 | Leasing: Rp 0
           </div>
         </div>
 
         <!-- Card 2: Total Pembayaran Diterima -->
-        <div class="glass-card rounded-2xl p-5 border border-slate-800 hover:border-slate-700 transition">
+        <div class="glass-card rounded-2xl p-5 border border-slate-200 hover:border-slate-300 transition">
           <div class="flex items-center justify-between">
             <span class="text-xs font-medium text-slate-400">Total Pembayaran Diterima</span>
             <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -1086,13 +1116,13 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             <span>Telah masuk kas</span>
             <span id="arReceiptPct" class="font-bold">0% Lunas</span>
           </div>
-          <div id="arReceiptBreakdown" class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-800/80">
+          <div id="arReceiptBreakdown" class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-200/80">
             Kas Cust: Rp 0 | Cair Leasing: Rp 0
           </div>
         </div>
 
         <!-- Card 3: Sisa Piutang (Outstanding Balance) -->
-        <div class="glass-card rounded-2xl p-5 border border-slate-800 hover:border-slate-700 transition">
+        <div class="glass-card rounded-2xl p-5 border border-slate-200 hover:border-slate-300 transition">
           <div class="flex items-center justify-between">
             <span class="text-xs font-medium text-slate-400">Sisa Piutang (Outstanding Balance)</span>
             <span class="p-2 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
@@ -1104,23 +1134,23 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             <span id="arBalanceDesc">Tertunggak / Belum Cair</span>
             <span id="arOutstandingCount" class="font-bold">0 Unpaid</span>
           </div>
-          <div id="arBalanceBreakdown" class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-800/80">
+          <div id="arBalanceBreakdown" class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-200/80">
             Piutang Cust: Rp 0 | Sisa Leasing: Rp 0
           </div>
         </div>
       </div>
 
       <!-- Trend Chart: Balance Overdue per Bulan -->
-      <div class="glass-card rounded-2xl p-5 border border-slate-800">
+      <div class="glass-card rounded-2xl p-5 border border-slate-200">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
           <div>
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="bar-chart-3" class="w-4 h-4 text-rose-400"></i>
               Tren Sisa Piutang (Balance Overdue per Bulan)
             </h3>
             <p class="text-xs text-slate-400 mt-0.5">Saldo tertunggak mulai muncul pada Agustus, September, dan Oktober</p>
           </div>
-          <span class="text-[11px] text-slate-400 bg-slate-900/90 px-3 py-1 rounded-lg border border-slate-800">
+          <span class="text-[11px] text-slate-400 bg-slate-900/90 px-3 py-1 rounded-lg border border-slate-200">
             Data Sumber: Sheet Januari - Oktober 2026
           </span>
         </div>
@@ -1130,10 +1160,10 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       </div>
 
       <!-- Table: Data Seluruh Transaksi AR Invoice -->
-      <div class="glass-card rounded-2xl p-5 border border-slate-800">
+      <div class="glass-card rounded-2xl p-5 border border-slate-200">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
           <div>
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="table" class="w-4 h-4 text-emerald-400"></i>
               Data Seluruh Transaksi AR Invoice (Sesuai Spreadsheet)
             </h3>
@@ -1145,19 +1175,19 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           <!-- Search & Count Badge -->
           <div class="flex items-center gap-3">
             <div class="relative">
-              <input type="text" id="arSearchInput" oninput="handleARSearch()" placeholder="Cari No Inv, Customer, Leasing..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 pl-8 text-xs text-slate-200 focus:outline-none focus:border-red-500 w-56 sm:w-72">
+              <input type="text" id="arSearchInput" oninput="handleARSearch()" placeholder="Cari No Inv, Customer, Leasing..." class="bg-slate-950 border border-slate-300 rounded-lg px-3 py-1.5 pl-8 text-xs text-slate-200 focus:outline-none focus:border-red-500 w-56 sm:w-72">
               <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5 pointer-events-none"></i>
             </div>
-            <span id="arTableRowCountBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-200 whitespace-nowrap">
+            <span id="arTableRowCountBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-300 text-slate-200 whitespace-nowrap">
               0 Transaksi
             </span>
           </div>
         </div>
 
         <!-- Responsive Table Container -->
-        <div class="overflow-x-auto custom-scrollbar max-h-[500px] border border-slate-800/80 rounded-xl">
+        <div class="overflow-x-auto custom-scrollbar max-h-[500px] border border-slate-200/80 rounded-xl">
           <table class="w-full text-left text-xs border-collapse">
-            <thead class="bg-slate-900/95 text-slate-300 sticky top-0 backdrop-blur z-10 border-b border-slate-800 font-semibold">
+            <thead class="bg-slate-100/95 text-slate-700 sticky top-0 backdrop-blur z-10 border-b border-slate-200 font-bold text-xs uppercase tracking-wider">
               <tr class="whitespace-nowrap">
                 <th class="py-2.5 px-3">No</th>
                 <th class="py-2.5 px-3">No. Invoice</th>
@@ -1176,7 +1206,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                 <th class="py-2.5 px-3 text-center">State</th>
               </tr>
             </thead>
-            <tbody id="arTableBody" class="divide-y divide-slate-800/70 text-slate-300 whitespace-nowrap font-normal">
+            <tbody id="arTableBody" class="divide-y divide-slate-200 text-slate-800 whitespace-nowrap font-normal">
               <!-- Rendered via JS -->
             </tbody>
           </table>
@@ -1200,11 +1230,11 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
     <div id="tabPolreg" class="tab-pane hidden space-y-6">
       
       <!-- HEADER & SUB-MENU CONTROLS -->
-      <div class="glass-card rounded-2xl p-5 border border-slate-800">
+      <div class="glass-card rounded-2xl p-5 border border-slate-200">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
                 <i data-lucide="map-pin" class="w-5 h-5 text-red-500"></i>
                 Market Share & Polreg 2026 - Peta Wilayah & Kecamatan Kota Bekasi
               </h2>
@@ -1221,7 +1251,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           <div class="flex flex-wrap items-center gap-3">
             
             <!-- Dropdown Pilihan Bulan -->
-            <div class="flex items-center gap-2 bg-slate-900 px-3 py-2 rounded-xl border border-slate-800">
+            <div class="flex items-center gap-2 bg-slate-900 px-3 py-2 rounded-xl border border-slate-200">
               <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
               <span class="text-xs text-slate-400 font-medium">Bulan:</span>
               <select id="polregMonthSelect" onchange="onPolregFilterChange()" class="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer">
@@ -1239,7 +1269,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             </div>
 
             <!-- Sub-Menu EV & HEV Toggle Group -->
-            <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+            <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-200 text-xs">
               <button id="btnPwAll" onclick="setPolregPowertrain('ALL')" class="px-3 py-1.5 rounded-lg font-bold transition bg-red-600 text-white shadow">
                 Semua Model
               </button>
@@ -1258,15 +1288,15 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         </div>
 
         <!-- KPI SUMMARY CARDS -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5 pt-4 border-t border-slate-800/80">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5 pt-4 border-t border-slate-200/80">
           
-          <div id="cardPolregTotal" class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 transition">
+          <div id="cardPolregTotal" class="p-4 rounded-xl bg-slate-900/80 border border-slate-200 transition">
             <span class="text-xs text-slate-400">Total All Market Kota Bekasi</span>
             <div class="text-2xl font-extrabold text-white mt-1" id="statPolregTotalMarket">16.224</div>
             <span class="text-[11px] text-slate-400" id="statPolregScopeDesc">Seluruh Merk & Tipe Terdaftar</span>
           </div>
 
-          <div id="cardPolregToyota" class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 transition">
+          <div id="cardPolregToyota" class="p-4 rounded-xl bg-slate-900/80 border border-slate-200 transition">
             <div class="flex justify-between items-start">
               <span class="text-xs text-slate-400">Penjualan Toyota (Unit)</span>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400" id="statPolregToyotaShare">22.4% Share</span>
@@ -1275,7 +1305,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             <span class="text-[11px] text-emerald-400 font-semibold" id="statPolregToyotaRank">#1 Market Leader</span>
           </div>
 
-          <div id="cardPolregCompetitor" class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 transition">
+          <div id="cardPolregCompetitor" class="p-4 rounded-xl bg-slate-900/80 border border-slate-200 transition">
             <div class="flex justify-between items-start">
               <span class="text-xs text-slate-400">Penantang Terdekat</span>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400" id="statPolregCompShare">13.5% Share</span>
@@ -1284,7 +1314,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             <span class="text-[11px] text-slate-400" id="statPolregCompDesc">Pesaing Utama di Area Bekasi</span>
           </div>
 
-          <div id="cardPolregPeakKec" class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 transition">
+          <div id="cardPolregPeakKec" class="p-4 rounded-xl bg-slate-900/80 border border-slate-200 transition">
             <span class="text-xs text-slate-400">Kecamatan Penjualan Tertinggi</span>
             <div class="text-2xl font-extrabold text-amber-400 mt-1" id="statPolregPeakKec">Bekasi Utara</div>
             <span class="text-[11px] text-amber-500 font-semibold" id="statPolregPeakKecQty">2.054 Unit Terdaftar</span>
@@ -1295,11 +1325,11 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       </div>
 
       <!-- MAP SECTION: PETA INTERAKTIF KOTA BEKASI & SELURUH WILAYAH -->
-      <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+      <div class="glass-card rounded-2xl p-5 border border-slate-200 space-y-4">
         
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div>
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="map" class="w-4 h-4 text-emerald-400"></i>
               <span>Peta Sebaran Registrasi Kendaraan (Polreg 2026)</span>
             </h3>
@@ -1310,7 +1340,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         </div>
 
         <!-- Legend Bar -->
-        <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-xs">
+        <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-200/80 text-xs">
           <div id="polregLegend" class="flex flex-wrap items-center gap-3">
             <!-- Injected by JS -->
           </div>
@@ -1320,20 +1350,20 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         </div>
 
         <!-- CONTAINER 1: THE GOOGLE MAP -->
-        <div id="containerGmapsView" class="relative w-full h-[540px] rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl z-0 group">
+        <div id="containerGmapsView" class="relative w-full h-[540px] rounded-2xl overflow-hidden border border-slate-300/80 shadow-2xl z-0 group">
           <div id="polregLeafletMap" class="w-full h-full"></div>
 
           <!-- Floating Google Maps Layer Switcher -->
-          <div class="absolute top-3 right-3 z-[400] flex items-center bg-slate-900/95 backdrop-blur-md p-1 rounded-xl border border-slate-700/80 shadow-xl gap-1">
+          <div class="absolute top-3 right-3 z-[400] flex items-center bg-slate-900/95 backdrop-blur-md p-1 rounded-xl border border-slate-300/80 shadow-xl gap-1">
             <button type="button" id="btnMapStreets" onclick="setPolregMapLayer('google_streets')" class="px-3 py-1.5 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow flex items-center gap-1.5">
               <i data-lucide="map" class="w-3.5 h-3.5"></i>
               <span>Google Maps</span>
             </button>
-            <button type="button" id="btnMapHybrid" onclick="setPolregMapLayer('google_hybrid')" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-1.5">
+            <button type="button" id="btnMapHybrid" onclick="setPolregMapLayer('google_hybrid')" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-1.5">
               <i data-lucide="globe" class="w-3.5 h-3.5"></i>
               <span>Satelit</span>
             </button>
-            <button type="button" id="btnMapTerrain" onclick="setPolregMapLayer('google_terrain')" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-1.5">
+            <button type="button" id="btnMapTerrain" onclick="setPolregMapLayer('google_terrain')" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-1.5">
               <i data-lucide="mountain" class="w-3.5 h-3.5"></i>
               <span>Medan</span>
             </button>
@@ -1341,11 +1371,11 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
           <!-- Floating Re-Center Focus Buttons -->
           <div class="absolute bottom-4 right-3 z-[400] flex items-center gap-1.5">
-            <button type="button" onclick="recenterBekasiMap()" class="px-3 py-1.5 bg-slate-900/95 backdrop-blur-md text-white text-xs font-bold rounded-xl border border-slate-700 shadow-xl hover:bg-slate-800 transition flex items-center gap-1.5">
+            <button type="button" onclick="recenterBekasiMap()" class="px-3 py-1.5 bg-slate-900/95 backdrop-blur-md text-white text-xs font-bold rounded-xl border border-slate-300 shadow-xl hover:bg-slate-800 transition flex items-center gap-1.5">
               <i data-lucide="crosshair" class="w-3.5 h-3.5 text-red-400"></i>
               <span>Fokus Kota Bekasi</span>
             </button>
-            <button type="button" onclick="fitAllKecamatanMap()" class="px-3 py-1.5 bg-slate-900/95 backdrop-blur-md text-white text-xs font-bold rounded-xl border border-slate-700 shadow-xl hover:bg-slate-800 transition flex items-center gap-1.5">
+            <button type="button" onclick="fitAllKecamatanMap()" class="px-3 py-1.5 bg-slate-900/95 backdrop-blur-md text-white text-xs font-bold rounded-xl border border-slate-300 shadow-xl hover:bg-slate-800 transition flex items-center gap-1.5">
               <i data-lucide="maximize" class="w-3.5 h-3.5 text-blue-400"></i>
               <span>Semua Wilayah</span>
             </button>
@@ -1375,13 +1405,13 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         </div>
 
         <!-- Quick Search for Other Regions (Kabupaten Bekasi, Jakarta, Tangerang, Depok) -->
-        <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-sm">
           <div class="flex items-center gap-2">
-            <i data-lucide="compass" class="w-4 h-4 text-blue-400"></i>
-            <span class="font-bold text-slate-200">Cari Rincian Kecamatan Lain (Kab. Bekasi, Jakarta, Tangerang, Depok):</span>
+            <i data-lucide="compass" class="w-4 h-4 text-blue-600"></i>
+            <span class="font-bold text-slate-800">Cari Rincian Kecamatan Lain (Kab. Bekasi, Jakarta, Tangerang, Depok):</span>
           </div>
           <div class="flex items-center gap-2 flex-1 max-w-md">
-            <select id="selectOtherKecamatan" onchange="onSelectOtherKecamatan(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-medium">
+            <select id="selectOtherKecamatan" onchange="onSelectOtherKecamatan(this.value)" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600 font-semibold shadow-sm">
               <option value="">-- Pilih Kecamatan di Luar Kota Bekasi --</option>
             </select>
           </div>
@@ -1390,11 +1420,11 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       </div>
 
       <!-- TOP 10 BRANDS & MARKET SHARE TABLE -->
-      <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+      <div class="glass-card rounded-2xl p-5 border border-slate-200 space-y-4">
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
               <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
               Peringkat 10 Besar Penjualan Merk Mobil & Pangsa Pasar (Market Share)
             </h3>
@@ -1402,14 +1432,14 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               Diurutkan dari penjualan unit terbanyak hingga terendah (10 besar) berdasarkan kolom <code>jumlah</code> pada spreadsheet.
             </p>
           </div>
-          <div class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center gap-2">
+          <div class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-200 text-xs text-slate-300 flex items-center gap-2">
             <span>Total All Market:</span>
             <strong id="tblTotalMarketBadge" class="text-white font-extrabold">16.224 Unit</strong>
           </div>
         </div>
 
         <!-- Calculation Formula Explanation Box (As requested) -->
-        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 flex flex-col md:flex-row md:items-center justify-between gap-2">
+        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-200 text-xs text-slate-300 flex flex-col md:flex-row md:items-center justify-between gap-2">
           <div class="flex items-center gap-2">
             <i data-lucide="help-circle" class="w-4 h-4 text-blue-400 flex-shrink-0"></i>
             <div>
@@ -1419,7 +1449,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               </span>
             </div>
           </div>
-          <div class="text-[11px] text-slate-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800" id="formulaExampleBox">
+          <div class="text-[11px] text-slate-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-200" id="formulaExampleBox">
             Contoh: Toyota (3.631) ÷ All Market (16.224) = <strong class="text-red-400 font-bold">22.4% Market Share</strong>
           </div>
         </div>
@@ -1428,7 +1458,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
-              <tr class="bg-slate-900/90 text-slate-300 border-b border-slate-800 font-semibold">
+              <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold text-xs uppercase tracking-wider">
                 <th class="py-3 px-3 text-center w-14">Rank</th>
                 <th class="py-3 px-4">Merk Kendaraan</th>
                 <th class="py-3 px-4">Model / Tipe Group Terlaris</th>
@@ -1437,7 +1467,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                 <th class="py-3 px-4 text-center">Status Pasar</th>
               </tr>
             </thead>
-            <tbody id="polregTop10TableBody" class="divide-y divide-slate-800/60 text-slate-300">
+            <tbody id="polregTop10TableBody" class="divide-y divide-slate-200 text-slate-800">
               <!-- Injected by JS -->
             </tbody>
           </table>
@@ -1448,13 +1478,13 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
     </div>
 
     <!-- MODAL POPUP RINCIAN KECAMATAN -->
-    <div id="kecamatanModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-      <div class="glass-card rounded-2xl max-w-2xl w-full p-6 border border-slate-700 space-y-5 shadow-2xl relative">
+    <div id="kecamatanModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-2xl w-full p-6 border border-slate-200 space-y-5 shadow-2xl relative text-slate-900">
         
-        <div class="flex items-start justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-start justify-between pb-3 border-b border-slate-200">
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="font-extrabold text-white text-base" id="modalKecName">Kecamatan Bekasi Utara</h3>
+              <h3 class="font-extrabold text-slate-950 text-base" id="modalKecName">Kecamatan Bekasi Utara</h3>
               <span id="modalKecRankBadge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                 Peringkat #1
               </span>
@@ -1471,12 +1501,12 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-200">
             <span class="text-xs text-slate-400">Total Unit Terjual di Kecamatan Ini:</span>
-            <div class="text-2xl font-black text-white mt-1" id="modalKecTotalQty">2.054</div>
+            <div class="text-2xl font-black text-slate-950 mt-1" id="modalKecTotalQty">2.054</div>
             <span class="text-[11px] text-slate-500">Berdasarkan filter periode aktif</span>
           </div>
-          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-200">
             <span class="text-xs text-slate-400">Kontribusi Terhadap Total Kota Bekasi:</span>
             <div class="text-2xl font-black text-amber-400 mt-1" id="modalKecShareKota">12.7%</div>
             <span class="text-[11px] text-amber-500 font-semibold">Pangsa Wilayah</span>
@@ -1487,7 +1517,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           
           <!-- Column 1: Merk Mobil -->
-          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-200">
             <h4 class="text-xs font-bold text-white mb-3 flex items-center justify-between">
               <span class="flex items-center gap-1.5"><i data-lucide="tag" class="w-3.5 h-3.5 text-red-400"></i> Merk Mobil Terbanyak</span>
               <span class="text-[10px] text-slate-400 font-normal">Unit Terjual</span>
@@ -1498,7 +1528,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           </div>
 
           <!-- Column 2: Tipe Group Model -->
-          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-200">
             <h4 class="text-xs font-bold text-white mb-3 flex items-center justify-between">
               <span class="flex items-center gap-1.5"><i data-lucide="car" class="w-3.5 h-3.5 text-blue-400"></i> Tipe Group Terbanyak</span>
               <span class="text-[10px] text-slate-400 font-normal">Unit Terjual</span>
@@ -1510,7 +1540,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
         </div>
 
-        <div class="flex items-center justify-end pt-3 border-t border-slate-800">
+        <div class="flex items-center justify-end pt-3 border-t border-slate-200">
           <button onclick="closeKecamatanModal()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition">
             Tutup
           </button>
@@ -1523,8 +1553,8 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
   <!-- MODAL PENGATURAN SYNC -->
   <div id="syncModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-card rounded-2xl max-w-lg w-full p-6 border border-slate-700 space-y-4">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+    <div class="glass-card rounded-2xl max-w-lg w-full p-6 border border-slate-300 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200">
         <h3 class="font-bold text-white text-sm flex items-center gap-2">
           <i data-lucide="settings" class="w-4 h-4 text-red-500"></i>
           Konfigurasi Sinkronisasi Google Sheets
@@ -1536,18 +1566,18 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       </p>
       <div>
         <label class="block text-xs text-slate-300 mb-1">Web App URL:</label>
-        <input type="text" id="modalScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+        <input type="text" id="modalScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-900 border border-slate-200 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
       </div>
       <div>
         <label class="block text-xs text-slate-300 mb-1">Auto-Sync Interval:</label>
-        <select id="modalAutoInterval" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+        <select id="modalAutoInterval" class="w-full bg-slate-900 border border-slate-200 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
           <option value="0">Manual Saja</option>
           <option value="30000" selected>Tiap 30 Detik</option>
           <option value="60000">Tiap 1 Menit</option>
           <option value="300000">Tiap 5 Menit</option>
         </select>
       </div>
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
         <button onclick="closeSyncModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300">Batal</button>
         <button onclick="saveModalConfig()" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-xs font-bold text-white">Simpan Pengaturan</button>
       </div>
@@ -1555,7 +1585,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
   </div>
 
   <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white shadow-2xl flex items-center gap-3">
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden px-4 py-3 rounded-xl bg-slate-900 border border-slate-300 text-xs text-white shadow-2xl flex items-center gap-3">
     <i data-lucide="check-circle" id="toastIcon" class="w-4 h-4 text-emerald-400"></i>
     <span id="toastMsg">Data berhasil diperbarui!</span>
   </div>
@@ -1605,8 +1635,8 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
     function switchTab(tabId) {
       document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.nav-tab').forEach(el => {
-        el.classList.remove('bg-red-600/90', 'text-white', 'shadow');
-        el.classList.add('text-slate-400');
+        el.classList.remove('bg-red-600', 'bg-red-600/90', 'text-white', 'shadow', 'font-bold');
+        el.classList.add('text-slate-600');
       });
 
       const targetPane = document.getElementById(tabId);
@@ -1614,8 +1644,8 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
       const targetBtn = document.getElementById('nav-' + tabId);
       if (targetBtn) {
-        targetBtn.classList.remove('text-slate-400');
-        targetBtn.classList.add('bg-red-600/90', 'text-white', 'shadow');
+        targetBtn.classList.remove('text-slate-600');
+        targetBtn.classList.add('bg-red-600', 'text-white', 'shadow', 'font-bold');
       }
 
       // Re-render chart sizes if needed
@@ -1703,7 +1733,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       const btnQuarter = document.getElementById('btnModeQuarter');
 
       [btnMonth, btnYTM, btnQuarter].forEach(btn => {
-        if (btn) btn.className = "px-3 py-1 rounded-md font-medium transition text-slate-400 hover:text-white";
+        if (btn) btn.className = "px-3 py-1 rounded-md font-medium transition text-slate-600 hover:text-slate-900";
       });
 
       if (mode === 'MONTH' && btnMonth) btnMonth.className = "px-3 py-1 rounded-md font-medium transition bg-red-600 text-white shadow";
@@ -2007,10 +2037,10 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               }
             },
             scales: {
-              x: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } },
+              x: { grid: { color: '#E2E8F0' }, ticks: { color: '#475569' } },
               y: {
-                grid: { color: 'rgba(51, 65, 85, 0.3)' },
-                ticks: { color: '#94A3B8' },
+                grid: { color: '#E2E8F0' },
+                ticks: { color: '#475569' },
                 suggestedMax: Math.ceil(maxVal * 1.15)
               }
             }
@@ -2028,7 +2058,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                   if (act === undefined || act === null) return;
                   const ach = tgt > 0 ? ((act / tgt) * 100).toFixed(0) : '0';
                   const text = `${Math.round(act)} (${ach}%)`;
-                  ctx.fillStyle = '#F8FAFC';
+                  ctx.fillStyle = '#0F172A';
                   ctx.font = 'bold 10px Inter, sans-serif';
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'bottom';
@@ -2077,7 +2107,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             },
             scales: {
               x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 10 } } },
-              y: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8', callback: v => v + '%' } }
+              y: { grid: { color: '#E2E8F0' }, ticks: { color: '#94A3B8', callback: v => v + '%' } }
             }
           }
         });
@@ -2157,11 +2187,11 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               }
             },
             scales: {
-              x: { stacked: true, grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } },
+              x: { stacked: true, grid: { color: '#E2E8F0' }, ticks: { color: '#475569' } },
               y: {
                 stacked: true,
-                grid: { color: 'rgba(51, 65, 85, 0.3)' },
-                ticks: { color: '#94A3B8' },
+                grid: { color: '#E2E8F0' },
+                ticks: { color: '#475569' },
                 suggestedMax: Math.ceil(maxTotal * 1.15)
               }
             }
@@ -2211,7 +2241,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
                 const topY = (barC && c > 0) ? barC.y : (barCr ? barCr.y : 0);
                 if (topY > 0) {
-                  ctx.fillStyle = '#F8FAFC';
+                  ctx.fillStyle = '#0F172A';
                   ctx.font = 'bold 10px Inter, sans-serif';
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'bottom';
@@ -2307,9 +2337,9 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               }
             },
             scales: {
-              x: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } },
+              x: { grid: { color: '#E2E8F0' }, ticks: { color: '#475569' } },
               y: {
-                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                grid: { color: '#E2E8F0' },
                 ticks: { color: '#94A3B8', precision: 0 },
                 suggestedMax: Math.max(Math.ceil(maxLease * 1.15), 30),
                 min: 0
@@ -2463,9 +2493,9 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               }
             },
             scales: {
-              x: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } },
+              x: { grid: { color: '#E2E8F0' }, ticks: { color: '#475569' } },
               y: {
-                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                grid: { color: '#E2E8F0' },
                 ticks: { color: '#94A3B8', callback: v => v + ' M' },
                 suggestedMax: Math.ceil(maxRev * 1.15)
               }
@@ -2484,7 +2514,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                   if (!act || act <= 0) return;
                   const ach = tgt > 0 ? ((act / tgt) * 100).toFixed(0) : '0';
                   const text = `Rp ${act.toFixed(1)}M (${ach}%)`;
-                  ctx.fillStyle = '#F8FAFC';
+                  ctx.fillStyle = '#0F172A';
                   ctx.font = 'bold 9px Inter, sans-serif';
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'bottom';
@@ -2560,9 +2590,9 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               }
             },
             scales: {
-              x: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } },
+              x: { grid: { color: '#E2E8F0' }, ticks: { color: '#475569' } },
               y: {
-                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                grid: { color: '#E2E8F0' },
                 ticks: { color: '#94A3B8', callback: v => v + ' Jt' },
                 suggestedMax: Math.ceil(maxGP * 1.15)
               }
@@ -2581,7 +2611,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                   if (!act || act <= 0) return;
                   const ach = tgt > 0 ? ((act / tgt) * 100).toFixed(0) : '0';
                   const text = `Rp ${act.toFixed(0)}Jt (${ach}%)`;
-                  ctx.fillStyle = '#F8FAFC';
+                  ctx.fillStyle = '#0F172A';
                   ctx.font = 'bold 9px Inter, sans-serif';
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'bottom';
@@ -2664,10 +2694,10 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         }).join('');
 
         return `
-          <tr class="hover:bg-slate-800/40 transition">
+          <tr class="hover:bg-slate-50/70 transition">
             <td class="py-2 px-3 font-semibold text-slate-200 text-xs">${label}</td>
             ${cells}
-            <td class="py-2 px-3 text-right bg-slate-800/50 font-bold text-amber-400 text-xs">${totalStr}</td>
+            <td class="py-2 px-3 text-right bg-slate-100/60 font-bold text-amber-400 text-xs">${totalStr}</td>
           </tr>
         `;
       };
@@ -2806,8 +2836,8 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             },
             scales: {
               x: {
-                grid: { color: 'rgba(51, 65, 85, 0.3)' },
-                ticks: { color: '#94A3B8' },
+                grid: { color: '#E2E8F0' },
+                ticks: { color: '#475569' },
                 suggestedMax: Math.ceil(maxVal * 1.3)
               },
               y: {
@@ -2828,7 +2858,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                   if (val === undefined || val === null) return;
                   const pct = totalFilteredUnits > 0 ? ((val / totalFilteredUnits) * 100).toFixed(1) : '0';
                   const text = `${val} Unit (${pct}%)`;
-                  ctx.fillStyle = '#F8FAFC';
+                  ctx.fillStyle = '#0F172A';
                   ctx.font = 'bold 11px Inter, sans-serif';
                   ctx.textAlign = 'left';
                   ctx.textBaseline = 'middle';
@@ -2854,7 +2884,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               data: topValues.slice(0, 6),
               backgroundColor: ['#D71920', '#EF4444', '#F97316', '#F59E0B', '#10B981', '#3B82F6'],
               borderWidth: 2,
-              borderColor: '#0F172A'
+              borderColor: '#FFFFFF'
             }]
           },
           options: {
@@ -2926,7 +2956,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           salesDiv.innerHTML = sortedSales.map(([name, count], idx) => {
             const pct = totalFilteredUnits > 0 ? ((count / totalFilteredUnits) * 100).toFixed(1) : '0';
             return `
-              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
+              <div class="p-3 rounded-xl bg-slate-900 border border-slate-200 flex items-center justify-between hover:border-slate-300 transition">
                 <div class="flex items-center gap-2.5 min-w-0 pr-2">
                   <span class="w-6 h-6 rounded-full ${idx === 0 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : idx === 1 ? 'bg-slate-300/20 text-slate-200 border border-slate-400/30' : idx === 2 ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 'bg-slate-800 text-slate-400'} font-bold flex items-center justify-center text-[10px] shrink-0">
                     ${idx + 1}
@@ -2988,7 +3018,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           tbody.innerHTML = `<tr><td colspan="12" class="py-4 text-center text-slate-500 text-xs">Tidak ada data tipe kendaraan ditemukan.</td></tr>`;
         } else {
           tbody.innerHTML = sortedRows.map(([name, mData]) => `
-            <tr class="hover:bg-slate-800/40 transition">
+            <tr class="hover:bg-slate-50/70 transition">
               <td class="py-2 px-3 font-semibold text-slate-200">${name}</td>
               <td class="py-2 px-2 text-center ${mData.January > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.January || '-'}</td>
               <td class="py-2 px-2 text-center ${mData.February > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.February || '-'}</td>
@@ -3070,16 +3100,16 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       const funnelDiv = document.getElementById('tradeInFunnelCards');
       if (funnelDiv) {
         funnelDiv.innerHTML = `
-          <div class="glass-card rounded-2xl p-5 border border-slate-800">
+          <div class="glass-card rounded-2xl p-5 border border-slate-200">
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs font-bold text-slate-400">1. Replacement Prospect</span>
               <span class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"><i data-lucide="users" class="w-4 h-4"></i></span>
             </div>
-            <div class="text-3xl font-black text-white mt-1">${totalProspect.toLocaleString('id-ID')}</div>
+            <div class="text-3xl font-black text-slate-950 mt-1">${totalProspect.toLocaleString('id-ID')}</div>
             <span class="text-[11px] text-blue-400 font-semibold mt-1 inline-block">Total Prospek Masuk</span>
           </div>
 
-          <div class="glass-card rounded-2xl p-5 border border-slate-800">
+          <div class="glass-card rounded-2xl p-5 border border-slate-200">
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs font-bold text-slate-400">2. Appraisal</span>
               <span class="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20"><i data-lucide="clipboard-check" class="w-4 h-4"></i></span>
@@ -3088,7 +3118,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             <span class="text-[11px] text-amber-500 font-semibold mt-1 inline-block">${appraisalRate}% Appraisal Rate</span>
           </div>
 
-          <div class="glass-card rounded-2xl p-5 border border-slate-800">
+          <div class="glass-card rounded-2xl p-5 border border-slate-200">
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs font-bold text-slate-400">3. Deal</span>
               <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-lucide="check-circle-2" class="w-4 h-4"></i></span>
@@ -3116,7 +3146,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               data: topBrands.map(x => x[1]),
               backgroundColor: colors,
               borderWidth: 2,
-              borderColor: '#0F172A'
+              borderColor: '#FFFFFF'
             }]
           },
           options: {
@@ -3192,7 +3222,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             },
             scales: {
               x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 11 } } },
-              y: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8', precision: 0 } }
+              y: { grid: { color: '#E2E8F0' }, ticks: { color: '#94A3B8', precision: 0 } }
             }
           }
         });
@@ -3226,7 +3256,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         
         const dealBadge = isDeal 
           ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Deal</span>'
-          : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">Proses / Batal</span>';
+          : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Proses / Batal</span>';
 
         const appBadge = isApp
           ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">Appraised</span>'
@@ -3238,7 +3268,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         const soldDisplay = r.sold_to || r.terjual_ke || r.reason || '-';
 
         return `
-          <tr class="hover:bg-slate-800/40 transition">
+          <tr class="hover:bg-slate-50/70 transition">
             <td class="py-2.5 px-3 text-slate-400">${r.no || (idx + 1)}</td>
             <td class="py-2.5 px-3 font-medium text-slate-300">${r.month || r.bulan || '-'}</td>
             <td class="py-2.5 px-3 text-slate-200 font-semibold">${r.sales || '-'}</td>
@@ -3345,7 +3375,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       if (state === 'Closed' || totalOutstanding <= 0) {
         return `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Lunas (0 Hari)</span>`;
       }
-      if (!dueDateStr) return `<span class="text-slate-400 text-xs">-</span>`;
+      if (!dueDateStr) return `<span class="text-slate-500 text-xs">-</span>`;
       
       const due = new Date(dueDateStr);
       const refDate = new Date('2026-11-22');
@@ -3523,8 +3553,8 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             }
           },
           scales: {
-            x: { grid: { display: false }, ticks: { color: '#94A3B8' } },
-            y: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8', callback: v => 'Rp ' + v + 'M' } }
+            x: { grid: { display: false }, ticks: { color: '#475569' } },
+            y: { grid: { color: '#E2E8F0' }, ticks: { color: '#94A3B8', callback: v => 'Rp ' + v + 'M' } }
           }
         }
       });
@@ -3593,7 +3623,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           const finCoDisplay = (r.financing_company && r.financing_company !== '-') ? r.financing_company : '<span class="text-slate-500">Cash / Non-Leasing</span>';
 
           rowsHtml += `
-            <tr class="hover:bg-slate-800/40 transition">
+            <tr class="hover:bg-slate-50/70 transition">
               <td class="py-2.5 px-3 text-slate-500 text-center">${rowNum}</td>
               <td class="py-2.5 px-3 font-semibold text-white tracking-wide font-mono text-[11px]">${r.inv_no}</td>
               <td class="py-2.5 px-3 text-slate-300">${formatDateID(r.trx_date)}</td>
@@ -3761,7 +3791,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
       [btnStreets, btnHybrid, btnTerrain].forEach(btn => {
         if (!btn) return;
-        btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-1.5";
+        btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg transition text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-1.5";
       });
 
       if (type === 'google_streets' && btnStreets) {
@@ -3841,7 +3871,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
       [btnAll, btnEvHev, btnBev, btnHev].forEach(btn => {
         if (!btn) return;
-        btn.className = "px-3 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white";
+        btn.className = "px-3 py-1.5 rounded-lg font-bold transition text-slate-600 hover:text-slate-900 hover:bg-slate-100";
       });
 
       if (pw === 'ALL') {
@@ -4008,7 +4038,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                     <span>#${info.rank}</span>
                     <div class="absolute -bottom-1.5 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px]" style="border-t-color: ${color};"></div>
                   </div>
-                  <div class="mt-2 px-2 py-0.5 rounded-full bg-slate-950/90 text-white text-[10px] font-bold border border-slate-700/80 shadow-lg flex items-center gap-1 whitespace-nowrap group-hover:border-amber-400 group-hover:scale-110 transition">
+                  <div class="mt-2 px-2 py-0.5 rounded-full bg-slate-950/90 text-white text-[10px] font-bold border border-slate-300/80 shadow-lg flex items-center gap-1 whitespace-nowrap group-hover:border-amber-400 group-hover:scale-110 transition">
                     <span>${kecName}</span>
                     <span style="color: ${color};">(${info.qty.toLocaleString('id-ID')})</span>
                   </div>
@@ -4063,7 +4093,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
                       <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
                     </svg>
                   </div>
-                  <div class="mt-0.5 px-1.5 py-0.2 rounded bg-slate-900/90 text-slate-300 text-[8px] font-semibold border border-slate-700 shadow-sm flex items-center gap-1 whitespace-nowrap group-hover:scale-110 group-hover:border-blue-400 group-hover:text-white transition">
+                  <div class="mt-0.5 px-1.5 py-0.2 rounded bg-slate-900/90 text-slate-300 text-[8px] font-semibold border border-slate-300 shadow-sm flex items-center gap-1 whitespace-nowrap group-hover:scale-110 group-hover:border-blue-400 group-hover:text-white transition">
                     <span>${kecName}</span>
                     <span class="text-sky-400 font-bold">(${info.qty.toLocaleString('id-ID')})</span>
                   </div>
@@ -4120,33 +4150,33 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             const rankBadge = item.rank === 1 ? '<span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-black flex items-center justify-center text-xs border border-amber-500/30">1</span>'
                             : item.rank === 2 ? '<span class="w-6 h-6 rounded-full bg-slate-300/20 text-slate-200 font-bold flex items-center justify-center text-xs border border-slate-300/30">2</span>'
                             : item.rank === 3 ? '<span class="w-6 h-6 rounded-full bg-amber-700/20 text-amber-500 font-bold flex items-center justify-center text-xs border border-amber-700/30">3</span>'
-                            : `<span class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 font-semibold flex items-center justify-center text-xs">${item.rank || (idx + 1)}</span>`;
+                            : `<span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 border border-slate-300 font-bold flex items-center justify-center text-xs">${item.rank || (idx + 1)}</span>`;
 
-            const brandClass = isToyota ? 'font-extrabold text-white text-sm flex items-center gap-2' : 'font-semibold text-slate-200 text-sm';
+            const brandClass = isToyota ? 'font-black text-slate-950 text-sm flex items-center gap-2' : 'font-bold text-slate-800 text-sm';
             const logoPill = isToyota ? '<span class="px-2 py-0.5 rounded text-[10px] font-black bg-red-600 text-white shadow-sm">TOYOTA</span>' : item.brand;
 
             const barColor = isToyota ? 'bg-red-600' : (isByd ? 'bg-blue-500' : (isJaecoo ? 'bg-cyan-400' : 'bg-slate-500'));
 
-            const statusBadge = item.rank === 1 ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Market Leader #1</span>'
-                              : item.rank <= 3 ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">Main Competitor</span>'
-                              : '<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-slate-400">Challenger</span>';
+            const statusBadge = item.rank === 1 ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">Market Leader #1</span>'
+                              : item.rank <= 3 ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Main Competitor</span>'
+                              : '<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">Challenger</span>';
 
             const modelsDesc = (item.top_models && item.top_models.length > 0) ? item.top_models.join(', ') : '-';
 
             return `
-              <tr class="hover:bg-slate-800/40 transition">
+              <tr class="hover:bg-slate-50/70 transition">
                 <td class="py-3 px-3 text-center">${rankBadge}</td>
                 <td class="py-3 px-4 ${brandClass}">
                   ${logoPill}
                 </td>
-                <td class="py-3 px-4 text-xs text-slate-300 truncate max-w-[200px]" title="${modelsDesc}">${modelsDesc}</td>
-                <td class="py-3 px-4 text-right font-extrabold text-white text-sm">${item.qty.toLocaleString('id-ID')}</td>
+                <td class="py-3 px-4 text-xs text-slate-600 font-medium truncate max-w-[200px]" title="${modelsDesc}">${modelsDesc}</td>
+                <td class="py-3 px-4 text-right font-extrabold text-slate-950 text-sm">${item.qty.toLocaleString('id-ID')}</td>
                 <td class="py-3 px-6 text-center">
                   <div class="flex items-center gap-3">
-                    <div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
+                    <div class="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
                       <div class="${barColor} h-2 rounded-full transition-all duration-500" style="width: ${Math.min(100, item.market_share * 3)}%;"></div>
                     </div>
-                    <span class="w-12 text-right font-black text-xs ${isToyota ? 'text-red-400' : 'text-slate-200'}">${item.market_share}%</span>
+                    <span class="w-12 text-right font-black text-xs ${isToyota ? 'text-red-600' : 'text-slate-800'}">${item.market_share}%</span>
                   </div>
                 </td>
                 <td class="py-3 px-4 text-center">${statusBadge}</td>
@@ -4179,7 +4209,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
               </div>
               <h5 class="text-xs font-bold text-white truncate">${name}</h5>
               <div class="text-sm font-black text-slate-100 mt-1">${kInfo.qty.toLocaleString('id-ID')} <span class="text-[10px] font-normal text-slate-400">Unit</span></div>
-              <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between border-t border-slate-800 pt-1.5">
+              <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between border-t border-slate-200 pt-1.5">
                 <span>Rincian Detail</span>
                 <span class="text-red-400 font-bold">&rarr;</span>
               </div>
@@ -4233,13 +4263,13 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       const brandsList = document.getElementById('modalKecBrandsList');
       if (brandsList) {
         brandsList.innerHTML = (info.top_brands || []).map((b, idx) => `
-          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 border border-slate-800/80 text-xs">
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 border border-slate-200/80 text-xs">
             <div class="flex items-center gap-2">
               <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center text-[10px]">${idx + 1}</span>
               <span class="font-bold ${b.brand.toUpperCase() === 'TOYOTA' ? 'text-red-400 font-black' : 'text-slate-200'}">${b.brand}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-slate-400 text-[11px]">(${b.pct}%)</span>
+              <span class="text-slate-500 text-[11px]">(${b.pct}%)</span>
               <strong class="text-white">${b.qty.toLocaleString('id-ID')} Unit</strong>
             </div>
           </div>
@@ -4250,13 +4280,13 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       const groupsList = document.getElementById('modalKecGroupsList');
       if (groupsList) {
         groupsList.innerHTML = (info.top_groups || []).map((g, idx) => `
-          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 border border-slate-800/80 text-xs">
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 border border-slate-200/80 text-xs">
             <div class="flex items-center gap-2">
               <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-300 font-bold flex items-center justify-center text-[10px]">${idx + 1}</span>
               <span class="font-medium text-slate-200 truncate max-w-[150px]" title="${g.group}">${g.group}</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-slate-400 text-[11px]">(${g.pct}%)</span>
+              <span class="text-slate-500 text-[11px]">(${g.pct}%)</span>
               <strong class="text-white">${g.qty.toLocaleString('id-ID')} Unit</strong>
             </div>
           </div>
@@ -4273,9 +4303,9 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
 
     // --- JSONP GOOGLE SHEETS FETCHER (Zero CORS Restriction) ---
-    function fetchGvizJsonp(sheetName) {
+    function fetchGvizJsonp(sheetName, extraParams = '') {
       return new Promise((resolve, reject) => {
-        const cbName = 'gviz_cb_' + Math.random().toString(36).substring(2, 9);
+        const cbName = 'gviz_cb_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
         const script = document.createElement('script');
         let timeout = setTimeout(() => {
           cleanup();
@@ -4302,7 +4332,9 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           reject(new Error('Network error loading sheet: ' + sheetName));
         };
 
-        script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=responseHandler:${cbName}&sheet=${encodeURIComponent(sheetName)}&_t=${Date.now()}`;
+        // Cache-busting: add unique reqId and timestamp to bypass Google CDN cache
+        const cacheBuster = `&tq=select%20*&reqId=${Date.now()}&_nocache=${Math.random()}`;
+        script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=responseHandler:${cbName}&sheet=${encodeURIComponent(sheetName)}${extraParams}${cacheBuster}`;
         document.body.appendChild(script);
       });
     }
@@ -4706,10 +4738,10 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       if (tbody) {
         tbody.innerHTML = rows.map(r => `
           <tr class="${r.cls || 'hover:bg-slate-850/50'} transition">
-            <td class="p-3 border-r border-slate-800 text-slate-300 font-semibold text-xs md:text-sm">${r.label}</td>
-            <td class="p-3 border-r border-slate-800 bg-red-950/10 text-red-200 text-xs md:text-sm font-semibold">${r.toyota}</td>
-            <td class="p-3 border-r border-slate-800 bg-blue-950/10 text-blue-200 text-xs md:text-sm font-semibold">${r.nonToyota}</td>
-            <td class="p-2 border-r border-slate-800 text-center text-xs text-slate-400">${r.bkToyota || '-'}</td>
+            <td class="p-3 border-r border-slate-200 text-slate-800 font-bold text-xs md:text-sm">${r.label}</td>
+            <td class="p-3 border-r border-slate-200 bg-red-950/10 text-red-200 text-xs md:text-sm font-semibold">${r.toyota}</td>
+            <td class="p-3 border-r border-slate-200 bg-blue-950/10 text-blue-200 text-xs md:text-sm font-semibold">${r.nonToyota}</td>
+            <td class="p-2 border-r border-slate-200 text-center text-xs text-slate-400">${r.bkToyota || '-'}</td>
             <td class="p-2 text-center text-xs text-slate-400">${r.bkNonToyota || '-'}</td>
           </tr>
         `).join('');
@@ -5083,7 +5115,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           fetchGvizJsonp('RS Bekasi').catch(err => { console.warn('Sync RS err:', err); return null; }),
           fetchGvizJsonp('Trade In').catch(err => { console.warn('Sync Trade In err:', err); return null; }),
           fetchGvizJsonp('AR').catch(err => { console.warn('Sync AR err:', err); return null; }),
-          fetchGvizJsonp('eNCOmpare&headers=0').catch(err => { console.warn('Sync eNCOmpare err:', err); return null; })
+          fetchGvizJsonp('eNCOmpare', '&headers=0').catch(err => { console.warn('Sync eNCOmpare err:', err); return null; })
         ]);
 
         let hasAnyUpdate = false;
@@ -5133,12 +5165,26 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         }
 
         if (hasAnyUpdate) {
+          try {
+            localStorage.setItem('tunas_live_app_data', JSON.stringify({
+              rs_afi: appData.rs_afi,
+              dashboard_kpi: appData.dashboard_kpi,
+              trade_in: appData.trade_in,
+              ar_data: appData.ar_data,
+              nco_data: appData.nco_data,
+              timestamp: Date.now()
+            }));
+          } catch (e) {
+            console.warn('LocalStorage quota exceeded or disabled', e);
+          }
           showToast('Live Sync: Seluruh Data Otomatis Terupdate dari Google Sheets!', 'success');
           const badgeEl = document.getElementById('syncStatusText');
           if (badgeEl) badgeEl.textContent = 'Live Terhubung ke Google Sheets';
           const timeEl = document.getElementById('syncLastTime');
           if (timeEl) timeEl.textContent = new Date().toLocaleTimeString('id-ID');
           applyFilters();
+          if (typeof renderEncompare === 'function') renderEncompare();
+          if (typeof updatePolregView === 'function') updatePolregView();
         } else {
           showToast('Data diperbarui menggunakan preloaded dataset lokal', 'info');
           applyFilters();
