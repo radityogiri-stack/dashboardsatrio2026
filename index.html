@@ -2085,7 +2085,6 @@
                 const crPct = ((cr / tot) * 100).toFixed(0);
                 const cPct = ((c / tot) * 100).toFixed(0);
 
-                // 1. Credit label inside blue bar
                 const barCr = metaCr.data[idx];
                 if (barCr && cr > 0) {
                   const h = Math.abs(barCr.base - barCr.y);
@@ -2099,7 +2098,6 @@
                   }
                 }
 
-                // 2. Cash label inside green bar
                 const barC = metaC.data[idx];
                 if (barC && c > 0) {
                   const h = Math.abs(barC.base - barC.y);
@@ -2113,7 +2111,6 @@
                   }
                 }
 
-                // 3. Total units on top of the stacked bar
                 const topY = (barC && c > 0) ? barC.y : (barCr ? barCr.y : 0);
                 if (topY > 0) {
                   ctx.fillStyle = '#F8FAFC';
@@ -2129,12 +2126,12 @@
         });
       }
 
-      // --- Chart 2: Leasing Share (Line Chart with Numbers & Percentages on Points) ---
-      const tvc = labels.map((_, i) => kpiSatrio.tvc_unit?.[MONTHS[i]] || 0);
-      const mtf = labels.map((_, i) => kpiSatrio.mtf_unit?.[MONTHS[i]] || 0);
-      const others = labels.map((_, i) => kpiSatrio.others_unit?.[MONTHS[i]] || 0);
+      // --- Chart 2: Leasing Share (Line Chart with Clean Integer Numbers & Percentages on Points) ---
+      const tvc = labels.map((_, i) => Math.round(kpiSatrio.tvc_unit?.[MONTHS[i]] || 0));
+      const mtf = labels.map((_, i) => Math.round(kpiSatrio.mtf_unit?.[MONTHS[i]] || 0));
+      const others = labels.map((_, i) => Math.round(kpiSatrio.others_unit?.[MONTHS[i]] || 0));
       const totalLeasing = labels.map((_, i) => tvc[i] + mtf[i] + others[i]);
-      const maxLease = Math.max(...tvc, ...mtf, 1);
+      const maxLease = Math.max(...tvc, ...mtf, 25);
 
       const ctxLease = document.getElementById('chartLeasingShare')?.getContext('2d');
       if (ctxLease) {
@@ -2215,8 +2212,9 @@
               x: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } },
               y: {
                 grid: { color: 'rgba(51, 65, 85, 0.3)' },
-                ticks: { color: '#94A3B8' },
-                suggestedMax: Math.ceil(maxLease * 1.25)
+                ticks: { color: '#94A3B8', precision: 0 },
+                suggestedMax: Math.max(Math.ceil(maxLease * 1.15), 30),
+                min: 0
               }
             }
           },
@@ -2231,13 +2229,13 @@
 
               labels.forEach((_, idx) => {
                 const tot = totalLeasing[idx] || 1;
-                const vTVC = tvc[idx];
-                const vMTF = mtf[idx];
-                const vOth = others[idx];
+                const vTVC = Math.round(tvc[idx]);
+                const vMTF = Math.round(mtf[idx]);
+                const vOth = Math.round(others[idx]);
 
-                const pTVC = ((vTVC / tot) * 100).toFixed(0);
-                const pMTF = ((vMTF / tot) * 100).toFixed(0);
-                const pOth = ((vOth / tot) * 100).toFixed(0);
+                const pTVC = tot > 0 ? ((vTVC / tot) * 100).toFixed(0) : 0;
+                const pMTF = tot > 0 ? ((vMTF / tot) * 100).toFixed(0) : 0;
+                const pOth = tot > 0 ? ((vOth / tot) * 100).toFixed(0) : 0;
 
                 const ptTVC = metaTVC.data[idx];
                 const ptMTF = metaMTF.data[idx];
@@ -2246,9 +2244,7 @@
                 ctx.font = 'bold 9px Inter, sans-serif';
                 ctx.textAlign = 'center';
 
-                // Intelligent vertical placement to avoid collision between TVC & MTF:
                 if (vTVC >= vMTF) {
-                  // TVC above, MTF below
                   if (ptTVC) {
                     ctx.fillStyle = '#EF4444';
                     ctx.textBaseline = 'bottom';
@@ -2260,7 +2256,6 @@
                     ctx.fillText(`${vMTF} (${pMTF}%)`, ptMTF.x, ptMTF.y + 6);
                   }
                 } else {
-                  // MTF above, TVC below
                   if (ptMTF) {
                     ctx.fillStyle = '#F59E0B';
                     ctx.textBaseline = 'bottom';
@@ -2273,7 +2268,6 @@
                   }
                 }
 
-                // Others text
                 if (ptOth && vOth > 0) {
                   ctx.fillStyle = '#94A3B8';
                   ctx.font = '8px Inter, sans-serif';
@@ -2945,7 +2939,7 @@
       const mFilter = document.getElementById('tradeInMonthFilter');
       const selMonth = mFilter ? mFilter.value : 'ALL';
       if (selMonth && selMonth !== 'ALL') {
-        records = records.filter(r => (r.month || '').toLowerCase() === selMonth.toLowerCase());
+        records = records.filter(r => (r.month || r.bulan || '').toLowerCase() === selMonth.toLowerCase());
       }
 
       // Update SPV badge pada header Trade In
@@ -2967,14 +2961,15 @@
         }
         if (r.is_deal || (r.deal && r.deal.toLowerCase() === 'deal')) {
           totalDeal++;
-          const soldTo = (r.sold_to || '').toLowerCase();
+          const soldTo = (r.sold_to || r.terjual_ke || '').toLowerCase();
           if (soldTo.includes('olx')) statusCounts['Deal OLXmobbi']++;
           else statusCounts['Deal Rekanan']++;
         } else {
           statusCounts['Belum Deal / Proses']++;
         }
 
-        const brand = r.old_brand || 'Lainnya';
+        const rawBrand = (r.old_brand || r.merek || '').trim();
+        const brand = rawBrand && rawBrand !== '-' ? (rawBrand.charAt(0).toUpperCase() + rawBrand.slice(1).toLowerCase()) : 'Lainnya';
         brandCounts[brand] = (brandCounts[brand] || 0) + 1;
       });
 
@@ -3113,10 +3108,11 @@
         });
       }
 
-      // Simpan records aktif untuk fungsi pencarian & render tabel
+      // 4. Render Table Data Seluruh Leads Trade In
       window.currentFilteredTradeInRecords = records;
       renderTradeInTableRows(records);
-      lucide.createIcons();
+
+      if (window.lucide) lucide.createIcons();
     }
 
     function renderTradeInTableRows(records) {
@@ -3133,9 +3129,10 @@
       }
 
       tbody.innerHTML = records.map((r, idx) => {
-        const isDeal = (r.deal && r.deal.toLowerCase() === 'deal');
-        const isApp = (r.appraisal && r.appraisal.toUpperCase().includes('APPRAISAL'));
-        const penawaranFmt = r.penawaran ? 'Rp ' + Number(r.penawaran).toLocaleString('id-ID') : '-';
+        const isDeal = (r.is_deal || (r.deal && r.deal.toLowerCase() === 'deal'));
+        const isApp = (r.is_appraisal || (r.appraisal && r.appraisal.toUpperCase().includes('APPRAISAL')));
+        const penVal = typeof r.penawaran === 'number' ? r.penawaran : (parseFloat(String(r.penawaran || '0').replace(/[^0-9.-]/g, '')) || 0);
+        const penawaranFmt = penVal > 0 ? 'Rp ' + Math.round(penVal).toLocaleString('id-ID') : '-';
         
         const dealBadge = isDeal 
           ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Deal</span>'
@@ -3145,20 +3142,25 @@
           ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">Appraised</span>'
           : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400">Belum</span>';
 
+        const brandDisplay = r.old_brand || r.merek || '';
+        const modelDisplay = r.old_model || r.model || '';
+        const carDisplay = (brandDisplay + ' ' + modelDisplay).trim() || '-';
+        const soldDisplay = r.sold_to || r.terjual_ke || r.reason || '-';
+
         return `
           <tr class="hover:bg-slate-800/40 transition">
             <td class="py-2.5 px-3 text-slate-400">${r.no || (idx + 1)}</td>
-            <td class="py-2.5 px-3 font-medium text-slate-300">${r.month || '-'}</td>
+            <td class="py-2.5 px-3 font-medium text-slate-300">${r.month || r.bulan || '-'}</td>
             <td class="py-2.5 px-3 text-slate-200 font-semibold">${r.sales || '-'}</td>
             <td class="py-2.5 px-3 text-slate-400">${r.spv || '-'}</td>
-            <td class="py-2.5 px-3 text-white font-bold">${r.new_car || '-'}</td>
-            <td class="py-2.5 px-3 text-slate-200 font-medium">${r.old_brand || ''} ${r.old_model || ''}</td>
-            <td class="py-2.5 px-3 text-slate-400">${r.year || '-'}</td>
-            <td class="py-2.5 px-3 font-mono text-[11px] text-amber-300">${r.plate || '-'}</td>
+            <td class="py-2.5 px-3 text-white font-bold">${r.new_car || r.mobil_baru || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-200 font-medium">${carDisplay}</td>
+            <td class="py-2.5 px-3 text-slate-400">${r.year || r.tahun || '-'}</td>
+            <td class="py-2.5 px-3 font-mono text-[11px] text-amber-300">${r.plate || r.plat || '-'}</td>
             <td class="py-2.5 px-3">${appBadge}</td>
             <td class="py-2.5 px-3 text-slate-300 font-medium">${penawaranFmt}</td>
             <td class="py-2.5 px-3">${dealBadge}</td>
-            <td class="py-2.5 px-3 text-slate-400 truncate max-w-[200px]" title="${r.sold_to || r.reason || '-'}">${r.sold_to || r.reason || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-400 truncate max-w-[200px]" title="${soldDisplay}">${soldDisplay}</td>
           </tr>
         `;
       }).join('');
@@ -3272,7 +3274,19 @@
     function renderARTab() {
       const allRecords = appData.ar_data || [];
       
-      // 1. Get active months based on currentPeriod & currentMode
+      // 1. Filter by Supervisor
+      let spvFiltered = allRecords.filter(r => {
+        if (currentSpv === 'ALL') return true;
+        if (currentSpv === 'SATRIYO KRESNO AJI') {
+          return r.spv && (r.spv.toUpperCase().includes('SATRIYO') || r.spv.toUpperCase().includes('SATRIO'));
+        }
+        if (currentSpv === 'YAMES') {
+          return r.spv && (r.spv.toUpperCase().includes('YAMES') || r.spv.toUpperCase().includes('JAMES'));
+        }
+        return true;
+      });
+
+      // 2. Get active months based on currentPeriod & currentMode
       const getMonthsList = () => {
         if (currentMode === 'MONTH') return [currentPeriod];
         if (currentMode === 'YTM') {
@@ -3288,18 +3302,6 @@
         return ['September'];
       };
       const activeMonths = getMonthsList();
-
-      // 2. Filter by Supervisor
-      let spvFiltered = allRecords.filter(r => {
-        if (currentSpv === 'ALL') return true;
-        if (currentSpv === 'SATRIYO KRESNO AJI') {
-          return r.spv && r.spv.toUpperCase().includes('SATRIYO');
-        }
-        if (currentSpv === 'YAMES') {
-          return r.spv && (r.spv.toUpperCase().includes('YAMES') || r.spv.toUpperCase().includes('JAMES'));
-        }
-        return true;
-      });
 
       // 3. Filter by Active Months
       let spvPeriodRecords = spvFiltered.filter(r => {
@@ -3394,6 +3396,7 @@
 
       // 8. Cache filtered data and render table
       filteredARDataCache = stateFiltered;
+      window.spvAllARRecordsCache = spvFiltered;
       renderARTableOnly();
       if (window.lucide) lucide.createIcons();
     }
@@ -3452,16 +3455,26 @@
     }
 
     function renderARTableOnly() {
-      let data = filteredARDataCache;
+      let data = filteredARDataCache || [];
       
-      // Apply search query
+      // If user is searching, search globally across the supervisor's records
       if (arSearchQuery) {
-        data = data.filter(r => {
-          return (r.inv_no && r.inv_no.toLowerCase().includes(arSearchQuery)) ||
-                 (r.customer && r.customer.toLowerCase().includes(arSearchQuery)) ||
-                 (r.financing_company && r.financing_company.toLowerCase().includes(arSearchQuery)) ||
-                 (r.state && r.state.toLowerCase().includes(arSearchQuery));
+        const pool = window.spvAllARRecordsCache || appData.ar_data || [];
+        data = pool.filter(r => {
+          const invMatch = (r.inv_no && r.inv_no.toLowerCase().includes(arSearchQuery));
+          const custMatch = (r.customer && r.customer.toLowerCase().includes(arSearchQuery));
+          const finMatch = (r.financing_company && r.financing_company.toLowerCase().includes(arSearchQuery));
+          const stateMatch = (r.state && r.state.toLowerCase().includes(arSearchQuery));
+          const monthMatch = (r.month && r.month.toLowerCase().includes(arSearchQuery)) || (r.month_en && r.month_en.toLowerCase().includes(arSearchQuery));
+          return invMatch || custMatch || finMatch || stateMatch || monthMatch;
         });
+
+        // Also respect state filter if selected Released or Closed during search
+        if (currentARStateFilter === 'Released') {
+          data = data.filter(r => r.state === 'Released');
+        } else if (currentARStateFilter === 'Closed') {
+          data = data.filter(r => r.state === 'Closed');
+        }
       }
 
       const totalRows = data.length;
@@ -3480,14 +3493,13 @@
       if (!tbody) return;
 
       if (pageData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="15" class="py-8 text-center text-slate-500 text-xs">Tidak ada transaksi AR yang cocok dengan filter atau kata kunci pencarian.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="15" class="py-8 text-center text-slate-500 text-xs">Tidak ada transaksi AR yang cocok dengan filter atau kata kunci pencarian "${arSearchQuery}".</td></tr>`;
       } else {
         let rowsHtml = '';
         pageData.forEach((r, idx) => {
           const rowNum = startIdx + idx + 1;
           const overdueBadge = calculateAROverdue(r.due_date, r.state, r.balance, r.fin_co_balance);
           
-          // Information logic according to user prompt:
           let infoBadge = '';
           const isFinCoZero = (r.fin_co_receipt_amount === 0 || r.fin_co_receipt_amount === 0.0);
           const hasBalance = ((r.balance || 0) > 0 || (r.fin_co_balance || 0) > 0);
@@ -3498,7 +3510,6 @@
             infoBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">Sudah Terbayar</span>`;
           }
 
-          // State badge
           const stateBadge = r.state === 'Released'
             ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">Released</span>`
             : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Closed</span>`;
@@ -3528,44 +3539,7 @@
         tbody.innerHTML = rowsHtml;
       }
 
-      // Pagination Information
-      const elInfo = document.getElementById('arPaginationInfo');
-      if (elInfo) {
-        if (totalRows === 0) {
-          elInfo.textContent = 'Menampilkan 0 - 0 dari 0 transaksi';
-        } else {
-          elInfo.textContent = `Menampilkan ${startIdx + 1} - ${endIdx} dari ${totalRows.toLocaleString('id-ID')} transaksi (Halaman ${currentARPage} dari ${totalPages})`;
-        }
-      }
-
-      // Pagination Buttons
-      const elBtns = document.getElementById('arPaginationButtons');
-      if (elBtns) {
-        if (totalPages <= 1) {
-          elBtns.innerHTML = '';
-        } else {
-          let btnHtml = '';
-          btnHtml += `<button onclick="changeARPage(${currentARPage - 1})" ${currentARPage === 1 ? 'disabled' : ''} class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed">Prev</button>`;
-          
-          let startP = Math.max(1, currentARPage - 2);
-          let endP = Math.min(totalPages, currentARPage + 2);
-          if (startP > 1) {
-            btnHtml += `<button onclick="changeARPage(1)" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 hover:text-white">1</button>`;
-            if (startP > 2) btnHtml += `<span class="px-1 text-slate-600">...</span>`;
-          }
-          for (let p = startP; p <= endP; p++) {
-            const isActive = (p === currentARPage);
-            btnHtml += `<button onclick="changeARPage(${p})" class="px-2.5 py-1 rounded ${isActive ? 'bg-red-600 text-white font-bold' : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'}">${p}</button>`;
-          }
-          if (endP < totalPages) {
-            if (endP < totalPages - 1) btnHtml += `<span class="px-1 text-slate-600">...</span>`;
-            btnHtml += `<button onclick="changeARPage(${totalPages})" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 hover:text-white">${totalPages}</button>`;
-          }
-
-          btnHtml += `<button onclick="changeARPage(${currentARPage + 1})" ${currentARPage === totalPages ? 'disabled' : ''} class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed">Next</button>`;
-          elBtns.innerHTML = btnHtml;
-        }
-      }
+      renderARPaginationControls(totalPages);
     }
 
     // --- TAB 6: FINANCIAL PERFORMANCE ---
@@ -3669,8 +3643,7 @@
 
       // Center map on Kota Bekasi
       polregMap = L.map('polregLeafletMap', {
-        center: [-6.2666, 106.9800],
-        zoom: 12,
+        center: [-6.2400, 106.9950], zoom: 12,
         zoomControl: true,
         attributionControl: false
       });
@@ -3734,7 +3707,7 @@
 
     function recenterBekasiMap() {
       if (polregMap) {
-        polregMap.setView([-6.2666, 106.9800], 12, { animate: true });
+        polregMap.setView([-6.2400, 106.9950], 12, { animate: true });
       }
     }
 
@@ -3851,7 +3824,7 @@
       const toyotaRankEl = document.getElementById('statPolregToyotaRank');
       if (toyotaRankEl) toyotaRankEl.textContent = '#' + (toyotaEntry.rank || 1) + ' di Kota Bekasi';
 
-      // Competitor (Rank 2 or 1 if Toyota is 2)
+      // Competitor
       const compEntry = (top10.length > 1 && top10[0].brand.toUpperCase() === 'TOYOTA') ? top10[1] : (top10[0] || { brand: '-', qty: 0, market_share: 0 });
       const compNameEl = document.getElementById('statPolregCompName');
       if (compNameEl) compNameEl.textContent = `${compEntry.brand} (${compEntry.qty.toLocaleString('id-ID')})`;
@@ -3878,18 +3851,17 @@
         formulaBox.innerHTML = `Contoh Aktif: Toyota (${toyotaEntry.qty.toLocaleString('id-ID')}) ÷ All Market (${totalMarket.toLocaleString('id-ID')}) = <strong class="text-red-400 font-bold">${toyotaEntry.market_share}% Market Share</strong>`;
       }
 
-      // 2. Update Map Markers & Polygons
+      // 2. Update Map Markers & Polygons (KHUSUS KOTA BEKASI SAJA, BERSIH DARI CLUTTER LUAR)
       if (polregMap) {
         polregMarkers.forEach(m => polregMap.removeLayer(m));
         polregMarkers = [];
 
-        const isNeonMode = (currentPolregPowertrain !== 'ALL');
-
-        // Color schemes
-        // Normal Paragon: Tier 1 #10B981, Tier 2 #06B6D4, Tier 3 #F59E0B, Tier 4 #F43F5E
-        // Neon Blue: Tier 1 #00F0FF, Tier 2 #38BDF8, Tier 3 #3B82F6, Tier 4 #6366F1
-        const normalColors = { 1: '#10B981', 2: '#06B6D4', 3: '#F59E0B', 4: '#F43F5E' };
-        const neonColors = { 1: '#00F0FF', 2: '#38BDF8', 3: '#3B82F6', 4: '#6366F1' };
+        // 4 Tiers of distinct colors for Kota Bekasi kecamatans based on sales ranking:
+        // Tier 1 (Rank 1-3): Emerald Green #10B981
+        // Tier 2 (Rank 4-6): Sky Blue #06B6D4
+        // Tier 3 (Rank 7-9): Amber Gold #F59E0B
+        // Tier 4 (Rank 10-12): Rose Coral #F43F5E
+        const tierColors = { 1: '#10B981', 2: '#06B6D4', 3: '#F59E0B', 4: '#F43F5E' };
 
         // Outer Boundary Line for Kota Bekasi (Garis tebal hitam keliling pembatas kota)
         const KOTA_BEKASI_OUTER_BOUNDARY = [
@@ -3910,284 +3882,105 @@
         polregMarkers.push(outerCityBorder);
 
         Object.entries(kecData).forEach(([kecName, info]) => {
-          const isCity = info.is_bekasi_city;
-          const lat = (isCity && KEC_LOCATIONS[kecName]) ? KEC_LOCATIONS[kecName].lat : (info.lat || -6.25);
-          const lng = (isCity && KEC_LOCATIONS[kecName]) ? KEC_LOCATIONS[kecName].lng : (info.lng || 107.00);
+          // Strictly render Kota Bekasi ONLY as requested by user!
+          if (!info.is_bekasi_city) return;
 
-          if (isCity) {
-            // === KOTA BEKASI: PARAGON POLYGON (SHAPE LINE HITAM + WARNA SESUAI MARKET) + PIN ===
-            const color = isNeonMode ? (neonColors[info.tier] || '#00F0FF') : (normalColors[info.tier] || '#10B981');
-            const kelText = KEC_KELURAHAN[kecName] || '';
+          const lat = KEC_LOCATIONS[kecName] ? KEC_LOCATIONS[kecName].lat : (info.lat || -6.25);
+          const lng = KEC_LOCATIONS[kecName] ? KEC_LOCATIONS[kecName].lng : (info.lng || 107.00);
+          const color = tierColors[info.tier] || '#10B981';
 
-            // 1. Polygon Region dengan Shape Line Hitam Tegas & Fill Warna Market
-            const polyCoords = KEC_POLYGONS[kecName];
-            if (polyCoords) {
-              const poly = L.polygon(polyCoords, {
-                color: '#000000',                 // Shape line warna hitam untuk mengetahui perbatasan
-                weight: 3.5,                       // Garis hitam tebal dan tajam
-                opacity: 1.0,                      // 100% solid black
-                fillColor: color,                  // Diwarnai sesuai jumlah market / paragon tier
-                fillOpacity: isNeonMode ? 0.52 : 0.45,
-                dashArray: null
-              }).addTo(polregMap);
+          // 1. Polygon Region dengan Shape Line Hitam Tegas & Fill Warna Market
+          const polyCoords = KEC_POLYGONS[kecName];
+          if (polyCoords) {
+            const poly = L.polygon(polyCoords, {
+              color: '#000000',                 // Shape line warna hitam untuk mengetahui perbatasan
+              weight: 2.8,                       // Garis hitam tebal dan tajam
+              opacity: 1.0,
+              fillColor: color,                  // Warna berbeda berdasarkan penjualan
+              fillOpacity: 0.45,
+              smoothFactor: 1.0
+            }).addTo(polregMap);
 
-              poly.on('mouseover', function() {
-                this.setStyle({ weight: 5, fillOpacity: 0.70 });
-              });
-              poly.on('mouseout', function() {
-                this.setStyle({ weight: 3.5, fillOpacity: isNeonMode ? 0.52 : 0.45 });
-              });
-              poly.on('click', () => openKecamatanModal(kecName));
-              poly.bindTooltip(`<strong>Kec. ${kecName} (#${info.rank})</strong><br><span class="text-[11px] text-emerald-300 font-bold">${info.qty.toLocaleString('id-ID')} Unit Terdaftar</span><br><span class="text-[10px] text-slate-300">${kelText}</span>`, {
-                sticky: true,
-                className: 'gmaps-polygon-tooltip'
-              });
-              polregMarkers.push(poly);
-            }
+            poly.on('mouseover', function() {
+              this.setStyle({ fillOpacity: 0.75, weight: 3.5 });
+            });
+            poly.on('mouseout', function() {
+              this.setStyle({ fillOpacity: 0.45, weight: 2.8 });
+            });
+            poly.on('click', function() {
+              openKecamatanModal(kecName);
+            });
 
-            // 2. Google Maps Teardrop SVG Pin Kota Bekasi (dengan Peringkat #1..#12)
-            const neonGlow = isNeonMode 
-              ? `filter: drop-shadow(0 0 10px #00F0FF) drop-shadow(0 0 18px rgba(0,240,255,0.6));` 
-              : `filter: drop-shadow(0 3px 6px rgba(0,0,0,0.45));`;
+            const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: 'TOYOTA', qty: 0 };
+            poly.bindTooltip(`
+              <div class="px-2 py-1 text-center font-sans">
+                <div class="font-extrabold text-xs text-slate-900">Kec. ${kecName}</div>
+                <div class="text-[11px] font-bold text-blue-700">${info.qty.toLocaleString('id-ID')} Unit (#${info.rank})</div>
+                <div class="text-[10px] text-slate-500">Market Leader: ${topBrand.brand}</div>
+              </div>
+            `, { sticky: true, className: 'gmaps-tooltip' });
 
-            const pinSvg = `
-              <svg width="34" height="44" viewBox="0 0 34 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="${neonGlow}">
-                <path d="M17 0C7.611 0 0 7.611 0 17C0 29.5 17 44 17 44C17 44 34 29.5 34 17C34 7.611 26.389 0 17 0Z" fill="${color}" stroke="#000000" stroke-width="2.5"/>
-                <circle cx="17" cy="17" r="9.5" fill="#FFFFFF" stroke="#000000" stroke-width="1.5"/>
-                <text x="17" y="21" font-size="11" font-family="system-ui, -apple-system, sans-serif" font-weight="900" text-anchor="middle" fill="#0F172A">#${info.rank}</text>
-              </svg>
-            `;
+            polregMarkers.push(poly);
+          }
 
-            const htmlContent = `
+          // 2. Custom Rank Badge Pin Marker matching Image 7
+          const rankIcon = L.divIcon({
+            html: `
               <div onclick="openKecamatanModal('${kecName}')" class="group cursor-pointer flex flex-col items-center" style="transform: translate(-50%, -100%);">
-                <div class="transition-transform duration-200 transform group-hover:scale-125">
-                  ${pinSvg}
+                <!-- Circular Rank Badge Pin -->
+                <div class="relative flex items-center justify-center w-8 h-8 rounded-full border-2 border-white shadow-xl text-white font-black text-xs transition-transform duration-200 transform group-hover:scale-125" style="background-color: ${color};">
+                  <span>#${info.rank}</span>
+                  <div class="absolute -bottom-1.5 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px]" style="border-t-color: ${color};"></div>
                 </div>
-                <div class="mt-1 px-2.5 py-0.5 rounded-full bg-slate-950/95 text-white text-[11px] font-bold border-2 border-black shadow-2xl flex items-center gap-1.5 whitespace-nowrap group-hover:border-cyan-400 transition">
+                <!-- Bottom Label Capsule (Kecamatan + Total Sales) -->
+                <div class="mt-2 px-2 py-0.5 rounded-full bg-slate-950/90 text-white text-[10px] font-bold border border-slate-700/80 shadow-lg flex items-center gap-1 whitespace-nowrap group-hover:border-amber-400 group-hover:scale-110 transition">
                   <span>${kecName}</span>
-                  <span style="color: ${color}; font-weight: 800;">(${info.qty})</span>
+                  <span style="color: ${color};">(${info.qty.toLocaleString('id-ID')})</span>
                 </div>
               </div>
-            `;
+            `,
+            className: 'gmaps-bekasi-rank-pin',
+            iconSize: [32, 48],
+            iconAnchor: [16, 48],
+            popupAnchor: [0, -48]
+          });
 
-            const customIcon = L.divIcon({
-              html: htmlContent,
-              className: 'gmaps-marker-pin',
-              iconSize: [34, 44],
-              iconAnchor: [17, 44],
-              popupAnchor: [0, -46]
-            });
+          const marker = L.marker([lat, lng], { icon: rankIcon, zIndexOffset: 1000 - (info.rank * 10) }).addTo(polregMap);
+          const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: '-', qty: 0 };
 
-            const marker = L.marker([lat, lng], { icon: customIcon }).addTo(polregMap);
-
-            // Google Maps InfoWindow Popup
-            const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: '-', qty: 0 };
-            const popupHtml = `
-              <div class="p-2 min-w-[210px] font-sans text-slate-900">
-                <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-200">
-                  <div class="flex items-center gap-1.5">
-                    <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${color};"></span>
-                    <strong class="font-extrabold text-xs text-slate-950">Kec. ${kecName}</strong>
-                  </div>
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-bold" style="background: ${color}25; color: ${color}; border: 1px solid ${color}60;">#${info.rank} Kota Bekasi</span>
-                </div>
-                <div class="text-[11px] text-slate-600 mb-1">
-                  Volume: <strong class="text-slate-950 font-bold">${info.qty.toLocaleString('id-ID')} Unit</strong>
-                </div>
-                <div class="text-[11px] text-slate-600 mb-2">
-                  Brand #1: <strong class="text-red-600 font-bold">${topBrand.brand}</strong> (${topBrand.qty} unit)
-                </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100">
-                  <button onclick="openKecamatanModal('${kecName}')" class="flex-1 py-1 px-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded transition shadow text-center">
-                    Rincian Merk & Tipe
-                  </button>
-                  <a href="https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}+Kota+Bekasi" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[10px] rounded transition border border-slate-300 flex items-center gap-0.5" title="Buka di Google Maps Web">
-                    <span>GMaps</span> ↗
-                  </a>
-                </div>
-              </div>
-            `;
-            marker.bindPopup(popupHtml);
-            polregMarkers.push(marker);
-
-          } else {
-            // === KECAMATAN LAIN (LUAR KOTA BEKASI - JABODETABEK) ===
-            // Logo titik dibuat lebih kecil dan ramping (12x16 micro-pin) agar tidak menumpuk/terlalu besar
-            const otherIcon = L.divIcon({
-              html: `
-                <div onclick="openKecamatanModal('${kecName}')" class="group cursor-pointer flex flex-col items-center" style="transform: translate(-50%, -100%);">
-                  <div class="transition-transform duration-200 transform group-hover:scale-125 filter drop-shadow">
-                    <svg width="12" height="16" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 0C5.373 0 0 5.373 0 12C0 21 12 32 12 32C12 32 24 21 24 12C24 5.373 18.627 0 12 0Z" fill="#2563EB" stroke="#FFFFFF" stroke-width="1.8"/>
-                      <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
-                    </svg>
-                  </div>
-                  <div class="mt-0.5 px-1.5 py-0.2 rounded bg-slate-900/90 text-slate-300 text-[8px] font-semibold border border-slate-700 shadow-sm flex items-center gap-1 whitespace-nowrap group-hover:scale-110 group-hover:border-blue-400 group-hover:text-white transition">
-                    <span>${kecName}</span>
-                    <span class="text-sky-400 font-bold">(${info.qty})</span>
-                  </div>
-                </div>
-              `,
-              className: 'gmaps-other-pin',
-              iconSize: [12, 16],
-              iconAnchor: [6, 16],
-              popupAnchor: [0, -18]
-            });
-
-            const otherMarker = L.marker([lat, lng], { icon: otherIcon }).addTo(polregMap);
-            const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: '-', qty: 0 };
-
-            const otherPopupHtml = `
-              <div class="p-2 min-w-[200px] font-sans text-slate-900">
-                <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-200">
+          const popupHtml = `
+            <div class="p-2 min-w-[220px] font-sans text-slate-900">
+              <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-200">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${color};"></span>
                   <strong class="font-extrabold text-xs text-slate-950">Kec. ${kecName}</strong>
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">${info.wilayah || 'Luar Bekasi'}</span>
                 </div>
-                <div class="text-[11px] text-slate-600 mb-1">
-                  Volume Terdaftar: <strong class="text-slate-950 font-bold">${info.qty.toLocaleString('id-ID')} Unit</strong>
-                </div>
-                <div class="text-[11px] text-slate-600 mb-2">
-                  Brand #1: <strong class="text-blue-600 font-bold">${topBrand.brand}</strong> (${topBrand.qty} unit)
-                </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100">
-                  <button onclick="openKecamatanModal('${kecName}')" class="flex-1 py-1 px-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded transition shadow text-center">
-                    Rincian Merk & Tipe
-                  </button>
-                  <a href="https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}+${encodeURIComponent(info.wilayah || '')}" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[10px] rounded transition border border-slate-300 flex items-center gap-0.5">
-                    <span>GMaps</span> ↗
-                  </a>
-                </div>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold" style="background: ${color}25; color: ${color}; border: 1px solid ${color}60;">#${info.rank} Kota Bekasi</span>
               </div>
-            `;
-            otherMarker.bindPopup(otherPopupHtml);
-            polregMarkers.push(otherMarker);
-          }
-        });
-
-        // Update Legend
-        const legendDiv = document.getElementById('polregLegend');
-        if (legendDiv) {
-          if (isNeonMode) {
-            legendDiv.innerHTML = `
-              <span class="text-cyan-400 font-bold flex items-center gap-1.5"><i data-lucide="zap" class="w-3.5 h-3.5"></i> Mode EV/HEV (Biru Neon):</span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#00F0FF] shadow-sm shadow-cyan-400 inline-block"></span><span class="text-cyan-200">Tier 1</span></span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#38BDF8] inline-block"></span><span class="text-sky-200">Tier 2</span></span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#3B82F6] inline-block"></span><span class="text-blue-200">Tier 3</span></span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#6366F1] inline-block"></span><span class="text-indigo-200">Tier 4</span></span>
-              <span class="flex items-center gap-1.5 border-l border-slate-700 pl-2 text-slate-400 text-[10px]"><span class="w-3 h-0.5 bg-black inline-block border border-slate-600"></span> Garis Hitam: Batas Wilayah</span>
-            `;
-          } else {
-            legendDiv.innerHTML = `
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span><span class="text-slate-300">Tier 1 (Tertinggi)</span></span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-cyan-500 inline-block"></span><span class="text-slate-300">Tier 2 (Tinggi)</span></span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span><span class="text-slate-300">Tier 3 (Sedang)</span></span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span><span class="text-slate-300">Tier 4 (Rendah)</span></span>
-              <span class="flex items-center gap-1.5 border-l border-slate-700 pl-2 text-slate-400 text-[10px]"><span class="w-3 h-0.5 bg-black inline-block border border-slate-600"></span> Garis Hitam: Batas Wilayah</span>
-            `;
-          }
-          lucide.createIcons();
-        }
-      }
-
-      // 4. Update 12 Kecamatan Quick Selector Grid (Kota Bekasi)
-      const gridContainer = document.getElementById('polregKecamatanGrid');
-      if (gridContainer) {
-        const bekasiKecs = Object.entries(kecData).filter(([_, kInfo]) => kInfo.is_bekasi_city);
-        const sortedKecs = bekasiKecs.sort((a, b) => a[1].rank - b[1].rank);
-        const isNeonMode = (currentPolregPowertrain !== 'ALL');
-        
-        gridContainer.innerHTML = sortedKecs.map(([name, kInfo]) => {
-          const borderClass = isNeonMode 
-            ? 'border-cyan-500/40 hover:border-cyan-400 bg-slate-900/90 hover:bg-slate-900 shadow-sm shadow-cyan-500/10'
-            : (kInfo.tier === 1 ? 'border-emerald-500/40 hover:border-emerald-400 bg-slate-900/90' :
-               kInfo.tier === 2 ? 'border-cyan-500/40 hover:border-cyan-400 bg-slate-900/90' :
-               kInfo.tier === 3 ? 'border-amber-500/40 hover:border-amber-400 bg-slate-900/90' :
-               'border-rose-500/40 hover:border-rose-400 bg-slate-900/90');
-
-          const badgeColor = isNeonMode
-            ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
-            : (kInfo.tier === 1 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' :
-               kInfo.tier === 2 ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' :
-               kInfo.tier === 3 ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
-               'bg-rose-500/20 text-rose-300 border-rose-500/30');
-
-          return `
-            <div onclick="openKecamatanModal('${name}')" class="p-3 rounded-xl border ${borderClass} cursor-pointer transition transform hover:-translate-y-1">
-              <div class="flex items-center justify-between mb-1">
-                <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold border ${badgeColor}">
-                  #${kInfo.rank}
-                </span>
-                <span class="text-[10px] text-slate-500">Tier ${kInfo.tier}</span>
+              <div class="text-[11px] text-slate-600 mb-1">
+                Volume: <strong class="text-slate-950 font-bold">${info.qty.toLocaleString('id-ID')} Unit</strong>
               </div>
-              <h5 class="text-xs font-bold text-white truncate">${name}</h5>
-              <div class="text-sm font-black text-slate-100 mt-1">${kInfo.qty.toLocaleString('id-ID')} <span class="text-[10px] font-normal text-slate-400">Unit</span></div>
-              <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between border-t border-slate-800 pt-1.5">
-                <span>Rincian Detail</span>
-                <span class="text-red-400 font-bold">&rarr;</span>
+              <div class="text-[11px] text-slate-600 mb-2">
+                Brand #1: <strong class="text-red-600 font-bold">${topBrand.brand}</strong> (${topBrand.qty} unit)
+              </div>
+              <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100">
+                <button onclick="openKecamatanModal('${kecName}')" class="flex-1 py-1 px-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded transition shadow text-center">
+                  Rincian Merk & Tipe
+                </button>
+                <a href="https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}+Kota+Bekasi" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[10px] rounded transition border border-slate-300 flex items-center gap-0.5" title="Buka di Google Maps Web">
+                  <span>GMaps</span> ↗
+                </a>
               </div>
             </div>
           `;
-        }).join('');
+          marker.bindPopup(popupHtml);
+          polregMarkers.push(marker);
+        });
       }
 
-      // 5. Populate Other Kecamatan Select Dropdown
-      const selectOther = document.getElementById('selectOtherKecamatan');
-      if (selectOther) {
-        const otherList = Object.entries(kecData)
-          .filter(([_, kInfo]) => !kInfo.is_bekasi_city)
-          .sort((a, b) => b[1].qty - a[1].qty);
-
-        selectOther.innerHTML = '<option value="">-- Pilih Kecamatan di Luar Kota Bekasi (${otherList.length} Kecamatan) --</option>' +
-          otherList.map(([name, kInfo]) => `
-            <option value="${name}">[${kInfo.wilayah || 'Jabodetabek'}] Kec. ${name} — ${kInfo.qty.toLocaleString('id-ID')} Unit</option>
-          `).join('');
-      }
-
-      // 6. Update Top 10 Table
-      const tbody = document.getElementById('polregTop10TableBody');
-      if (tbody) {
-        tbody.innerHTML = top10.map((item, idx) => {
-          const isToyota = item.brand.toUpperCase() === 'TOYOTA';
-          const isByd = item.brand.toUpperCase() === 'BYD';
-          const isJaecoo = item.brand.toUpperCase() === 'JAECOO';
-
-          const rankBadge = item.rank === 1 ? '<span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-black flex items-center justify-center text-xs border border-amber-500/30">1</span>'
-                          : item.rank === 2 ? '<span class="w-6 h-6 rounded-full bg-slate-300/20 text-slate-200 font-bold flex items-center justify-center text-xs border border-slate-300/30">2</span>'
-                          : item.rank === 3 ? '<span class="w-6 h-6 rounded-full bg-amber-700/20 text-amber-500 font-bold flex items-center justify-center text-xs border border-amber-700/30">3</span>'
-                          : `<span class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 font-semibold flex items-center justify-center text-xs">${item.rank}</span>`;
-
-          const brandClass = isToyota ? 'font-extrabold text-white text-sm flex items-center gap-2' : 'font-semibold text-slate-200 text-sm';
-          const logoPill = isToyota ? '<span class="px-2 py-0.5 rounded text-[10px] font-black bg-red-600 text-white">TOYOTA</span>' : item.brand;
-
-          const barColor = isToyota ? 'bg-red-600' : (isByd ? 'bg-blue-500' : (isJaecoo ? 'bg-cyan-400' : 'bg-slate-500'));
-
-          const statusBadge = item.rank === 1 ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Market Leader #1</span>'
-                            : item.rank <= 3 ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">Main Competitor</span>'
-                            : '<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-slate-400">Challenger</span>';
-
-          const modelsDesc = (item.top_models && item.top_models.length > 0) ? item.top_models.join(', ') : '-';
-
-          return `
-            <tr class="hover:bg-slate-800/40 transition">
-              <td class="py-3 px-3 text-center">${rankBadge}</td>
-              <td class="py-3 px-4 ${brandClass}">
-                ${logoPill}
-              </td>
-              <td class="py-3 px-4 text-xs text-slate-300 truncate max-w-[200px]" title="${modelsDesc}">${modelsDesc}</td>
-              <td class="py-3 px-4 text-right font-extrabold text-white text-sm">${item.qty.toLocaleString('id-ID')}</td>
-              <td class="py-3 px-6 text-center">
-                <div class="flex items-center gap-3">
-                  <div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
-                    <div class="${barColor} h-2 rounded-full transition-all duration-500" style="width: ${Math.min(100, item.market_share * 3)}%;"></div>
-                  </div>
-                  <span class="w-12 text-right font-black text-xs ${isToyota ? 'text-red-400' : 'text-slate-200'}">${item.market_share}%</span>
-                </div>
-              </td>
-              <td class="py-3 px-4 text-center">${statusBadge}</td>
-            </tr>
-          `;
-        }).join('');
-      }
+      // 3. Render Top 10 Table & Kecamatan Grid
+      renderPolregTable(top10, totalMarket);
+      renderPolregKecamatanGrid(kecData);
     }
 
     // Modal Kecamatan Drilldown (Supports both Kota Bekasi & Non-Kota Bekasi)
@@ -4367,9 +4160,13 @@
           const cIdx = idx + 2;
           let val = 0.0;
           if (cIdx < cArr.length && cArr[cIdx]) {
-            const v = cArr[cIdx].v;
-            if (v !== null && v !== undefined) {
-              val = parseFloat(v) || 0.0;
+            const cell = cArr[cIdx];
+            const raw = cell.v !== null && cell.v !== undefined ? cell.v : (cell.f || 0);
+            if (typeof raw === 'number') {
+              val = raw;
+            } else if (typeof raw === 'string') {
+              const cleaned = raw.replace(/\./g, '').replace(/,/g, '.').replace(/[^0-9.-]/g, '');
+              val = parseFloat(cleaned) || 0.0;
             }
           }
           res[m] = val;
@@ -4384,25 +4181,48 @@
         financial_satrio: {}
       };
 
+      let currentSection = 'kpi_cabang';
+
       table.rows.forEach(r => {
-        const c0 = String(r.c[0] ? r.c[0].v : '').trim();
-        const c1 = String(r.c[1] ? r.c[1].v : '').trim();
-        const label = `${c0} ${c1}`.toLowerCase();
+        if (!r || !r.c) return;
+        const c0 = String(r.c[0] ? (r.c[0].v || r.c[0].f || '') : '').trim().toLowerCase();
+        const c1 = String(r.c[1] ? (r.c[1].v || r.c[1].f || '') : '').trim().toLowerCase();
+
+        if (c0.includes('kpi cabang')) currentSection = 'kpi_cabang';
+        else if (c0.includes('kpi satrio')) currentSection = 'kpi_satrio';
+        else if (c0.includes('financial cabang')) currentSection = 'financial_cabang';
+        else if (c0.includes('financial satrio')) currentSection = 'financial_satrio';
+
         const mDict = parseMonths(r.c);
 
-        if (label.includes('target bekasi')) kpi.kpi_cabang.target_bekasi = mDict;
-        else if (label.includes('rs afi bekasi')) kpi.kpi_cabang.rs_afi_bekasi = mDict;
-        else if (label.includes('target satrio')) kpi.kpi_satrio.target_satrio = mDict;
-        else if (label.includes('rs afi satrio')) kpi.kpi_satrio.rs_afi_satrio = mDict;
-        else if (label.includes('cash satrio')) kpi.kpi_satrio.cash_satrio = mDict;
-        else if (label.includes('credit satrio')) kpi.kpi_satrio.credit_satrio = mDict;
-        else if (label.includes('tvc')) kpi.kpi_satrio.tvc_unit = mDict;
-        else if (label.includes('mtf')) kpi.kpi_satrio.mtf_unit = mDict;
-        else if (label.includes('others')) kpi.kpi_satrio.others_unit = mDict;
-        else if (label.includes('gp target') && !label.includes('satrio')) kpi.financial_cabang.gp_target = mDict;
-        else if (label.includes('gp actual') && !label.includes('satrio')) kpi.financial_cabang.gp_actual = mDict;
-        else if (label.includes('gp target') && label.includes('satrio')) kpi.financial_satrio.gp_target = mDict;
-        else if (label.includes('gp actual') && label.includes('satrio')) kpi.financial_satrio.gp_actual = mDict;
+        if (currentSection === 'kpi_cabang') {
+          if (c1.includes('target')) kpi.kpi_cabang.target_bekasi = mDict;
+          else if (c1.includes('rs afi')) kpi.kpi_cabang.rs_afi_bekasi = mDict;
+          else if (c1.includes('ach')) kpi.kpi_cabang.ach_bekasi = mDict;
+        } else if (currentSection === 'kpi_satrio') {
+          if (c1.includes('target')) kpi.kpi_satrio.target_satrio = mDict;
+          else if (c1.includes('rs afi')) kpi.kpi_satrio.rs_afi_satrio = mDict;
+          else if (c1.includes('ach')) kpi.kpi_satrio.ach_satrio = mDict;
+          else if (c1.includes('cash satrio')) kpi.kpi_satrio.cash_satrio = mDict;
+          else if (c1.includes('credit satrio')) kpi.kpi_satrio.credit_satrio = mDict;
+          else if (c1.includes('tvc') && (c1.includes('unit') || !c1.includes('comp'))) kpi.kpi_satrio.tvc_unit = mDict;
+          else if (c1.includes('mtf') && (c1.includes('unit') || !c1.includes('comp'))) kpi.kpi_satrio.mtf_unit = mDict;
+          else if (c1.includes('others') && (c1.includes('unit') || !c1.includes('comp'))) kpi.kpi_satrio.others_unit = mDict;
+        } else if (currentSection === 'financial_cabang') {
+          if (c1.includes('revenue') && c1.includes('target')) kpi.financial_cabang.rev_target = mDict;
+          else if (c1.includes('revenue') && c1.includes('actual')) kpi.financial_cabang.rev_actual = mDict;
+          else if (c1.includes('gp') && c1.includes('target')) kpi.financial_cabang.gp_target = mDict;
+          else if (c1.includes('gp') && c1.includes('actual')) kpi.financial_cabang.gp_actual = mDict;
+          else if (c1.includes('opex') && c1.includes('target')) kpi.financial_cabang.opex_target = mDict;
+          else if (c1.includes('opex') && c1.includes('actual')) kpi.financial_cabang.opex_actual = mDict;
+          else if (c1.includes('pbt') && c1.includes('target')) kpi.financial_cabang.pbt_target = mDict;
+          else if (c1.includes('pbt') && c1.includes('actual')) kpi.financial_cabang.pbt_actual = mDict;
+        } else if (currentSection === 'financial_satrio') {
+          if (c1.includes('revenue') && c1.includes('target')) kpi.financial_satrio.rev_target = mDict;
+          else if (c1.includes('revenue') && c1.includes('actual')) kpi.financial_satrio.rev_actual = mDict;
+          else if (c1.includes('gp') && c1.includes('target')) kpi.financial_satrio.gp_target = mDict;
+          else if (c1.includes('gp') && c1.includes('actual')) kpi.financial_satrio.gp_actual = mDict;
+        }
       });
 
       return kpi;
@@ -4848,33 +4668,65 @@
         return cell.f !== undefined && cell.f !== null ? cell.f : cell.v;
       };
 
+      const parseCleanNum = val => {
+        if (val === null || val === undefined || val === '') return 0;
+        if (typeof val === 'number') return val;
+        const clean = String(val).replace(/\./g, '').replace(/,/g, '.').replace(/[^0-9.-]/g, '');
+        const n = parseFloat(clean);
+        return isNaN(n) ? 0 : n;
+      };
+
       const records = [];
-      table.rows.forEach(row => {
+      table.rows.forEach((row, idx) => {
         if (!row || !row.c) return;
         const sales = getVal(row, 'Sales', 'sales');
         const mobilBaru = getVal(row, 'Mobil baru yang dibeli', 'mobil baru');
         if (!sales && !mobilBaru) return;
 
+        const mIndo = String(getVal(row, 'Bulan', 'bulan') || '').trim();
+        const brand = String(getVal(row, 'Merek', 'merek') || '').trim();
+        const model = String(getVal(row, 'Model ', 'model') || '').trim();
+        const year = String(getVal(row, 'Tahun', 'tahun') || '').replace('.0', '').trim();
+        const plate = String(getVal(row, 'Plat Nomor', 'plat') || '').trim();
+        const appraisalStr = String(getVal(row, 'Appraisal\n(Sudah/Belum)', 'appraisal') || '').trim();
+        const dealStr = String(getVal(row, 'Deal/ Tidak', 'deal') || '').trim();
+        const doStr = String(getVal(row, 'DO/ Tidak', 'do') || '').trim();
+        const penawaranVal = parseCleanNum(getVal(row, ' Harga Penawaran', 'penawaran'));
+        const permintaanVal = parseCleanNum(getVal(row, ' Harga Permintaan', 'permintaan'));
+        const dealVal = parseCleanNum(getVal(row, ' Harga Deal', 'harga deal'));
+        const soldTo = String(getVal(row, 'Terjual ke ', 'terjual ke') || '').trim();
+        const reason = String(getVal(row, 'Reason jika tidak deal', 'reason') || '').trim();
+
         records.push({
-          bulan: String(getVal(row, 'Bulan', 'bulan') || '').trim(),
+          no: idx + 1,
+          month: mIndo,
+          bulan: mIndo,
           sales: String(sales || '').trim(),
           spv: String(getVal(row, 'Spv', 'spv') || '').trim(),
+          new_car: String(mobilBaru || '').trim(),
           mobil_baru: String(mobilBaru || '').trim(),
-          merek: String(getVal(row, 'Merek', 'merek') || '').trim(),
-          model: String(getVal(row, 'Model ', 'model') || '').trim(),
-          varian: String(getVal(row, 'Varian', 'varian') || '').trim(),
-          transmisi: String(getVal(row, 'Transmisi', 'transmisi') || '').trim(),
-          bahan_bakar: String(getVal(row, 'Bahan Bakar', 'bahan bakar') || '').trim(),
-          tahun: String(getVal(row, 'Tahun', 'tahun') || '').trim(),
-          plat: String(getVal(row, 'Plat Nomor', 'plat') || '').trim(),
-          appraisal: String(getVal(row, 'Appraisal\n(Sudah/Belum)', 'appraisal') || '').trim(),
-          permintaan: getVal(row, ' Harga Permintaan', 'permintaan') || 0,
-          penawaran: getVal(row, ' Harga Penawaran', 'penawaran') || 0,
-          deal: String(getVal(row, 'Deal/ Tidak', 'deal') || '').trim(),
-          do: String(getVal(row, 'DO/ Tidak', 'do') || '').trim(),
-          harga_deal: getVal(row, ' Harga Deal', 'harga deal') || 0,
-          terjual_ke: String(getVal(row, 'Terjual ke ', 'terjual ke') || '').trim(),
-          reason: String(getVal(row, 'Reason jika tidak deal', 'reason') || '').trim()
+          old_brand: brand || 'Lainnya',
+          merek: brand || 'Lainnya',
+          old_model: model,
+          model: model,
+          variant: String(getVal(row, 'Varian', 'varian') || '').trim(),
+          transmission: String(getVal(row, 'Transmisi', 'transmisi') || '').trim(),
+          fuel: String(getVal(row, 'Bahan Bakar', 'bahan bakar') || '').trim(),
+          year: year,
+          tahun: year,
+          plate: plate,
+          plat: plate,
+          appraisal: appraisalStr,
+          is_appraisal: appraisalStr.toUpperCase().includes('APPRAISAL'),
+          permintaan: permintaanVal,
+          penawaran: penawaranVal,
+          deal: dealStr,
+          is_deal: dealStr.toLowerCase() === 'deal',
+          do: doStr,
+          harga_deal: dealVal,
+          sold_to: soldTo,
+          terjual_ke: soldTo,
+          reason: reason
         });
       });
 
