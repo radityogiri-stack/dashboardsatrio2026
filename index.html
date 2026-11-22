@@ -256,6 +256,10 @@
         <i data-lucide="scale" class="w-4 h-4 text-emerald-600"></i>
         <span>eNCOmpare</span>
       </button>
+      <button onclick="switchTab('tabCustomerCard')" id="nav-tabCustomerCard" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+        <i data-lucide="user-check" class="w-4 h-4 text-blue-600"></i>
+        <span>Customer Card</span>
+      </button>
       <button onclick="switchTab('tabAchievement')" id="nav-tabAchievement" class="nav-tab active flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition shadow font-bold">
         <i data-lucide="award" class="w-4 h-4"></i>
         <span>Dashboard Achievement</span>
@@ -467,6 +471,674 @@
           </div>
 
         </div>
+      </div>
+
+    </div>
+
+<!-- ============================================================ -->
+    <!-- TAB 0.5: CUSTOMER CARD (DASHBOARD & DATA CLEANSING)          -->
+    <!-- ============================================================ -->
+    <div id="tabCustomerCard" class="tab-pane hidden space-y-6">
+
+      <!-- TOP BANNER TITLE & SOURCE SPREADSHEET LINK -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 p-6 shadow-lg text-white">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-xs font-bold uppercase tracking-wider mb-2 backdrop-blur-sm">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>tunasTOYOTA Bekasi — Template Customer Card</span>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-black tracking-tight">DASHBOARD CUSTOMER CARD</h2>
+            <p class="text-xs md:text-sm text-blue-100 mt-1 max-w-2xl leading-relaxed">
+              Monitoring 360° profil kepemilikan unit, riwayat servis, kebiasaan berkendara, analisis potensi upselling, serta rekomendasi AI interaktif (MRA & SA) tersinkronisasi spreadsheet.
+            </p>
+          </div>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div class="px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-right">
+              <span class="text-[10px] text-blue-200 block font-semibold uppercase tracking-wider">Tanggal Data (TODAY)</span>
+              <strong id="ccTodayDate" class="text-sm font-extrabold text-white">22 Nov 2026</strong>
+            </div>
+            <a href="https://docs.google.com/spreadsheets/d/1_gaqJRX5QHQ89GdEt7TzPGPjKmx1LFAucbXF8rZaWYI/edit?gid=1729404659#gid=1729404659" target="_blank" class="px-4 py-2.5 rounded-xl bg-white text-blue-900 font-extrabold text-xs shadow-md hover:bg-blue-50 transition flex items-center gap-1.5 flex-shrink-0">
+              <i data-lucide="external-link" class="w-4 h-4 text-blue-600"></i>
+              <span>Buka Spreadsheet Asli</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 1: SEARCH & NOPOL DROPDOWN SELECTOR (Mirip Baris 9 Spreadsheet) -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div class="flex-1">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+              Pilihlah DATA by VIN / NOPOL &nbsp;|&nbsp; Cara Copy Paste Ctrl+Shift+V
+            </div>
+            <div class="flex flex-wrap items-center gap-3 mt-2">
+              <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-300">
+                <i data-lucide="car" class="w-4 h-4 text-red-600"></i>
+                <span class="text-xs font-extrabold text-slate-700">NOPOL:</span>
+                <select id="custCardNopolSelect" onchange="onCustomerNopolChange(this.value)" class="bg-white text-xs font-extrabold text-slate-900 border border-slate-300 rounded-lg px-2.5 py-1 focus:outline-none focus:border-red-500 cursor-pointer shadow-sm">
+                  <!-- Populated via JS -->
+                </select>
+              </div>
+
+              <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 flex-1 min-w-[240px]">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                <input type="text" id="custCardQuickSearch" oninput="onCustQuickSearch(this.value)" placeholder="Ketik Cepat: Nopol / Nama / VIN / Telepon..." class="bg-transparent text-xs text-slate-900 placeholder-slate-400 focus:outline-none w-full font-medium">
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Indicator Badges -->
+          <div class="flex flex-wrap items-center gap-2 self-start lg:self-center">
+            <div class="px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs">
+              <span class="text-[10px] text-slate-500 block">VIN / NO. RANGKA</span>
+              <strong id="ccVinTop" class="font-mono text-slate-950 font-bold text-xs">MHFAB1BY2N0051115</strong>
+            </div>
+            <div class="px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-xs">
+              <span class="text-[10px] text-blue-600 block">NOPOL</span>
+              <strong id="ccNopolTop" class="font-mono text-blue-900 font-extrabold text-xs">B1980FIB</strong>
+            </div>
+            <div class="px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs text-center">
+              <span class="text-[10px] text-slate-500 block">Initial Status</span>
+              <span id="ccInitStatus" class="inline-block mt-0.5 px-2 py-0.5 rounded font-black text-[11px] bg-blue-100 text-blue-800 border border-blue-300">PUNCTUAL</span>
+            </div>
+            <div class="px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs text-center">
+              <span class="text-[10px] text-slate-500 block">Current Status</span>
+              <span id="ccCurrStatus" class="inline-block mt-0.5 px-2 py-0.5 rounded font-black text-[11px] bg-rose-100 text-rose-800 border border-rose-300">NOT ACTIVE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Autocomplete Suggestions Dropdown -->
+        <div id="custCardSearchResults" class="hidden mt-2 p-2 rounded-xl bg-white border border-slate-300 shadow-xl max-h-56 overflow-y-auto space-y-1 z-30"></div>
+      </div>
+
+      <!-- SECTION 2: CUSTOMER OVERVIEW & OTHER CARS TABLE (Baris 19-33) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Customer Master Identifiers (7 cols) -->
+        <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <i data-lucide="user-check" class="w-5 h-5 text-red-600"></i>
+              <h3 class="font-extrabold text-slate-950 text-sm">Identitas Pelanggan & Unit Kendaraan</h3>
+            </div>
+            <span id="ccTypeCustBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200">RETAIL</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+              <span class="text-[10px] font-semibold text-slate-500 uppercase">Customer ID</span>
+              <div id="ccCustId" class="font-black text-slate-900 text-xs mt-0.5">CSTBK-11131</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+              <span class="text-[10px] font-semibold text-slate-500 uppercase">Number Cust ID</span>
+              <div id="ccCustIdRow" class="font-bold text-slate-900 text-xs mt-0.5">CSTBK-11131-1</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+              <span class="text-[10px] font-semibold text-slate-500 uppercase">Total Car</span>
+              <div id="ccTotalCar" class="font-black text-emerald-700 text-xs mt-0.5">1 Unit</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 sm:col-span-2">
+              <span class="text-[10px] font-semibold text-slate-500 uppercase">Nama Customer</span>
+              <div id="ccCustName" class="font-extrabold text-slate-950 text-sm mt-0.5 truncate">SILIUS MASAARO  GIAWA</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+              <span class="text-[10px] font-semibold text-slate-500 uppercase">Model Car</span>
+              <div id="ccModelCar" class="font-black text-red-600 text-xs mt-0.5">VELOZ</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100 text-xs">
+            <div>
+              <span class="text-[10px] text-slate-400 block font-medium">AREA</span>
+              <strong id="ccArea" class="text-slate-900 font-bold">R 1</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block font-medium">KOTA</span>
+              <strong id="ccKota" class="text-slate-900 font-bold">KAB. BEKASI</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block font-medium">PEMBELIAN</span>
+              <strong id="ccPembelian" class="text-slate-900 font-bold">BK</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block font-medium">PROGRAM</span>
+              <strong id="ccProgram" class="text-emerald-700 font-extrabold">T-CARE</strong>
+            </div>
+            <div class="col-span-2 sm:col-span-4 mt-1 p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-700">
+              <span class="text-[10px] text-slate-500 block font-semibold uppercase">Alamat Lengkap</span>
+              <span id="ccAlamat" class="font-medium text-xs text-slate-900">PERUM KIRANA CIBITUNG BLOK K4 NO.14 RT/RW 004/024</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table: DATA OTHER CARS FROM THIS CUSTOMER (5 cols) -->
+        <div class="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="layers" class="w-4 h-4 text-blue-600"></i>
+                <h4 class="font-extrabold text-slate-950 text-xs uppercase tracking-wider">Data Other Cars From This Customer</h4>
+              </div>
+              <span id="ccOtherCarsCountBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">1 Mobil</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase border-y border-slate-200">
+                    <th class="py-2 px-2 text-center">No</th>
+                    <th class="py-2 px-2">No Rangka</th>
+                    <th class="py-2 px-2">Nopol</th>
+                    <th class="py-2 px-2 text-center">Tahun</th>
+                    <th class="py-2 px-2">Program</th>
+                    <th class="py-2 px-2 text-center">Next Job</th>
+                  </tr>
+                </thead>
+                <tbody id="ccOtherCarsTableBody" class="divide-y divide-slate-100 text-slate-800">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+            <span>Status Unit Aktif: <strong id="ccOtherCarStatus" class="text-rose-600 font-bold">NOT ACTIVE</strong></span>
+            <span class="text-slate-400">Sumber: Sheet Dashboard</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 3: 3-COLUMN DETAILED PROFILE (Baris 35-65) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+        <!-- Column 1: Contact Person, Transaction & Insurance -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+            <i data-lucide="phone-call" class="w-4 h-4 text-emerald-600"></i>
+            <h4 class="font-extrabold text-slate-950 text-xs uppercase tracking-wider">Contact & Insurance</h4>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-emerald-800 font-bold block uppercase">Contact Phone / WA</span>
+                <strong id="ccContactPhoneVal" class="text-sm font-black text-emerald-950">81385285999</strong>
+              </div>
+              <a id="ccWaBtn1" href="https://wa.me/6281385285999" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow flex items-center gap-1 transition">
+                <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+
+            <div class="space-y-2 pt-1 text-slate-700">
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Method Payment:</span>
+                <strong id="ccMethodPayment" class="font-bold text-slate-900">CREDIT</strong>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Nama Leasing:</span>
+                <strong id="ccNamaLeasing" class="font-bold text-slate-900 text-right truncate max-w-[160px]">PT. MANDIRI TUNAS FINANCE</strong>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Nama Asuransi:</span>
+                <span id="ccNamaAsuransi" class="text-slate-600 font-medium">-</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Jenis Asuransi:</span>
+                <span id="ccJenisAsuransi" class="text-slate-600 font-medium">-</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">All Risk EX. Date:</span>
+                <span id="ccAllRiskEx" class="text-slate-600 font-medium">-</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Insurance EX. Date:</span>
+                <span id="ccInsuranceEx" class="text-slate-600 font-medium">-</span>
+              </div>
+              <div class="flex justify-between py-1">
+                <span class="text-slate-500">Insurance Status:</span>
+                <span id="ccInsuranceStatus" class="text-slate-600 font-medium">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Customer Information -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+            <i data-lucide="user" class="w-4 h-4 text-blue-600"></i>
+            <h4 class="font-extrabold text-slate-950 text-xs uppercase tracking-wider">Customer Information</h4>
+          </div>
+
+          <div class="space-y-2 text-xs text-slate-700">
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Tipe Customer:</span>
+              <strong id="ccInfoTipeCust" class="font-bold text-slate-900">RETAIL</strong>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Decision Maker:</span>
+              <strong id="ccDecisionMaker" class="font-bold text-slate-900 text-right truncate max-w-[160px]">SILIUS MASAARO  GIAWA</strong>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Decision Phone:</span>
+              <strong id="ccDecisionPhone" class="font-bold text-slate-900">81385285999</strong>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Birthday Date:</span>
+              <span id="ccBirthday" class="text-slate-900 font-medium">10 Okt 1980</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Gender / JK:</span>
+              <span id="ccGender" class="text-slate-900 font-medium">Male</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Customer JOB:</span>
+              <span id="ccJob" class="text-slate-900 font-medium">KARYAWAN SWASTA</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Minuman Favorit:</span>
+              <span id="ccFavDrink" class="text-emerald-700 font-bold">Teh</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Makanan Favorit:</span>
+              <span id="ccFavFood" class="text-amber-700 font-bold">Bakso</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Hobi Pelanggan:</span>
+              <span id="ccHobby" class="text-blue-700 font-bold">Badminton</span>
+            </div>
+            <div class="flex justify-between py-1">
+              <span class="text-slate-500">Waktu Digunakan:</span>
+              <span id="ccUsedDay" class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Weekday</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Vehicle Information -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+            <i data-lucide="gauge" class="w-4 h-4 text-red-600"></i>
+            <h4 class="font-extrabold text-slate-950 text-xs uppercase tracking-wider">Vehicle Information</h4>
+          </div>
+
+          <div class="space-y-2 text-xs text-slate-700">
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Car Model Name:</span>
+              <strong id="ccCarModel" class="font-black text-red-600">VELOZ</strong>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Code / Color:</span>
+              <span id="ccCodeColor" class="font-mono text-slate-900 font-bold">S28</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Delivery Date:</span>
+              <span id="ccDeliveryDate" class="text-slate-900 font-medium">6 Jan 2023</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Production Year:</span>
+              <span id="ccProdYear" class="text-slate-900 font-bold">2022</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Vehicle Age:</span>
+              <span id="ccVehicleAge" class="text-slate-900 font-bold">3,9 Tahun</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Salesman Name:</span>
+              <span id="ccSalesman" class="text-slate-900 font-medium">SIDIK PRANOTO</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">T-Intouch Status:</span>
+              <span id="ccTIntouchStatus" class="font-bold text-cyan-700">T- Intouch (Aktif)</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">T-Intouch Last Day:</span>
+              <span id="ccTIntouchLastDay" class="text-slate-900 font-semibold">31 Jan 2026</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Program Service:</span>
+              <span id="ccProgramService" class="font-extrabold text-emerald-700">T-CARE</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500">Avg Speed:</span>
+              <span id="ccAvgSpeed" class="font-bold text-slate-900">13,74 KM/Jam</span>
+            </div>
+            <div class="flex justify-between py-1">
+              <span class="text-slate-500">Avg Jarak & Waktu:</span>
+              <span id="ccAvgKm" class="font-bold text-slate-900">49,83 KM (3,46 Jam/hr)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 4: POTENCY SELLING, UPSELLING & AI COPYWRITING (Baris 69-89) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- Potency Selling & Upselling Cards (5 cols) -->
+        <div class="lg:col-span-5 space-y-5">
+          
+          <!-- Potency Selling -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+              <i data-lucide="tag" class="w-4 h-4 text-amber-500"></i>
+              <h4 class="font-extrabold text-slate-950 text-xs uppercase tracking-wider">Potency Selling</h4>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Potency Insurance:</span>
+                <span id="ccPotencyInsurance" class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">Tawarkan Asuransi</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Test Drive & Trade IN:</span>
+                <span id="ccPotencyTestDrive" class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200">Tawarkan Test Drive</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">T Intouch Renewal:</span>
+                <span id="ccPotencyTIntouch" class="px-2 py-0.5 rounded text-[11px] font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">Renewal T intouch</span>
+              </div>
+              <div class="flex justify-between py-1">
+                <span class="text-slate-500">Extended STNK:</span>
+                <span id="ccPotencyStnk" class="text-slate-500 font-medium">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Potency Upselling -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+              <i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i>
+              <h4 class="font-extrabold text-slate-950 text-xs uppercase tracking-wider">Potency Upselling</h4>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Next & Suggest Service:</span>
+                <span id="ccNextSuggestService" class="font-bold text-emerald-700 text-right">Weekend Service & Booking to Dealer</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Engine Oil:</span>
+                <span id="ccEngineOil" class="font-black text-amber-600">TMO 10W-40</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">Upselling Status:</span>
+                <span id="ccUpsellingStatus" class="font-bold text-blue-700">Potency to upselling</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">T-Intouch Part Number:</span>
+                <span id="ccTIntouchPartNo" class="font-mono text-slate-800 font-semibold">60101-TATEL</span>
+              </div>
+              <div class="py-1">
+                <span class="text-slate-500 block mb-0.5">Suggest Service With Habit:</span>
+                <span id="ccSuggestServiceHabit" class="font-semibold text-slate-900 bg-slate-50 p-2 rounded-lg border border-slate-200 block">Extra Engine maintenance, Brake And Tyre maintenance</span>
+              </div>
+              <div class="py-1">
+                <span class="text-slate-500 block mb-0.5">Suggest Part With Habit:</span>
+                <span id="ccSuggestPartHabit" class="font-semibold text-slate-900 bg-slate-50 p-2 rounded-lg border border-slate-200 block text-[11px]">Injector Cleaner, Engine Flush & TMO Full, BPC, Balance</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Suggest AI (7 cols) -->
+        <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <div class="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+                  <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-slate-950 text-sm">Rekomendasi AI Otomatis (MRA & SA)</h4>
+                  <p class="text-[11px] text-slate-400">Script komunikasi dipersonalisasi berdasarkan riwayat dan kebiasaan berkendara</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200">AI GENERATED</span>
+            </div>
+
+            <!-- Tab Buttons for MRA vs SA -->
+            <div class="flex items-center gap-2 mt-4 bg-slate-100 p-1 rounded-xl text-xs font-bold">
+              <button type="button" id="btnTabMra" onclick="switchAiSuggestTab('mra')" class="flex-1 py-1.5 px-3 rounded-lg transition bg-white text-blue-900 shadow font-extrabold flex items-center justify-center gap-1.5">
+                <i data-lucide="message-square" class="w-3.5 h-3.5 text-blue-600"></i>
+                <span>Suggest for MRA (Chat WA)</span>
+              </button>
+              <button type="button" id="btnTabSa" onclick="switchAiSuggestTab('sa')" class="flex-1 py-1.5 px-3 rounded-lg transition text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5">
+                <i data-lucide="mic" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Suggest for SA (Service Advisor)</span>
+              </button>
+            </div>
+
+            <!-- MRA Content -->
+            <div id="aiSuggestMraContent" class="mt-4 space-y-3">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 font-sans text-xs text-slate-800 leading-relaxed whitespace-pre-line max-h-72 overflow-y-auto custom-scrollbar" id="ccMraText">
+                <!-- Text populated via JS -->
+              </div>
+              <div class="flex items-center justify-end gap-2 pt-1">
+                <button type="button" onclick="copyMraScript()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-300 flex items-center gap-1.5 transition">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  <span>Salin Pesan MRA</span>
+                </button>
+                <a id="ccSendWaMraBtn" href="https://wa.me/6281385285999" target="_blank" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow flex items-center gap-1.5 transition">
+                  <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                  <span>Kirim Pesan ke WhatsApp</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- SA Content -->
+            <div id="aiSuggestSaContent" class="hidden mt-4 space-y-3">
+              <div class="p-4 rounded-xl bg-blue-50/60 border border-blue-200 font-sans text-xs text-slate-900 leading-relaxed whitespace-pre-line max-h-72 overflow-y-auto custom-scrollbar" id="ccSaText">
+                <!-- Text populated via JS -->
+              </div>
+              <div class="flex items-center justify-end gap-2 pt-1">
+                <button type="button" onclick="copySaScript()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-300 flex items-center gap-1.5 transition">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  <span>Salin Script SA</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 5: SERVICE ANALYTICS & HISTORY SERVICE (Baris 91-150) -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+        
+        <!-- Free Service & Sequence Service Row -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-5 pb-5 border-b border-slate-200">
+          
+          <!-- Free Service Table (6 cols) -->
+          <div class="md:col-span-6 space-y-2">
+            <div class="flex items-center gap-2 pb-1.5">
+              <i data-lucide="wrench" class="w-4 h-4 text-red-600"></i>
+              <h4 class="font-extrabold text-slate-950 text-xs uppercase tracking-wider">Free Service Program (T-CARE)</h4>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase border-y border-slate-200">
+                    <th class="py-2 px-3">KM Service</th>
+                    <th class="py-2 px-3">Expired Date</th>
+                    <th class="py-2 px-3">Service Date</th>
+                    <th class="py-2 px-3 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="ccFreeServiceTableBody" class="divide-y divide-slate-100 text-slate-800">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Sequence Service & Last Revenue (6 cols) -->
+          <div class="md:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+              <span class="text-[10px] font-bold text-slate-500 uppercase block pb-1 border-b border-slate-200">Sequence Service</span>
+              <div class="flex justify-between py-0.5">
+                <span class="text-slate-500">Last Service Date:</span>
+                <strong id="ccSeqLastDate" class="text-slate-900 font-bold">6 Okt 2023</strong>
+              </div>
+              <div class="flex justify-between py-0.5">
+                <span class="text-slate-500">Last 1st SBE:</span>
+                <span id="ccSeqLast1st" class="text-slate-800 font-medium">6 Okt 2023</span>
+              </div>
+              <div class="flex justify-between py-0.5">
+                <span class="text-slate-500">Last 2nd SBE:</span>
+                <span id="ccSeqLast2nd" class="text-slate-800 font-medium">6 Jun 2023</span>
+              </div>
+              <div class="flex justify-between py-0.5">
+                <span class="text-slate-500">SBE Sequence Svc:</span>
+                <strong id="ccSeqSbe" class="text-blue-700 font-extrabold">4,1</strong>
+              </div>
+              <div class="flex justify-between py-0.5">
+                <span class="text-slate-500">Range Last Service:</span>
+                <span id="ccSeqRange" class="text-slate-900 font-bold">38,1</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+              <span class="text-[10px] font-bold text-slate-500 uppercase block pb-1 border-b border-slate-200">Last Revenue Service</span>
+              <div class="flex justify-between py-0.5">
+                <span class="text-slate-500">PKB Number:</span>
+                <strong id="ccRevPkb" class="font-mono text-slate-900 font-bold text-[11px]">140PKB2310-0118</strong>
+              </div>
+              <div class="flex justify-between py-0.5">
+                <span class="text-slate-500">Revenue Jasa:</span>
+                <span id="ccRevJasa" class="text-slate-600">-</span>
+              </div>
+              <div class="flex justify-between py-0.5">
+                <span class="text-slate-500">Revenue Part:</span>
+                <span id="ccRevPart" class="text-slate-600">-</span>
+              </div>
+              <div class="flex justify-between py-0.5">
+                <span class="text-slate-500">Revenue Oil:</span>
+                <span id="ccRevOil" class="text-slate-600">-</span>
+              </div>
+              <div class="flex justify-between py-0.5 pt-1.5 border-t border-slate-200">
+                <span class="font-bold text-slate-900">Total Revenue:</span>
+                <strong id="ccRevTotal" class="font-black text-slate-950">-</strong>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- History Service Logs Table (13 Baris Log) -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="history" class="w-4 h-4 text-blue-600"></i>
+              <h4 class="font-extrabold text-slate-950 text-xs uppercase tracking-wider">History Service Log (Riwayat Servis Kendaraan)</h4>
+            </div>
+            <span id="ccHistoryLogCountBadge" class="text-[11px] text-slate-500 font-medium">13 Entri Servis</span>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-[10px] font-extrabold text-slate-600 uppercase border-b border-slate-200">
+                  <th class="py-2.5 px-3 text-center">No</th>
+                  <th class="py-2.5 px-3">Job Category</th>
+                  <th class="py-2.5 px-3">Job Type</th>
+                  <th class="py-2.5 px-3">Service Date</th>
+                  <th class="py-2.5 px-4">Service Description</th>
+                  <th class="py-2.5 px-3 text-right">Kilometer (KM)</th>
+                  <th class="py-2.5 px-4">Service Advisor (SA)</th>
+                </tr>
+              </thead>
+              <tbody id="ccHistoryServiceTableBody" class="divide-y divide-slate-100 text-slate-800">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 6: DATA CLEANSING INTERACTIVE TABLE (Sesuai Permintaan User) -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="database" class="w-5 h-5 text-emerald-600"></i>
+              <h3 class="font-extrabold text-slate-950 text-base">DATA Cleansing — Database Master Pelanggan</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Data sheet <strong>DATA Cleansing (gid 921666428)</strong>. Klik tombol <strong>"Lihat Customer Card"</strong> pada baris manapun untuk langsung memuat data mobil tersebut ke Dashboard di atas.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="cleansingTotalBadge" class="px-3 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-800 border border-blue-200">20.555 Pelanggan</span>
+          </div>
+        </div>
+
+        <!-- Toolbar: Search & Model Filter -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          
+          <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-300 flex-1 max-w-md shadow-sm">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+            <input type="text" id="cleansingSearchInput" oninput="onCleansingSearch(this.value)" placeholder="Cari NOPOL, Nama, VIN, HP, Alamat, atau Model..." class="bg-transparent text-xs text-slate-900 placeholder-slate-400 focus:outline-none w-full font-medium">
+          </div>
+
+          <!-- Model Filters -->
+          <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar py-1 text-xs">
+            <button type="button" onclick="filterCleansingModel('ALL')" class="btn-clean-filter active px-3 py-1 rounded-lg font-bold bg-slate-900 text-white shadow-sm transition" data-model="ALL">Semua</button>
+            <button type="button" onclick="filterCleansingModel('VELOZ')" class="btn-clean-filter px-3 py-1 rounded-lg font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-model="VELOZ">Veloz</button>
+            <button type="button" onclick="filterCleansingModel('CALYA')" class="btn-clean-filter px-3 py-1 rounded-lg font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-model="CALYA">Calya</button>
+            <button type="button" onclick="filterCleansingModel('AVANZA')" class="btn-clean-filter px-3 py-1 rounded-lg font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-model="AVANZA">Avanza</button>
+            <button type="button" onclick="filterCleansingModel('INNOVA')" class="btn-clean-filter px-3 py-1 rounded-lg font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-model="INNOVA">Innova</button>
+            <button type="button" onclick="filterCleansingModel('RUSH')" class="btn-clean-filter px-3 py-1 rounded-lg font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-model="RUSH">Rush</button>
+            <button type="button" onclick="filterCleansingModel('FORTUNER')" class="btn-clean-filter px-3 py-1 rounded-lg font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition" data-model="FORTUNER">Fortuner</button>
+          </div>
+
+        </div>
+
+        <!-- Table Data Cleansing -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-[10px] font-black text-slate-700 uppercase border-b border-slate-200 tracking-wider">
+                <th class="py-3 px-3 text-center">No</th>
+                <th class="py-3 px-3">Cust ID</th>
+                <th class="py-3 px-3 font-mono">NOPOL</th>
+                <th class="py-3 px-4">Nama Customer</th>
+                <th class="py-3 px-3">Tipe Kendaraan</th>
+                <th class="py-3 px-2 text-center">Tahun</th>
+                <th class="py-3 px-3">No. Telepon / WA</th>
+                <th class="py-3 px-4">Alamat</th>
+                <th class="py-3 px-3 text-right">Jarak/Hari</th>
+                <th class="py-3 px-3 text-center">Waktu Pakai</th>
+                <th class="py-3 px-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="cleansingTableBody" class="divide-y divide-slate-100 text-slate-800">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
+          <div class="text-slate-500 font-medium">
+            Menampilkan <span id="cleansingPageStart" class="font-bold text-slate-900">1</span> - <span id="cleansingPageEnd" class="font-bold text-slate-900">15</span> dari <span id="cleansingTotalFiltered" class="font-bold text-slate-900">0</span> data
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btnPrevCleansing" onclick="changeCleansingPage(-1)" class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+              &larr; Sebelumnya
+            </button>
+            <span id="cleansingPageIndicator" class="px-3 py-1 font-extrabold text-slate-900 bg-slate-100 rounded-lg">1</span>
+            <button type="button" id="btnNextCleansing" onclick="changeCleansingPage(1)" class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+              Selanjutnya &rarr;
+            </button>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -1649,6 +2321,9 @@
       setTimeout(() => {
         if (tabId === 'tabEncompare') {
           renderEncompareTab();
+        }
+        if (tabId === 'tabCustomerCard') {
+          renderCustomerCardTab();
         }
         if (tabId === 'tabAchievement') {
           if (chartTrend) chartTrend.resize();
@@ -5079,6 +5754,659 @@
       return records;
     }
 
+// ============================================================
+    // TAB 0.5: CUSTOMER CARD & DATA CLEANSING LOGIC
+    // ============================================================
+    let currentCustomerNopol = 'B1980FIB';
+    let cleansingSearchQuery = '';
+    let cleansingSelectedModel = 'ALL';
+    let cleansingCurrentPage = 1;
+    const CLEANSING_PAGE_SIZE = 15;
+    let isCustomerCardInitialized = false;
+
+    function initCustomerCard() {
+      if (isCustomerCardInitialized) return;
+      isCustomerCardInitialized = true;
+
+      const ccData = appData.customer_card || {};
+      const records = ccData.cleansing_records || [];
+      const nopolSelect = document.getElementById('custCardNopolSelect');
+
+      if (nopolSelect) {
+        nopolSelect.innerHTML = '';
+        // Add B1980FIB first
+        const optB1980 = document.createElement('option');
+        optB1980.value = 'B1980FIB';
+        optB1980.textContent = 'B1980FIB — SILIUS MASAARO GIAWA (VELOZ)';
+        optB1980.selected = true;
+        nopolSelect.appendChild(optB1980);
+
+        records.forEach(r => {
+          if (r.nopol && r.nopol.toUpperCase() !== 'B1980FIB') {
+            const opt = document.createElement('option');
+            opt.value = r.nopol;
+            opt.textContent = `${r.nopol} — ${r.name || 'Customer'} (${r.type || 'Toyota'})`;
+            nopolSelect.appendChild(opt);
+          }
+        });
+      }
+
+      // Populate default B1980FIB profile
+      onCustomerNopolChange('B1980FIB');
+      renderCleansingTable();
+    }
+
+    function renderCustomerCardTab() {
+      initCustomerCard();
+      lucide.createIcons();
+    }
+
+    function onCustomerNopolChange(nopol) {
+      currentCustomerNopol = (nopol || '').trim().toUpperCase();
+      const ccData = appData.customer_card || {};
+      const defProfile = ccData.default_profile || {};
+      const records = ccData.cleansing_records || [];
+
+      let profile = null;
+      if (currentCustomerNopol === 'B1980FIB' || currentCustomerNopol === (defProfile.nopol || '').toUpperCase()) {
+        profile = JSON.parse(JSON.stringify(defProfile));
+      } else {
+        const found = records.find(r => (r.nopol || '').toUpperCase() === currentCustomerNopol);
+        if (found) {
+          profile = buildCustomerProfileFromRecord(found, defProfile);
+        } else {
+          profile = JSON.parse(JSON.stringify(defProfile));
+        }
+      }
+
+      populateCustomerCard(profile);
+
+      // Keep dropdown in sync
+      const nopolSelect = document.getElementById('custCardNopolSelect');
+      if (nopolSelect && nopolSelect.value !== currentCustomerNopol) {
+        // If option exists, select it
+        let exists = false;
+        for (let i = 0; i < nopolSelect.options.length; i++) {
+          if (nopolSelect.options[i].value.toUpperCase() === currentCustomerNopol) {
+            nopolSelect.selectedIndex = i;
+            exists = true;
+            break;
+          }
+        }
+        if (!exists && profile.nopol) {
+          const newOpt = document.createElement('option');
+          newOpt.value = profile.nopol;
+          newOpt.textContent = `${profile.nopol} — ${profile.name} (${profile.model_car || profile.type})`;
+          newOpt.selected = true;
+          nopolSelect.prepend(newOpt);
+        }
+      }
+    }
+
+    function buildCustomerProfileFromRecord(rec, def) {
+      const type = (rec.type || 'VELOZ').toUpperCase();
+      const year = parseInt(rec.year) || 2022;
+      const vehAge = Math.max(0.5, (2026 - year)).toFixed(1).replace('.', ',');
+      const phone = (rec.phone || '81385285999').replace(/[^0-9]/g, '');
+      const avgKm = rec.km ? rec.km + ' KM' : '42,50 KM';
+      const avgMin = rec.min ? rec.min : '180';
+      const avgJam = (parseFloat(avgMin.replace(',', '.')) / 60 || 3).toFixed(2).replace('.', ',');
+      const avgSpeed = rec.spd ? rec.spd + ' KM/Jam' : '14,20 KM/Jam';
+      const usedDay = rec.day || 'Weekday';
+
+      // Engine oil based on model
+      let oil = 'TMO 10W-40';
+      if (type.includes('CALYA') || type.includes('AGYA')) oil = 'TMO 0W-16 / 0W-20';
+      else if (type.includes('INNOVA') || type.includes('FORTUNER')) oil = 'TMO Diesel 5W-30';
+      else if (type.includes('HYBRID') || type.includes('ZENIX')) oil = 'TMO 0W-20 Synthetic';
+
+      const mraText = `Halo Bapak/Ibu ${rec.name || 'Pelanggan Setia Toyota'}, agar performa kendaraan ${rec.type || 'Toyota'} Anda (${rec.nopol}) tetap prima dan aman saat berkendara, kami merekomendasikan layanan sesuai kebutuhan Anda:
+
+1. Weekend Service: Solusi praktis bagi Bapak/Ibu yang sibuk di hari kerja. Kami tetap melayani di hari Sabtu dan Minggu dengan waktu pengerjaan yang efisien.
+
+2. Booking to Dealer: Hindari antrean panjang dengan melakukan reservasi jadwal terlebih dahulu. Kendaraan Anda akan langsung ditangani oleh teknisi kami sesuai jam yang disepakati.
+
+3. Extra Engine Maintenance: Perawatan menyeluruh pada ruang bakar dan sistem pelumasan (${oil}) untuk mengembalikan performa mesin agar lebih bertenaga dan irit bahan bakar.
+
+4. Brake and Tyre Maintenance: Prioritas keamanan melalui pengecekan sistem pengereman dan kondisi ban untuk memastikan cengkeraman maksimal di perjalanan.
+
+Silakan pilih jadwal dan jenis layanan yang diinginkan, kami siap membantu melakukan booking sekarang agar perjalanan Bapak/Ibu selalu nyaman. Mau reservasi untuk akhir pekan ini?`;
+
+      const saText = `Selamat pagi/siang Bapak/Ibu ${rec.name || ''}, selamat datang di dealer Tunas Toyota Bekasi. Agar kendaraan ${rec.type || 'Toyota'} (${rec.nopol}) tetap prima dan perjalanan Bapak/Ibu lebih aman, kami memiliki rekomendasi layanan terbaik yang bisa disesuaikan dengan kebutuhan dan waktu luang Bapak/Ibu:
+
+1. Weekend Service:
+"Bapak/Ibu, jika jadwal di hari kerja cukup padat, kami menyediakan layanan Weekend Service di hari Sabtu dan Minggu. Bapak/Ibu tetap bisa merawat kendaraan tanpa mengganggu rutinitas kerja, sehingga kendaraan siap digunakan kembali dengan performa maksimal di hari Senin."
+
+2. Booking to Dealer (Efisiensi Waktu):
+"Agar Bapak/Ibu tidak perlu mengantre lama, kami sangat menyarankan untuk melakukan Booking Service terlebih dahulu. Dengan booking, teknisi dan suku cadang kami sudah siap saat Bapak/Ibu tiba, sehingga proses pengerjaan jadi jauh lebih cepat dan efisien."
+
+3. Extra Engine Maintenance (${oil}):
+"Untuk menjaga tarikan mesin tetap enteng dan konsumsi BBM lebih irit, kami merekomendasikan Extra Engine Maintenance. Layanan ini mencakup pembersihan ruang bakar secara menyeluruh, sangat cocok bagi Bapak/Ibu yang sering menempuh perjalanan harian sekitar ${avgKm}."
+
+4. Brake and Tyre Maintenance (Keamanan Berkendara):
+"Keamanan adalah prioritas utama, terutama untuk pengereman dan kondisi ban. Kami memiliki paket Brake and Tyre Maintenance untuk memastikan sistem rem berfungsi pakem dan kondisi ban tetap dalam tekanan serta ketebalan yang aman."
+
+Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berkendara ke depannya?`;
+
+      return {
+        nopol: rec.nopol,
+        vin: rec.vin || def.vin,
+        initial_status: 'PUNCTUAL',
+        current_status: 'ACTIVE',
+        cust_id: rec.c_id || def.cust_id,
+        cust_id_row: (rec.c_id ? rec.c_id + '-1' : def.cust_id_row),
+        name: rec.name || 'Pelanggan Toyota',
+        total_car: 1,
+        model_car: rec.type || 'TOYOTA',
+        type_cust: 'RETAIL',
+        area: rec.area || 'R 1',
+        kota: 'KAB. BEKASI',
+        alamat: rec.addr || 'Bekasi, Jawa Barat',
+        pembelian: 'BK',
+        program: 'T-CARE',
+        contact_phone: phone,
+        decision_maker: rec.name || 'Pelanggan Toyota',
+        decision_phone: phone,
+        method_payment: 'CREDIT',
+        nama_leasing: 'PT. MANDIRI TUNAS FINANCE',
+        nama_asuransi: '-',
+        jenis_asuransi: '-',
+        all_risk_ex: '-',
+        insurance_ex: '-',
+        insurance_status: '-',
+        ktp_sim: '-',
+        birthday: '15 Mei 1985',
+        gender: 'Male',
+        job: 'WIRASWASTA',
+        fav_drink: 'Kopi / Teh',
+        fav_food: 'Nasi Padang / Bakso',
+        hobby: 'Otomotif & Olahraga',
+        used_day: usedDay,
+        place_visit: '-',
+        code_color: 'Standard Toyota Color',
+        delivery_date: `15 Jan ${year + 1}`,
+        year: year.toString(),
+        vehicle_age: vehAge,
+        salesman: def.salesman || 'SIDIK PRANOTO',
+        spv_sales: rec.name || 'SILIUS MASAARO GIAWA',
+        t_intouch_status: 'T- Intouch',
+        t_intouch_last_day: '31 Jan 2026',
+        program_service: 'T-CARE',
+        extended_warranty: 'Eligible',
+        avg_speed: avgSpeed,
+        avg_km: avgKm,
+        avg_used_time: `${avgJam} Jam (${avgMin} Menit)`,
+        potency_insurance: 'Tawarkan Asuransi',
+        potency_test_drive: 'Tawarkan Test Drive',
+        potency_stnk: '-',
+        potency_t_intouch: 'Renewal T intouch',
+        next_suggest_service: (usedDay === 'Weekday' ? 'Weekend Service & Booking to Dealer' : 'Express Service'),
+        engine_oil: oil,
+        upselling_status: 'Potency to upselling',
+        t_intouch_part_no: '60101-TATEL',
+        suggest_service_habit: 'Extra Engine maintenance  Brake And Tyre mainteance',
+        suggest_part_habit: 'Inector Cleaner ,Engine Flush & TMO Full  BPC , Balance',
+        mra_suggestion: mraText,
+        sa_suggestion: saText,
+        other_cars: [
+          {
+            no: '1', vin: rec.vin || def.vin, nopol: rec.nopol,
+            year: year.toString(), type: rec.type || 'TOYOTA', program: 'T-CARE',
+            last_date: '10 Jan 2024', last_job: '20K', next_job: '30K',
+            other_info: 'ACTIVE'
+          }
+        ],
+        free_services: def.free_services || [],
+        sequence_service: def.sequence_service || {},
+        last_revenue_service: def.last_revenue_service || {},
+        history_services: def.history_services || []
+      };
+    }
+
+    function populateCustomerCard(p) {
+      if (!p) return;
+
+      const setT = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val || '-';
+      };
+
+      setT('ccVinTop', p.vin);
+      setT('ccNopolTop', p.nopol);
+      setT('ccInitStatus', p.initial_status || 'PUNCTUAL');
+      setT('ccCurrStatus', p.current_status || 'NOT ACTIVE');
+
+      setT('ccCustId', p.cust_id);
+      setT('ccCustIdRow', p.cust_id_row);
+      setT('ccCustName', p.name);
+      setT('ccTotalCar', (p.total_car || 1) + ' Unit');
+      setT('ccModelCar', p.model_car || p.type);
+      setT('ccTypeCustBadge', p.type_cust || 'RETAIL');
+      setT('ccArea', p.area || 'R 1');
+      setT('ccKota', p.kota || 'KAB. BEKASI');
+      setT('ccPembelian', p.pembelian || 'BK');
+      setT('ccProgram', p.program || 'T-CARE');
+      setT('ccAlamat', p.alamat || p.addr);
+
+      setT('ccContactPhoneVal', p.contact_phone || p.phone);
+      const cleanPhone = (p.contact_phone || p.phone || '81385285999').replace(/[^0-9]/g, '');
+      const waNumber = cleanPhone.startsWith('0') ? '62' + cleanPhone.slice(1) : (cleanPhone.startsWith('62') ? cleanPhone : '62' + cleanPhone);
+      const waLink1 = document.getElementById('ccWaBtn1');
+      if (waLink1) waLink1.href = `https://wa.me/${waNumber}`;
+
+      setT('ccMethodPayment', p.method_payment);
+      setT('ccNamaLeasing', p.nama_leasing);
+      setT('ccNamaAsuransi', p.nama_asuransi);
+      setT('ccJenisAsuransi', p.jenis_asuransi);
+      setT('ccAllRiskEx', p.all_risk_ex);
+      setT('ccInsuranceEx', p.insurance_ex);
+      setT('ccInsuranceStatus', p.insurance_status);
+
+      setT('ccInfoTipeCust', p.type_cust || 'RETAIL');
+      setT('ccDecisionMaker', p.decision_maker || p.name);
+      setT('ccDecisionPhone', p.decision_phone || p.contact_phone || p.phone);
+      setT('ccBirthday', p.birthday);
+      setT('ccGender', p.gender);
+      setT('ccJob', p.job);
+      setT('ccFavDrink', p.fav_drink);
+      setT('ccFavFood', p.fav_food);
+      setT('ccHobby', p.hobby);
+      setT('ccUsedDay', p.used_day);
+
+      setT('ccCarModel', p.model_car || p.type);
+      setT('ccCodeColor', p.code_color);
+      setT('ccDeliveryDate', p.delivery_date);
+      setT('ccProdYear', p.year);
+      setT('ccVehicleAge', p.vehicle_age ? p.vehicle_age + ' Tahun' : '-');
+      setT('ccSalesman', p.salesman);
+      setT('ccTIntouchStatus', p.t_intouch_status);
+      setT('ccTIntouchLastDay', p.t_intouch_last_day);
+      setT('ccProgramService', p.program_service || p.program);
+      setT('ccAvgSpeed', p.avg_speed);
+      setT('ccAvgKm', `${p.avg_km || '-'} (${p.avg_used_time || '-'})`);
+
+      setT('ccPotencyInsurance', p.potency_insurance);
+      setT('ccPotencyTestDrive', p.potency_test_drive);
+      setT('ccPotencyTIntouch', p.potency_t_intouch);
+      setT('ccPotencyStnk', p.potency_stnk);
+
+      setT('ccNextSuggestService', p.next_suggest_service);
+      setT('ccEngineOil', p.engine_oil);
+      setT('ccUpsellingStatus', p.upselling_status);
+      setT('ccTIntouchPartNo', p.t_intouch_part_no);
+      setT('ccSuggestServiceHabit', p.suggest_service_habit);
+      setT('ccSuggestPartHabit', p.suggest_part_habit);
+
+      setT('ccMraText', p.mra_suggestion);
+      setT('ccSaText', p.sa_suggestion);
+
+      const sendWaBtn = document.getElementById('ccSendWaMraBtn');
+      if (sendWaBtn) {
+        const encText = encodeURIComponent(p.mra_suggestion || '');
+        sendWaBtn.href = `https://wa.me/${waNumber}?text=${encText}`;
+      }
+
+      // Populate Other Cars Table
+      const otherTbody = document.getElementById('ccOtherCarsTableBody');
+      if (otherTbody) {
+        const cars = p.other_cars || [];
+        setT('ccOtherCarsCountBadge', cars.length + ' Mobil');
+        setT('ccOtherCarStatus', cars[0]?.other_info || p.current_status || 'NOT ACTIVE');
+        otherTbody.innerHTML = cars.map((c, idx) => `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2 px-2 text-center font-bold text-slate-400">${c.no || idx + 1}</td>
+            <td class="py-2 px-2 font-mono text-[11px] font-semibold text-slate-800">${c.vin || '-'}</td>
+            <td class="py-2 px-2 font-mono text-[11px] font-extrabold text-blue-700">${c.nopol || '-'}</td>
+            <td class="py-2 px-2 text-center font-medium">${c.year || '-'}</td>
+            <td class="py-2 px-2 font-bold text-emerald-700">${c.program || 'T-CARE'}</td>
+            <td class="py-2 px-2 text-center font-bold text-amber-700">${c.next_job || '30K'}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="6" class="p-2 text-center text-slate-400">Tidak ada kendaraan lain</td></tr>';
+      }
+
+      // Populate Free Service Table
+      const freeTbody = document.getElementById('ccFreeServiceTableBody');
+      if (freeTbody) {
+        const freeList = p.free_services || [];
+        freeTbody.innerHTML = freeList.map(fs => `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2 px-3 font-extrabold text-slate-900">${fs.km}</td>
+            <td class="py-2 px-3 text-slate-500 font-medium">${fs.expired_date || '-'}</td>
+            <td class="py-2 px-3 text-emerald-700 font-bold">${fs.service_date || '-'}</td>
+            <td class="py-2 px-3 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${fs.service_date ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500'}">
+                ${fs.service_date ? 'Completed' : 'Pending'}
+              </span>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" class="p-2 text-center text-slate-400">Tidak ada data free service</td></tr>';
+      }
+
+      // Sequence Service
+      const seq = p.sequence_service || {};
+      setT('ccSeqLastDate', seq.last_service_date);
+      setT('ccSeqLast1st', seq.last_1st_sbe);
+      setT('ccSeqLast2nd', seq.last_2nd_sbe);
+      setT('ccSeqSbe', seq.sbe_sequence);
+      setT('ccSeqRange', seq.range_last_service);
+
+      // Last Revenue Service
+      const rev = p.last_revenue_service || {};
+      setT('ccRevPkb', rev.pkb_no || '-');
+      setT('ccRevJasa', rev.rev_jasa || '-');
+      setT('ccRevPart', rev.rev_part || '-');
+      setT('ccRevOil', rev.rev_oil || '-');
+      setT('ccRevTotal', rev.total_revenue || '-');
+
+      // History Service Logs Table
+      const histTbody = document.getElementById('ccHistoryServiceTableBody');
+      if (histTbody) {
+        const logs = p.history_services || [];
+        setT('ccHistoryLogCountBadge', logs.length + ' Entri Servis');
+        histTbody.innerHTML = logs.map((h, idx) => {
+          const badgeClass = h.cat === 'SBE' ? 'bg-blue-50 text-blue-700 border-blue-200'
+                           : h.cat === 'SBI' ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                           : 'bg-amber-50 text-amber-700 border-amber-200';
+          return `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-2.5 px-3 text-center font-bold text-slate-400">${idx + 1}</td>
+              <td class="py-2.5 px-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-black border ${badgeClass}">${h.cat}</span>
+              </td>
+              <td class="py-2.5 px-3 font-extrabold text-slate-900">${h.type}</td>
+              <td class="py-2.5 px-3 font-medium text-slate-600">${h.date}</td>
+              <td class="py-2.5 px-4 font-semibold text-slate-800">${h.desc}</td>
+              <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-950">${h.km}</td>
+              <td class="py-2.5 px-4 font-bold text-slate-700">${h.sa}</td>
+            </tr>
+          `;
+        }).join('') || '<tr><td colspan="7" class="p-3 text-center text-slate-400">Tidak ada riwayat servis</td></tr>';
+      }
+
+      lucide.createIcons();
+    }
+
+    function switchAiSuggestTab(tab) {
+      const btnMra = document.getElementById('btnTabMra');
+      const btnSa = document.getElementById('btnTabSa');
+      const mraContent = document.getElementById('aiSuggestMraContent');
+      const saContent = document.getElementById('aiSuggestSaContent');
+
+      if (tab === 'mra') {
+        if (btnMra) btnMra.className = "flex-1 py-1.5 px-3 rounded-lg transition bg-white text-blue-900 shadow font-extrabold flex items-center justify-center gap-1.5";
+        if (btnSa) btnSa.className = "flex-1 py-1.5 px-3 rounded-lg transition text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5";
+        if (mraContent) mraContent.classList.remove('hidden');
+        if (saContent) saContent.classList.add('hidden');
+      } else {
+        if (btnSa) btnSa.className = "flex-1 py-1.5 px-3 rounded-lg transition bg-white text-blue-900 shadow font-extrabold flex items-center justify-center gap-1.5";
+        if (btnMra) btnMra.className = "flex-1 py-1.5 px-3 rounded-lg transition text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5";
+        if (saContent) saContent.classList.remove('hidden');
+        if (mraContent) mraContent.classList.add('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    function copyMraScript() {
+      const el = document.getElementById('ccMraText');
+      if (el) {
+        navigator.clipboard.writeText(el.innerText || el.textContent);
+        showToast('Pesan MRA berhasil disalin ke clipboard!', 'success');
+      }
+    }
+
+    function copySaScript() {
+      const el = document.getElementById('ccSaText');
+      if (el) {
+        navigator.clipboard.writeText(el.innerText || el.textContent);
+        showToast('Script SA berhasil disalin ke clipboard!', 'success');
+      }
+    }
+
+    function onCustQuickSearch(q) {
+      const query = (q || '').trim().toUpperCase();
+      const resContainer = document.getElementById('custCardSearchResults');
+      if (!resContainer) return;
+
+      if (!query) {
+        resContainer.classList.add('hidden');
+        return;
+      }
+
+      const ccData = appData.customer_card || {};
+      const records = ccData.cleansing_records || [];
+      const matches = records.filter(r => 
+        (r.nopol || '').toUpperCase().includes(query) ||
+        (r.name || '').toUpperCase().includes(query) ||
+        (r.vin || '').toUpperCase().includes(query) ||
+        (r.phone || '').includes(query)
+      ).slice(0, 8);
+
+      if (matches.length === 0) {
+        resContainer.innerHTML = '<div class="p-2 text-xs text-slate-400">Tidak ada pelanggan yang cocok</div>';
+      } else {
+        resContainer.innerHTML = matches.map(m => `
+          <div onclick="selectCustomerFromQuickSearch('${m.nopol}')" class="p-2 rounded-lg hover:bg-blue-50 cursor-pointer flex items-center justify-between text-xs transition border border-transparent hover:border-blue-200">
+            <div>
+              <strong class="font-mono text-blue-900 font-bold">${m.nopol}</strong> &mdash; 
+              <span class="font-semibold text-slate-900">${m.name}</span>
+              <span class="text-slate-500 text-[11px] block">${m.type} (${m.year}) &bull; ${m.addr || 'Bekasi'}</span>
+            </div>
+            <button class="px-2 py-1 bg-blue-600 text-white rounded text-[10px] font-bold">Pilih</button>
+          </div>
+        `).join('');
+      }
+      resContainer.classList.remove('hidden');
+    }
+
+    function selectCustomerFromQuickSearch(nopol) {
+      const resContainer = document.getElementById('custCardSearchResults');
+      if (resContainer) resContainer.classList.add('hidden');
+      const input = document.getElementById('custCardQuickSearch');
+      if (input) input.value = '';
+      onCustomerNopolChange(nopol);
+    }
+
+    // --- DATA CLEANSING INTERACTIVE TABLE LOGIC ---
+    function renderCleansingTable() {
+      const ccData = appData.customer_card || {};
+      const records = ccData.cleansing_records || [];
+      const q = cleansingSearchQuery.toUpperCase();
+
+      let filtered = records.filter(r => {
+        if (cleansingSelectedModel !== 'ALL') {
+          const t = (r.type || '').toUpperCase();
+          if (!t.includes(cleansingSelectedModel)) return false;
+        }
+        if (q) {
+          const matchNopol = (r.nopol || '').toUpperCase().includes(q);
+          const matchName = (r.name || '').toUpperCase().includes(q);
+          const matchVin = (r.vin || '').toUpperCase().includes(q);
+          const matchPhone = (r.phone || '').includes(q);
+          const matchAddr = (r.addr || '').toUpperCase().includes(q);
+          const matchType = (r.type || '').toUpperCase().includes(q);
+          if (!matchNopol && !matchName && !matchVin && !matchPhone && !matchAddr && !matchType) return false;
+        }
+        return true;
+      });
+
+      const totalBadge = document.getElementById('cleansingTotalBadge');
+      if (totalBadge) totalBadge.textContent = `${(ccData.total_cleansing_rows || 20555).toLocaleString('id-ID')} Pelanggan Terdaftar`;
+
+      const totalFilteredEl = document.getElementById('cleansingTotalFiltered');
+      if (totalFilteredEl) totalFilteredEl.textContent = filtered.length.toLocaleString('id-ID');
+
+      const maxPages = Math.ceil(filtered.length / CLEANSING_PAGE_SIZE) || 1;
+      if (cleansingCurrentPage > maxPages) cleansingCurrentPage = maxPages;
+      if (cleansingCurrentPage < 1) cleansingCurrentPage = 1;
+
+      const startIdx = (cleansingCurrentPage - 1) * CLEANSING_PAGE_SIZE;
+      const endIdx = Math.min(startIdx + CLEANSING_PAGE_SIZE, filtered.length);
+      const pageSlice = filtered.slice(startIdx, endIdx);
+
+      const pageStartEl = document.getElementById('cleansingPageStart');
+      const pageEndEl = document.getElementById('cleansingPageEnd');
+      const pageIndicator = document.getElementById('cleansingPageIndicator');
+      const btnPrev = document.getElementById('btnPrevCleansing');
+      const btnNext = document.getElementById('btnNextCleansing');
+
+      if (pageStartEl) pageStartEl.textContent = filtered.length > 0 ? (startIdx + 1).toLocaleString('id-ID') : 0;
+      if (pageEndEl) pageEndEl.textContent = endIdx.toLocaleString('id-ID');
+      if (pageIndicator) pageIndicator.textContent = `${cleansingCurrentPage} / ${maxPages}`;
+      if (btnPrev) btnPrev.disabled = (cleansingCurrentPage <= 1);
+      if (btnNext) btnNext.disabled = (cleansingCurrentPage >= maxPages);
+
+      const tbody = document.getElementById('cleansingTableBody');
+      if (tbody) {
+        tbody.innerHTML = pageSlice.map((r, idx) => {
+          const isSelected = (r.nopol || '').toUpperCase() === currentCustomerNopol;
+          const rowBg = isSelected ? 'bg-blue-50/70 border-l-4 border-blue-600' : 'hover:bg-slate-50';
+          const cleanPhone = (r.phone || '').replace(/[^0-9]/g, '');
+          const waNum = cleanPhone.startsWith('0') ? '62' + cleanPhone.slice(1) : (cleanPhone.startsWith('62') ? cleanPhone : '62' + cleanPhone);
+          return `
+            <tr class="${rowBg} transition">
+              <td class="py-2.5 px-3 text-center font-bold text-slate-400">${startIdx + idx + 1}</td>
+              <td class="py-2.5 px-3 font-semibold text-slate-700">${r.c_id || '-'}</td>
+              <td class="py-2.5 px-3 font-mono font-extrabold text-blue-900">${r.nopol}</td>
+              <td class="py-2.5 px-4 font-extrabold text-slate-950">${r.name || '-'}</td>
+              <td class="py-2.5 px-3 font-bold text-slate-800">${r.type || 'TOYOTA'}</td>
+              <td class="py-2.5 px-2 text-center text-slate-600 font-medium">${r.year || '-'}</td>
+              <td class="py-2.5 px-3">
+                <a href="https://wa.me/${waNum}" target="_blank" class="font-mono text-emerald-700 hover:text-emerald-800 font-bold hover:underline flex items-center gap-1" title="Chat via WhatsApp">
+                  <span>${r.phone || '-'}</span>
+                </a>
+              </td>
+              <td class="py-2.5 px-4 text-slate-600 text-[11px] truncate max-w-[200px]" title="${r.addr}">${r.addr || '-'}</td>
+              <td class="py-2.5 px-3 text-right font-bold text-slate-900">${r.km ? r.km + ' KM' : '-'}</td>
+              <td class="py-2.5 px-3 text-center">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.day === 'Weekend' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-700'}">${r.day || 'Weekday'}</span>
+              </td>
+              <td class="py-2.5 px-3 text-center">
+                <button type="button" onclick="selectCustomerFromTable('${r.nopol}')" class="px-2.5 py-1 rounded-lg ${isSelected ? 'bg-slate-900 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'} font-bold text-[11px] shadow-sm flex items-center gap-1 mx-auto transition">
+                  <span>${isSelected ? 'Sedang Tampil' : 'Pilih'}</span> &rarr;
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('') || '<tr><td colspan="11" class="py-4 text-center text-slate-400">Tidak ada data pelanggan yang cocok dengan pencarian</td></tr>';
+      }
+      lucide.createIcons();
+    }
+
+    function onCleansingSearch(val) {
+      cleansingSearchQuery = val;
+      cleansingCurrentPage = 1;
+      renderCleansingTable();
+    }
+
+    function filterCleansingModel(model) {
+      cleansingSelectedModel = model;
+      cleansingCurrentPage = 1;
+      document.querySelectorAll('.btn-clean-filter').forEach(btn => {
+        if (btn.getAttribute('data-model') === model) {
+          btn.className = "btn-clean-filter active px-3 py-1 rounded-lg font-bold bg-slate-900 text-white shadow-sm transition";
+        } else {
+          btn.className = "btn-clean-filter px-3 py-1 rounded-lg font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+        }
+      });
+      renderCleansingTable();
+    }
+
+    function changeCleansingPage(delta) {
+      cleansingCurrentPage += delta;
+      renderCleansingTable();
+    }
+
+    function selectCustomerFromTable(nopol) {
+      onCustomerNopolChange(nopol);
+      renderCleansingTable();
+      // Smooth scroll to top of customer card
+      const topEl = document.getElementById('tabCustomerCard');
+      if (topEl) {
+        topEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      showToast(`Profil Customer ${nopol} berhasil dimuat ke Dashboard!`, 'success');
+    }
+
+    // Customer Card Live Sync from Google Sheets
+    function fetchCustomerCardLive() {
+      const CUSTOMER_CARD_SPREADSHEET_ID = '1_gaqJRX5QHQ89GdEt7TzPGPjKmx1LFAucbXF8rZaWYI';
+      return new Promise((resolve, reject) => {
+        const cbName = 'gviz_cc_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
+        const script = document.createElement('script');
+        let timeout = setTimeout(() => {
+          cleanup();
+          reject(new Error('Timeout loading Customer Card GSheets'));
+        }, 12000);
+        function cleanup() {
+          clearTimeout(timeout);
+          if (window[cbName]) delete window[cbName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+        window[cbName] = function(json) {
+          cleanup();
+          if (json && json.status === 'ok' && json.table) {
+            resolve(json.table);
+          } else {
+            reject(new Error('Invalid response'));
+          }
+        };
+        script.onerror = function() {
+          cleanup();
+          reject(new Error('Network error loading Customer Card'));
+        };
+        script.src = `https://docs.google.com/spreadsheets/d/${CUSTOMER_CARD_SPREADSHEET_ID}/gviz/tq?tqx=responseHandler:${cbName}&gid=1729404659&tq=select%20*&_nocache=${Math.random()}`;
+        document.body.appendChild(script);
+      });
+    }
+
+    function parseGvizToCustomerCard(table) {
+      if (!table || !table.rows) return;
+      const getVal = (r, c) => {
+        if (!table.rows[r] || !table.rows[r].c || !table.rows[r].c[c]) return '';
+        const v = table.rows[r].c[c].f !== undefined ? table.rows[r].c[c].f : (table.rows[r].c[c].v !== undefined ? table.rows[r].c[c].v : '');
+        return (v !== null && v !== undefined) ? String(v).trim() : '';
+      };
+      const nopol = getVal(10, 1) || getVal(10, 3) || 'B1980FIB';
+      const vin = getVal(10, 2) || '';
+      const initStatus = getVal(10, 4) || 'PUNCTUAL';
+      const currStatus = getVal(10, 5) || 'NOT ACTIVE';
+      const custId = getVal(20, 0) || 'CSTBK-11131';
+      const custIdRow = getVal(20, 1) || 'CSTBK-11131-1';
+      const custName = getVal(20, 2) || '';
+      const totalCar = getVal(20, 3) || '1';
+      const modelCar = getVal(20, 4) || 'VELOZ';
+      const typeCust = getVal(20, 5) || 'RETAIL';
+      const area = getVal(28, 0) || 'R 1';
+      const kota = getVal(28, 1) || 'KAB. BEKASI';
+      const alamat = getVal(28, 2) || '';
+      const pembelian = getVal(28, 3) || 'BK';
+      const program = getVal(28, 4) || 'T-CARE';
+
+      if (!appData.customer_card) appData.customer_card = {};
+      if (!appData.customer_card.default_profile) appData.customer_card.default_profile = {};
+      const dp = appData.customer_card.default_profile;
+      if (nopol) dp.nopol = nopol;
+      if (vin) dp.vin = vin;
+      if (initStatus) dp.initial_status = initStatus;
+      if (currStatus) dp.current_status = currStatus;
+      if (custId) dp.cust_id = custId;
+      if (custIdRow) dp.cust_id_row = custIdRow;
+      if (custName) dp.name = custName;
+      if (totalCar) dp.total_car = totalCar;
+      if (modelCar) dp.model_car = modelCar;
+      if (typeCust) dp.type_cust = typeCust;
+      if (area) dp.area = area;
+      if (kota) dp.kota = kota;
+      if (alamat) dp.alamat = alamat;
+      if (pembelian) dp.pembelian = pembelian;
+      if (program) dp.program = program;
+
+      if (currentCustomerNopol === nopol) {
+        populateCustomerCard(dp);
+      }
+    }
+
+
     // --- REAL-TIME GOOGLE SHEETS SYNC ENGINE (HYBRID: GVIZ JSONP + APPS SCRIPT) ---
     async function triggerSync() {
       const customUrl = localStorage.getItem('tunas_sheets_sync_url');
@@ -5112,12 +6440,13 @@
 
       // Method 2: Direct Live Google Sheets GViz via JSONP (No CORS, Zero Config)
       try {
-        const [dashTable, rsTable, tradeInTable, arTable, encTable] = await Promise.all([
+        const [dashTable, rsTable, tradeInTable, arTable, encTable, ccTable] = await Promise.all([
           fetchGvizJsonp('Dashboard Achievement').catch(err => { console.warn('Sync Dash err:', err); return null; }),
           fetchGvizJsonp('RS Bekasi').catch(err => { console.warn('Sync RS err:', err); return null; }),
           fetchGvizJsonp('Trade In').catch(err => { console.warn('Sync Trade In err:', err); return null; }),
           fetchGvizJsonp('AR').catch(err => { console.warn('Sync AR err:', err); return null; }),
-          fetchGvizJsonp('eNCOmpare', '&headers=0').catch(err => { console.warn('Sync eNCOmpare err:', err); return null; })
+          fetchGvizJsonp('eNCOmpare', '&headers=0').catch(err => { console.warn('Sync eNCOmpare err:', err); return null; }),
+          fetchCustomerCardLive().catch(err => { console.warn('Sync Customer Card err:', err); return null; })
         ]);
 
         let hasAnyUpdate = false;
@@ -5164,6 +6493,11 @@
 
         if (encTable) {
           parseGvizToEncompare(encTable);
+        }
+
+        if (ccTable) {
+          parseGvizToCustomerCard(ccTable);
+          hasAnyUpdate = true;
         }
 
         if (hasAnyUpdate) {
