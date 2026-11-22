@@ -3886,6 +3886,163 @@
       return kpi;
     }
 
+    // Helper parse GViz table to Trade In records
+    function parseGvizToTradeIn(table) {
+      if (!table || !table.cols || !table.rows) return [];
+      const cols = table.cols.map(c => (c.label || c.id || '').trim().toLowerCase());
+      const colMap = {};
+      cols.forEach((name, idx) => { if (name) colMap[name] = idx; });
+
+      const getVal = (row, exactName, pattern) => {
+        let idx = colMap[exactName.toLowerCase()];
+        if (idx === undefined && pattern) {
+          idx = cols.findIndex(c => c.includes(pattern.toLowerCase()));
+        }
+        if (idx === undefined || idx === -1) return null;
+        const cell = row.c && row.c[idx];
+        if (!cell) return null;
+        return cell.f !== undefined && cell.f !== null ? cell.f : cell.v;
+      };
+
+      const records = [];
+      table.rows.forEach(row => {
+        if (!row || !row.c) return;
+        const sales = getVal(row, 'Sales', 'sales');
+        const mobilBaru = getVal(row, 'Mobil baru yang dibeli', 'mobil baru');
+        if (!sales && !mobilBaru) return;
+
+        records.push({
+          bulan: String(getVal(row, 'Bulan', 'bulan') || '').trim(),
+          sales: String(sales || '').trim(),
+          spv: String(getVal(row, 'Spv', 'spv') || '').trim(),
+          mobil_baru: String(mobilBaru || '').trim(),
+          merek: String(getVal(row, 'Merek', 'merek') || '').trim(),
+          model: String(getVal(row, 'Model ', 'model') || '').trim(),
+          varian: String(getVal(row, 'Varian', 'varian') || '').trim(),
+          transmisi: String(getVal(row, 'Transmisi', 'transmisi') || '').trim(),
+          bahan_bakar: String(getVal(row, 'Bahan Bakar', 'bahan bakar') || '').trim(),
+          tahun: String(getVal(row, 'Tahun', 'tahun') || '').trim(),
+          plat: String(getVal(row, 'Plat Nomor', 'plat') || '').trim(),
+          appraisal: String(getVal(row, 'Appraisal\n(Sudah/Belum)', 'appraisal') || '').trim(),
+          permintaan: getVal(row, ' Harga Permintaan', 'permintaan') || 0,
+          penawaran: getVal(row, ' Harga Penawaran', 'penawaran') || 0,
+          deal: String(getVal(row, 'Deal/ Tidak', 'deal') || '').trim(),
+          do: String(getVal(row, 'DO/ Tidak', 'do') || '').trim(),
+          harga_deal: getVal(row, ' Harga Deal', 'harga deal') || 0,
+          terjual_ke: String(getVal(row, 'Terjual ke ', 'terjual ke') || '').trim(),
+          reason: String(getVal(row, 'Reason jika tidak deal', 'reason') || '').trim()
+        });
+      });
+
+      return records;
+    }
+
+    // Helper parse GViz table to AR records
+    function parseGvizToAR(table) {
+      if (!table || !table.cols || !table.rows) return [];
+      const cols = table.cols.map(c => (c.label || c.id || '').trim());
+      const colMap = {};
+      cols.forEach((name, idx) => { if (name) colMap[name.toLowerCase()] = idx; });
+
+      const getVal = (row, exactName, fallbackPattern) => {
+        let idx = colMap[exactName.toLowerCase()];
+        if (idx === undefined && fallbackPattern) {
+          idx = cols.findIndex(c => c.toLowerCase().includes(fallbackPattern.toLowerCase()));
+        }
+        if (idx === undefined || idx === -1) return null;
+        const cell = row.c && row.c[idx];
+        if (!cell) return null;
+        return cell.f !== undefined && cell.f !== null ? cell.f : cell.v;
+      };
+
+      const monthNamesIndo = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const monthNamesEng = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+      const parseNum = val => {
+        if (val === null || val === undefined || val === '') return 0;
+        if (typeof val === 'number') return val;
+        const clean = String(val).replace(/[^0-9.-]/g, '');
+        const n = parseFloat(clean);
+        return isNaN(n) ? 0 : n;
+      };
+
+      const records = [];
+
+      table.rows.forEach(row => {
+        if (!row || !row.c) return;
+        const invNo = getVal(row, 'Inv / Credit Note No', 'credit note') || getVal(row, 'Invoice No', 'inv');
+        if (!invNo) return;
+
+        let trxRaw = String(getVal(row, 'Transaction Date', 'transaction date') || '');
+        let trxDate = '';
+        let mIndo = 'September';
+        let mEng = 'September';
+
+        if (trxRaw.startsWith('Date(')) {
+          const parts = trxRaw.replace('Date(', '').replace(')', '').split(',');
+          if (parts.length >= 3) {
+            const y = parseInt(parts[0].trim());
+            const m = parseInt(parts[1].trim()) + 1;
+            const d = parseInt(parts[2].trim());
+            trxDate = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            mIndo = monthNamesIndo[m] || 'September';
+            mEng = monthNamesEng[m] || 'September';
+          }
+        } else if (trxRaw.includes('/')) {
+          const parts = trxRaw.split('/');
+          if (parts.length === 3) {
+            const d = parts[0].padStart(2, '0');
+            const m = parseInt(parts[1]);
+            const y = parts[2];
+            trxDate = `${y}-${String(m).padStart(2, '0')}-${d}`;
+            mIndo = monthNamesIndo[m] || 'September';
+            mEng = monthNamesEng[m] || 'September';
+          }
+        } else {
+          trxDate = trxRaw.substring(0, 10);
+        }
+
+        let dueRaw = String(getVal(row, 'Due Date', 'due date') || '');
+        let dueDate = '';
+        if (dueRaw.startsWith('Date(')) {
+          const parts = dueRaw.replace('Date(', '').replace(')', '').split(',');
+          if (parts.length >= 3) {
+            const y = parseInt(parts[0].trim());
+            const m = parseInt(parts[1].trim()) + 1;
+            const d = parseInt(parts[2].trim());
+            dueDate = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          }
+        } else if (dueRaw.includes('/')) {
+          const parts = dueRaw.split('/');
+          if (parts.length === 3) {
+            dueDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+          }
+        } else {
+          dueDate = dueRaw.substring(0, 10);
+        }
+
+        records.push({
+          inv_no: String(invNo).trim(),
+          trx_date: trxDate,
+          due_date: dueDate,
+          state: String(getVal(row, 'State', 'state') || 'Closed').trim(),
+          spv: String(getVal(row, 'Supervisor', 'supervisor') || 'SATRIYO KRESNO AJI').trim(),
+          customer: String(getVal(row, 'Customer', null) || '-').trim(),
+          inv_amount: parseNum(getVal(row, 'Invoice Amount', 'invoice amount')),
+          financing_company: String(getVal(row, 'Financing Company', 'financing company') || '-').trim(),
+          fin_co_balance: parseNum(getVal(row, 'Financing Company Balance', 'financing company balance')),
+          receipt_amount: parseNum(getVal(row, 'Total Receipt Amount', 'total receipt amount')),
+          balance: parseNum(getVal(row, 'Balance', 'balance')),
+          fin_co_inv_amount: parseNum(getVal(row, 'Financing Company Invoice Amount', 'financing company invoice amount')),
+          fin_co_receipt_amount: parseNum(getVal(row, 'Financing Company Receipt Amount', 'financing company receipt amount')),
+          month: mIndo,
+          month_en: mEng
+        });
+      });
+
+      return records;
+    }
+
     // --- REAL-TIME GOOGLE SHEETS SYNC ENGINE (HYBRID: GVIZ JSONP + APPS SCRIPT) ---
     async function triggerSync() {
       const customUrl = localStorage.getItem('tunas_sheets_sync_url');
@@ -3900,12 +4057,14 @@
           if (remote && remote.data) {
             if (remote.data.rs_afi && remote.data.rs_afi.length > 0) appData.rs_afi = remote.data.rs_afi;
             if (remote.data.dashboard_kpi) appData.dashboard_kpi = remote.data.dashboard_kpi;
-            if (remote.data.trade_in) appData.trade_in = remote.data.trade_in;
-            if (remote.data.ar) appData.ar_data = remote.data.ar;
+            if (remote.data.trade_in && remote.data.trade_in.length > 0) appData.trade_in = remote.data.trade_in;
+            if (remote.data.ar && remote.data.ar.length > 0) appData.ar_data = remote.data.ar;
             
-            showToast('Live Sync Apps Script Berhasil!', 'success');
-            document.getElementById('syncStatusText').textContent = 'Live Terhubung ke Apps Script';
-            document.getElementById('syncLastTime').textContent = new Date().toLocaleTimeString('id-ID');
+            showToast('Live Sync Apps Script: Seluruh Data Berhasil Terupdate!', 'success');
+            const badgeEl = document.getElementById('syncStatusText');
+            if (badgeEl) badgeEl.textContent = 'Live Terhubung ke Apps Script';
+            const timeEl = document.getElementById('syncLastTime');
+            if (timeEl) timeEl.textContent = new Date().toLocaleTimeString('id-ID');
             applyFilters();
             if (icon) icon.classList.remove('animate-spin');
             return;
@@ -3917,26 +4076,61 @@
 
       // Method 2: Direct Live Google Sheets GViz via JSONP (No CORS, Zero Config)
       try {
-        const [dashTable, rsTable] = await Promise.all([
-          fetchGvizJsonp('Dashboard Achievement'),
-          fetchGvizJsonp('RS Bekasi')
+        const [dashTable, rsTable, tradeInTable, arTable] = await Promise.all([
+          fetchGvizJsonp('Dashboard Achievement').catch(err => { console.warn('Sync Dash err:', err); return null; }),
+          fetchGvizJsonp('RS Bekasi').catch(err => { console.warn('Sync RS err:', err); return null; }),
+          fetchGvizJsonp('Trade In').catch(err => { console.warn('Sync Trade In err:', err); return null; }),
+          fetchGvizJsonp('AR').catch(err => { console.warn('Sync AR err:', err); return null; })
         ]);
 
-        if (dashTable && rsTable) {
-          const liveKpi = parseGvizToKpi(dashTable);
-          const liveRs = parseGvizToRsAfi(rsTable);
+        let hasAnyUpdate = false;
 
+        if (dashTable) {
+          const liveKpi = parseGvizToKpi(dashTable);
+          if (liveKpi && Object.keys(liveKpi.kpi_cabang).length > 0) {
+            appData.dashboard_kpi = Object.assign(appData.dashboard_kpi || {}, liveKpi);
+            hasAnyUpdate = true;
+          }
+        }
+
+        if (rsTable) {
+          const liveRs = parseGvizToRsAfi(rsTable);
           if (liveRs && liveRs.length > 0) {
             appData.rs_afi = liveRs;
+            hasAnyUpdate = true;
           }
-          if (liveKpi && Object.keys(liveKpi.kpi_cabang).length > 0) {
-            // merge KPI
-            appData.dashboard_kpi = Object.assign(appData.dashboard_kpi || {}, liveKpi);
-          }
+        }
 
-          showToast('Live Sync: Data Otomatis Diperbarui dari Google Sheets!', 'success');
-          document.getElementById('syncStatusText').textContent = 'Live Terhubung ke Google Sheets';
-          document.getElementById('syncLastTime').textContent = new Date().toLocaleTimeString('id-ID');
+        if (tradeInTable) {
+          const liveTradeIn = parseGvizToTradeIn(tradeInTable);
+          if (liveTradeIn && liveTradeIn.length > 0) {
+            appData.trade_in = liveTradeIn;
+            hasAnyUpdate = true;
+          }
+        }
+
+        if (arTable) {
+          const liveAr = parseGvizToAR(arTable);
+          if (liveAr && liveAr.length > 0) {
+            if (liveAr.length >= 100) {
+              appData.ar_data = liveAr;
+            } else {
+              // Merge/upsert by inv_no so existing records are kept and spreadsheet edits apply live
+              const arMap = new Map();
+              (appData.ar_data || []).forEach(r => arMap.set(r.inv_no, r));
+              liveAr.forEach(r => arMap.set(r.inv_no, Object.assign({}, arMap.get(r.inv_no) || {}, r)));
+              appData.ar_data = Array.from(arMap.values());
+            }
+            hasAnyUpdate = true;
+          }
+        }
+
+        if (hasAnyUpdate) {
+          showToast('Live Sync: Seluruh Data Otomatis Terupdate dari Google Sheets!', 'success');
+          const badgeEl = document.getElementById('syncStatusText');
+          if (badgeEl) badgeEl.textContent = 'Live Terhubung ke Google Sheets';
+          const timeEl = document.getElementById('syncLastTime');
+          if (timeEl) timeEl.textContent = new Date().toLocaleTimeString('id-ID');
           applyFilters();
         } else {
           showToast('Data diperbarui menggunakan preloaded dataset lokal', 'info');
