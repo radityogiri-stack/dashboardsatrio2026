@@ -2269,6 +2269,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
     let currentMode = 'MONTH'; // 'MONTH', 'YTM', 'QUARTER'
     let currentSpv = 'SATRIYO KRESNO AJI'; // 'ALL', 'SATRIYO KRESNO AJI', 'YAMES'
     let currentPeriod = 'September'; // default month
+    let currentYtmStart = 'January'; // default YTM start
     let syncIntervalId = null;
 
     // Charts instances
@@ -2496,8 +2497,14 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
     // --- MAIN FILTER LOGIC ---
     function applyFilters() {
-      currentSpv = document.getElementById('filterSpv').value;
-      currentPeriod = document.getElementById('filterPeriod').value;
+      const spvEl = document.getElementById('filterSpv');
+      if (spvEl) currentSpv = spvEl.value;
+
+      const periodEl = document.getElementById('filterPeriod');
+      if (periodEl) currentPeriod = periodEl.value;
+
+      const ytmStartEl = document.getElementById('filterYtmStart');
+      if (ytmStartEl && ytmStartEl.value) currentYtmStart = ytmStartEl.value;
 
       renderDashboardAchievement();
       renderVehicleTab();
