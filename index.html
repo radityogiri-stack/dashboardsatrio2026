@@ -291,15 +291,15 @@
     <div id="tabEncompare" class="tab-pane hidden space-y-6">
       
       <!-- TOP BANNER TITLE (Mirip Persis Format Spreadsheet) -->
-      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-pink-900/40 via-purple-900/30 to-slate-900 border border-pink-500/30 p-5 shadow-xl text-center">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/20 border border-pink-500/40 text-pink-300 text-xs font-semibold uppercase tracking-wider mb-2">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-400"></i>
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-600 via-cyan-600 to-sky-700 p-6 shadow-md text-center text-white">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-xs font-bold uppercase tracking-wider mb-2 backdrop-blur-sm">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
           <span>Simulasi Komparasi Biaya Kepemilikan (Total Cost of Ownership)</span>
         </div>
-        <h1 class="text-xl md:text-3xl font-black text-white tracking-wide uppercase drop-shadow-md">
+        <h1 class="text-xl md:text-3xl font-black text-white tracking-wide uppercase drop-shadow-sm">
           DASHBOARD NCO HEV TOYOTA &amp; BEV NON TOYOTA
         </h1>
-        <p class="text-xs md:text-sm text-slate-300 mt-1 max-w-3xl mx-auto">
+        <p class="text-xs md:text-sm text-cyan-100 mt-1 max-w-3xl mx-auto font-medium">
           Perbandingan komprehensif Nett Cost of Ownership (NCO) antara kendaraan Hybrid Toyota (HEV) melawan mobil listrik murni Non-Toyota (BEV) tersinkronisasi otomatis dengan Google Sheets.
         </p>
       </div>
@@ -308,13 +308,13 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- ESTIMATED USAGE -->
-        <div class="bg-cyan-950/40 border border-cyan-500/40 rounded-xl p-4 shadow-lg backdrop-blur-sm">
+        <div class="bg-white border border-cyan-300 rounded-xl p-4 shadow-sm">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-cyan-300">ESTIMATED USAGE</span>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-200 border border-cyan-500/30 font-semibold">Tahun</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-cyan-800">ESTIMATED USAGE</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-100 text-cyan-800 font-bold">Tahun</span>
           </div>
           <div class="flex items-center gap-3">
-            <select id="ncoUsageYear" onchange="onNcoParamChange()" class="flex-1 bg-slate-900 text-cyan-300 font-bold text-lg border border-cyan-500/50 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-400 focus:outline-none cursor-pointer">
+            <select id="ncoUsageYear" onchange="onNcoParamChange()" class="flex-1 bg-white text-slate-900 font-bold text-base border border-cyan-400 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none cursor-pointer">
               <option value="1">1 Tahun</option>
               <option value="2">2 Tahun</option>
               <option value="3" selected>3 Tahun</option>
@@ -322,20 +322,20 @@
               <option value="5">5 Tahun</option>
             </select>
             <div class="text-right">
-              <div id="ncoDaysCount" class="text-lg font-black text-white font-mono">1.095</div>
-              <div class="text-[10px] text-cyan-400 font-semibold uppercase">HARI (DAYS)</div>
+              <div id="ncoDaysCount" class="text-lg font-black text-cyan-950 font-mono">1.095</div>
+              <div class="text-[10px] text-cyan-700 font-bold uppercase">HARI (DAYS)</div>
             </div>
           </div>
         </div>
 
         <!-- MILEAGE ESTIMATION -->
-        <div class="bg-cyan-950/40 border border-cyan-500/40 rounded-xl p-4 shadow-lg backdrop-blur-sm">
+        <div class="bg-white border border-cyan-300 rounded-xl p-4 shadow-sm">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-cyan-300">MILEAGE ESTIMATION</span>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-200 border border-cyan-500/30 font-semibold">Km / Hari</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-cyan-800">MILEAGE ESTIMATION</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-100 text-cyan-800 font-bold">Km / Hari</span>
           </div>
           <div class="flex items-center gap-3">
-            <select id="ncoMileageDay" onchange="onNcoParamChange()" class="flex-1 bg-slate-900 text-cyan-300 font-bold text-lg border border-cyan-500/50 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-400 focus:outline-none cursor-pointer">
+            <select id="ncoMileageDay" onchange="onNcoParamChange()" class="flex-1 bg-white text-slate-900 font-bold text-base border border-cyan-400 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none cursor-pointer">
               <option value="40">40 KM / Hari</option>
               <option value="60" selected>60 KM / Hari</option>
               <option value="80">80 KM / Hari</option>
@@ -343,30 +343,30 @@
               <option value="120">120 KM / Hari</option>
             </select>
             <div class="text-right">
-              <div id="ncoTotalKm" class="text-lg font-black text-white font-mono">65.700</div>
-              <div class="text-[10px] text-cyan-400 font-semibold uppercase">TOTAL KM</div>
+              <div id="ncoTotalKm" class="text-lg font-black text-cyan-950 font-mono">65.700</div>
+              <div class="text-[10px] text-cyan-700 font-bold uppercase">TOTAL KM</div>
             </div>
           </div>
         </div>
 
         <!-- MODEL TOYOTA SELECTOR -->
-        <div class="bg-red-950/30 border border-red-500/40 rounded-xl p-4 shadow-lg backdrop-blur-sm">
+        <div class="bg-white border border-red-300 rounded-xl p-4 shadow-sm">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-red-300">TOYOTA (HEV)</span>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-red-600/30 text-white font-bold">Kandidat Utama</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-red-700">TOYOTA (HEV)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-red-100 text-red-700 font-bold border border-red-200">Kandidat Utama</span>
           </div>
-          <select id="ncoToyotaSelect" onchange="onNcoParamChange()" class="w-full bg-slate-900 text-red-200 font-bold text-sm border border-red-500/50 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-400 focus:outline-none cursor-pointer">
+          <select id="ncoToyotaSelect" onchange="onNcoParamChange()" class="w-full bg-white text-slate-900 font-bold text-sm border border-red-400 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none cursor-pointer">
             <!-- Populated dynamically -->
           </select>
         </div>
 
         <!-- MODEL NON TOYOTA SELECTOR -->
-        <div class="bg-blue-950/30 border border-blue-500/40 rounded-xl p-4 shadow-lg backdrop-blur-sm">
+        <div class="bg-white border border-blue-300 rounded-xl p-4 shadow-sm">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-blue-300">NON TOYOTA (BEV)</span>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-600/30 text-white font-bold">Kompetitor</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-700">NON TOYOTA (BEV)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-bold border border-blue-200">Kompetitor</span>
           </div>
-          <select id="ncoNonToyotaSelect" onchange="onNcoParamChange()" class="w-full bg-slate-900 text-blue-200 font-bold text-sm border border-blue-500/50 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none cursor-pointer">
+          <select id="ncoNonToyotaSelect" onchange="onNcoParamChange()" class="w-full bg-white text-slate-900 font-bold text-sm border border-blue-400 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
             <!-- Populated dynamically -->
           </select>
         </div>
@@ -374,15 +374,15 @@
       </div>
 
       <!-- MAIN COMPARISON TABLE & BREAKDOWN (PERSIS SPREADSHEET ROW 3-17) -->
-      <div class="bg-slate-900/90 border border-slate-200 rounded-2xl overflow-hidden shadow-2xl">
-        <div class="px-5 py-3 border-b border-slate-200 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 flex flex-wrap items-center justify-between gap-3">
+      <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        <div class="px-5 py-3 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2">
-            <i data-lucide="table-properties" class="w-5 h-5 text-cyan-400"></i>
-            <span class="text-sm font-bold text-white uppercase tracking-wider">Matriks Perhitungan NCO &amp; Breakdown Biaya Operasional</span>
+            <i data-lucide="table-properties" class="w-5 h-5 text-cyan-600"></i>
+            <span class="text-sm font-bold text-slate-900 uppercase tracking-wider">Matriks Perhitungan NCO &amp; Breakdown Biaya Operasional</span>
           </div>
           <div class="flex items-center gap-2 text-xs">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>Formula Otomatis Sesuai Spreadsheet</span>
             </span>
           </div>
@@ -391,33 +391,33 @@
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs md:text-sm">
             <thead>
-              <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold text-xs uppercase tracking-wider">
-                <th class="p-3 w-1/4 border-r border-slate-200 uppercase tracking-wider">VARIABLE</th>
-                <th class="p-3 w-1/4 border-r border-slate-200 bg-red-950/20 text-red-300 font-bold uppercase tracking-wider">
+              <tr class="bg-slate-100 text-slate-800 border-b border-slate-200 font-bold text-xs uppercase tracking-wider">
+                <th class="p-3 w-1/4 border-r border-slate-200 uppercase tracking-wider text-slate-900 font-black">VARIABLE</th>
+                <th class="p-3 w-1/4 border-r border-slate-200 bg-red-50 text-red-700 font-black uppercase tracking-wider">
                   <div class="flex items-center gap-1.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-600 inline-block"></span>
                     <span>TOYOTA (HEV)</span>
                   </div>
                 </th>
-                <th class="p-3 w-1/4 border-r border-slate-200 bg-blue-950/20 text-blue-300 font-bold uppercase tracking-wider">
+                <th class="p-3 w-1/4 border-r border-slate-200 bg-blue-50 text-blue-700 font-black uppercase tracking-wider">
                   <div class="flex items-center gap-1.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
                     <span>NON TOYOTA (BEV)</span>
                   </div>
                 </th>
-                <th class="p-3 w-1/4 bg-cyan-950/30 text-cyan-300 font-bold uppercase tracking-wider" colspan="2">
+                <th class="p-3 w-1/4 bg-slate-100 text-slate-800 font-black uppercase tracking-wider" colspan="2">
                   <div class="text-center">OPERATE BREAKDOWN COST</div>
                 </th>
               </tr>
-              <tr class="bg-slate-950/80 text-[11px] text-slate-400 border-b border-slate-200">
+              <tr class="bg-slate-50 text-[11px] text-slate-600 border-b border-slate-200 font-semibold">
                 <th class="p-2 border-r border-slate-200"></th>
-                <th id="thToyotaModelName" class="p-2 border-r border-slate-200 font-semibold text-white bg-red-950/30">NEW VELOZ Q HYBRID</th>
-                <th id="thNonToyotaModelName" class="p-2 border-r border-slate-200 font-semibold text-white bg-blue-950/30">BYD M6</th>
-                <th class="p-2 border-r border-slate-200 text-center font-semibold text-red-300 bg-slate-900 w-1/8">TOYOTA</th>
-                <th class="p-2 text-center font-semibold text-blue-300 bg-slate-900 w-1/8">NON TOYOTA</th>
+                <th id="thToyotaModelName" class="p-2 border-r border-slate-200 font-bold text-red-700 bg-red-50/60">NEW VELOZ Q HYBRID</th>
+                <th id="thNonToyotaModelName" class="p-2 border-r border-slate-200 font-bold text-blue-700 bg-blue-50/60">BYD M6</th>
+                <th class="p-2 border-r border-slate-200 text-center font-bold text-red-700 bg-slate-100 w-1/8">TOYOTA</th>
+                <th class="p-2 text-center font-bold text-blue-700 bg-slate-100 w-1/8">NON TOYOTA</th>
               </tr>
             </thead>
-            <tbody id="ncoTableBody" class="divide-y divide-slate-800 font-mono">
+            <tbody id="ncoTableBody" class="divide-y divide-slate-200 font-mono">
               <!-- Populated dynamically -->
             </tbody>
           </table>
@@ -474,7 +474,7 @@
     <div id="tabAchievement" class="tab-pane space-y-6">
       
       <!-- HEADER BANNER & HIGHLIGHT -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 p-4 rounded-2xl border border-slate-200 shadow-lg">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         <div>
           <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
             <i data-lucide="award" class="w-5 h-5 text-amber-400"></i>
@@ -483,11 +483,11 @@
           <p class="text-xs text-slate-600 mt-0.5 font-medium">Monitoring komprehensif pencapaian RS AFI vs Target Unit, Komposisi Cash/Kredit & Leasing, serta Realisasi Finansial (Revenue & Gross Profit).</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap text-xs">
-          <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-300 flex items-center gap-1.5 font-medium">
+          <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-1.5 font-semibold">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            Data Aktif: <strong id="chipActiveSpv" class="text-white">SATRIYO KRESNO AJI</strong>
+            Data Aktif: <strong id="chipActiveSpv" class="text-slate-900">SATRIYO KRESNO AJI</strong>
           </span>
-          <span class="px-2.5 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 font-semibold" id="chipActivePeriod">
+          <span class="px-2.5 py-1 rounded-lg bg-red-50 text-red-700 border border-red-200 font-bold" id="chipActivePeriod">
             September 2026
           </span>
         </div>
@@ -744,10 +744,10 @@
                 <th class="py-2.5 px-2 text-center">Aug</th>
                 <th class="py-2.5 px-2 text-center">Sep</th>
                 <th class="py-2.5 px-2 text-center">Oct</th>
-                <th class="py-2.5 px-3 text-right bg-slate-800/80 text-amber-400 font-bold min-w-[100px]">Total / YTD</th>
+                <th class="py-2.5 px-3 text-right bg-slate-100 text-slate-900 font-black border-l border-slate-200 min-w-[100px]">Total / YTD</th>
               </tr>
             </thead>
-            <tbody id="achievementMatrixBody" class="divide-y divide-slate-800/60 font-mono text-slate-300">
+            <tbody id="achievementMatrixBody" class="divide-y divide-slate-200 font-mono text-slate-900">
               <!-- Dynamically rendered by JavaScript -->
             </tbody>
           </table>
@@ -826,7 +826,7 @@
           <p class="text-xs text-slate-400">Sebaran kuantitas unit (Qty) terjual per model / tipe kendaraan dan kontribusi SPV</p>
         </div>
         <div class="flex items-center gap-2">
-          <input type="text" id="vehicleSearch" oninput="renderVehicleTables()" placeholder="Cari model mobil..." class="bg-slate-900 border border-slate-200 text-xs rounded-lg px-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-red-500">
+          <input type="text" id="vehicleSearch" oninput="renderVehicleTables()" placeholder="Cari model mobil..." class="bg-white border border-slate-300 text-xs rounded-lg px-3 py-1.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 shadow-sm w-48 sm:w-60">
         </div>
       </div>
 
@@ -885,10 +885,10 @@
                 <th class="py-2.5 px-2 text-center">Aug</th>
                 <th class="py-2.5 px-2 text-center">Sep</th>
                 <th class="py-2.5 px-2 text-center">Oct</th>
-                <th class="py-2.5 px-3 text-right bg-red-600/20 text-red-300 font-bold">Grand Total</th>
+                <th class="py-2.5 px-3 text-right bg-red-50 text-red-700 font-black border-l border-red-200">Grand Total</th>
               </tr>
             </thead>
-            <tbody id="vehicleMatrixBody" class="divide-y divide-slate-200 text-slate-800">
+            <tbody id="vehicleMatrixBody" class="divide-y divide-slate-200 text-slate-900">
               <!-- Injected by JS -->
             </tbody>
           </table>
@@ -932,7 +932,7 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="text-xs text-slate-400 whitespace-nowrap">Filter Bulan:</span>
-          <select id="tradeInMonthFilter" onchange="renderTradeInTab()" class="bg-slate-950 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-red-500">
+          <select id="tradeInMonthFilter" onchange="renderTradeInTab()" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-red-500 shadow-sm">
             <option value="ALL">Semua Bulan (YTD 2026)</option>
             <option value="Januari">Januari</option>
             <option value="Februari">Februari</option>
@@ -1000,10 +1000,10 @@
           </div>
           <div class="flex items-center gap-3">
             <div class="relative">
-              <input type="text" id="tradeInSearchInput" oninput="filterTradeInTable()" placeholder="Cari Sales, Mobil, Plat..." class="bg-slate-950 border border-slate-300 rounded-lg px-3 py-1.5 pl-8 text-xs text-slate-200 focus:outline-none focus:border-red-500 w-48 sm:w-64">
-              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5 pointer-events-none"></i>
+              <input type="text" id="tradeInSearchInput" oninput="filterTradeInTable()" placeholder="Cari Sales, Mobil, Plat..." class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 pl-8 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 shadow-sm w-48 sm:w-64">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none"></i>
             </div>
-            <span id="tradeInLeadCountBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-300 text-slate-200 whitespace-nowrap">
+            <span id="tradeInLeadCountBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 border border-slate-200 text-slate-800 whitespace-nowrap">
               0 Leads
             </span>
           </div>
@@ -1048,9 +1048,9 @@
               <i data-lucide="file-text" class="w-5 h-5"></i>
             </span>
             <div>
-              <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
                 AR Invoice (Account Receivable)
-                <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
                   Data Real Spreadsheet
                 </span>
               </h2>
@@ -1062,7 +1062,7 @@
         </div>
 
         <!-- Sub-Menu Filter: ALL, Released, Closed -->
-        <div class="flex flex-wrap items-center gap-2 bg-slate-900/80 p-1.5 rounded-xl border border-slate-200">
+        <div class="flex flex-wrap items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
           <button onclick="setARStateFilter('ALL')" id="arBtnFilterAll" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-red-600 text-white shadow-md shadow-red-600/30">
             <span>Semua Status (ALL)</span>
             <span id="arBadgeCountAll" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-bold">0</span>
@@ -1147,7 +1147,7 @@
             </h3>
             <p class="text-xs text-slate-400 mt-0.5">Saldo tertunggak mulai muncul pada Agustus, September, dan Oktober</p>
           </div>
-          <span class="text-[11px] text-slate-400 bg-slate-900/90 px-3 py-1 rounded-lg border border-slate-200">
+          <span class="text-[11px] text-slate-700 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200 font-semibold">
             Data Sumber: Sheet Januari - Oktober 2026
           </span>
         </div>
@@ -1172,10 +1172,10 @@
           <!-- Search & Count Badge -->
           <div class="flex items-center gap-3">
             <div class="relative">
-              <input type="text" id="arSearchInput" oninput="handleARSearch()" placeholder="Cari No Inv, Customer, Leasing..." class="bg-slate-950 border border-slate-300 rounded-lg px-3 py-1.5 pl-8 text-xs text-slate-200 focus:outline-none focus:border-red-500 w-56 sm:w-72">
-              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5 pointer-events-none"></i>
+              <input type="text" id="arSearchInput" oninput="handleARSearch()" placeholder="Cari No Inv, Customer, Leasing..." class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 pl-8 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 shadow-sm w-56 sm:w-72">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none"></i>
             </div>
-            <span id="arTableRowCountBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-300 text-slate-200 whitespace-nowrap">
+            <span id="arTableRowCountBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 border border-slate-200 text-slate-800 whitespace-nowrap">
               0 Transaksi
             </span>
           </div>
@@ -1248,25 +1248,25 @@
           <div class="flex flex-wrap items-center gap-3">
             
             <!-- Dropdown Pilihan Bulan -->
-            <div class="flex items-center gap-2 bg-slate-900 px-3 py-2 rounded-xl border border-slate-200">
+            <div class="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
               <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
               <span class="text-xs text-slate-400 font-medium">Bulan:</span>
               <select id="polregMonthSelect" onchange="onPolregFilterChange()" class="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer">
-                <option value="ALL" class="bg-slate-900" selected>Semua Bulan (Jan – Sep 2026)</option>
-                <option value="Jan" class="bg-slate-900">Januari 2026</option>
-                <option value="Feb" class="bg-slate-900">Februari 2026</option>
-                <option value="Mar" class="bg-slate-900">Maret 2026</option>
-                <option value="Apr" class="bg-slate-900">April 2026</option>
-                <option value="May" class="bg-slate-900">Mei 2026</option>
-                <option value="Jun" class="bg-slate-900">Juni 2026</option>
-                <option value="Jul" class="bg-slate-900">Juli 2026</option>
-                <option value="Aug" class="bg-slate-900">Agustus 2026</option>
-                <option value="Sep" class="bg-slate-900">September 2026</option>
+                <option value="ALL" class="bg-white text-slate-900" selected>Semua Bulan (Jan – Sep 2026)</option>
+                <option value="Jan" class="bg-white text-slate-900">Januari 2026</option>
+                <option value="Feb" class="bg-white text-slate-900">Februari 2026</option>
+                <option value="Mar" class="bg-white text-slate-900">Maret 2026</option>
+                <option value="Apr" class="bg-white text-slate-900">April 2026</option>
+                <option value="May" class="bg-white text-slate-900">Mei 2026</option>
+                <option value="Jun" class="bg-white text-slate-900">Juni 2026</option>
+                <option value="Jul" class="bg-white text-slate-900">Juli 2026</option>
+                <option value="Aug" class="bg-white text-slate-900">Agustus 2026</option>
+                <option value="Sep" class="bg-white text-slate-900">September 2026</option>
               </select>
             </div>
 
             <!-- Sub-Menu EV & HEV Toggle Group -->
-            <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-200 text-xs">
+            <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
               <button id="btnPwAll" onclick="setPolregPowertrain('ALL')" class="px-3 py-1.5 rounded-lg font-bold transition bg-red-600 text-white shadow">
                 Semua Model
               </button>
@@ -1287,13 +1287,13 @@
         <!-- KPI SUMMARY CARDS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5 pt-4 border-t border-slate-200/80">
           
-          <div id="cardPolregTotal" class="p-4 rounded-xl bg-slate-900/80 border border-slate-200 transition">
+          <div id="cardPolregTotal" class="p-4 rounded-xl bg-white border border-slate-200 shadow-sm transition">
             <span class="text-xs text-slate-400">Total All Market Kota Bekasi</span>
             <div class="text-2xl font-extrabold text-white mt-1" id="statPolregTotalMarket">16.224</div>
             <span class="text-[11px] text-slate-400" id="statPolregScopeDesc">Seluruh Merk & Tipe Terdaftar</span>
           </div>
 
-          <div id="cardPolregToyota" class="p-4 rounded-xl bg-slate-900/80 border border-slate-200 transition">
+          <div id="cardPolregToyota" class="p-4 rounded-xl bg-white border border-slate-200 shadow-sm transition">
             <div class="flex justify-between items-start">
               <span class="text-xs text-slate-400">Penjualan Toyota (Unit)</span>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400" id="statPolregToyotaShare">22.4% Share</span>
@@ -1302,7 +1302,7 @@
             <span class="text-[11px] text-emerald-400 font-semibold" id="statPolregToyotaRank">#1 Market Leader</span>
           </div>
 
-          <div id="cardPolregCompetitor" class="p-4 rounded-xl bg-slate-900/80 border border-slate-200 transition">
+          <div id="cardPolregCompetitor" class="p-4 rounded-xl bg-white border border-slate-200 shadow-sm transition">
             <div class="flex justify-between items-start">
               <span class="text-xs text-slate-400">Penantang Terdekat</span>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400" id="statPolregCompShare">13.5% Share</span>
@@ -1311,7 +1311,7 @@
             <span class="text-[11px] text-slate-400" id="statPolregCompDesc">Pesaing Utama di Area Bekasi</span>
           </div>
 
-          <div id="cardPolregPeakKec" class="p-4 rounded-xl bg-slate-900/80 border border-slate-200 transition">
+          <div id="cardPolregPeakKec" class="p-4 rounded-xl bg-white border border-slate-200 shadow-sm transition">
             <span class="text-xs text-slate-400">Kecamatan Penjualan Tertinggi</span>
             <div class="text-2xl font-extrabold text-amber-400 mt-1" id="statPolregPeakKec">Bekasi Utara</div>
             <span class="text-[11px] text-amber-500 font-semibold" id="statPolregPeakKecQty">2.054 Unit Terdaftar</span>
@@ -1337,7 +1337,7 @@
         </div>
 
         <!-- Legend Bar -->
-        <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-200/80 text-xs">
+        <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
           <div id="polregLegend" class="flex flex-wrap items-center gap-3">
             <!-- Injected by JS -->
           </div>
@@ -1429,7 +1429,7 @@
               Diurutkan dari penjualan unit terbanyak hingga terendah (10 besar) berdasarkan kolom <code>jumlah</code> pada spreadsheet.
             </p>
           </div>
-          <div class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-200 text-xs text-slate-300 flex items-center gap-2">
+          <div class="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700 flex items-center gap-2 font-medium">
             <span>Total All Market:</span>
             <strong id="tblTotalMarketBadge" class="text-white font-extrabold">16.224 Unit</strong>
           </div>
@@ -1446,7 +1446,7 @@
               </span>
             </div>
           </div>
-          <div class="text-[11px] text-slate-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-200" id="formulaExampleBox">
+          <div class="text-[11px] text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 font-mono font-medium" id="formulaExampleBox">
             Contoh: Toyota (3.631) ÷ All Market (16.224) = <strong class="text-red-400 font-bold">22.4% Market Share</strong>
           </div>
         </div>
@@ -1760,7 +1760,7 @@
           const opt = document.createElement('option');
           opt.value = m.en;
           opt.textContent = `${m.id} 2026`;
-          opt.className = "bg-slate-900 text-slate-100 py-1.5 px-2";
+          opt.className = "bg-white text-slate-900 py-1.5 px-2 font-medium";
           opt.style.backgroundColor = "#0F172A";
           opt.style.color = "#F8FAFC";
           if (m.en === 'September' || m.en === currentPeriod) opt.selected = true;
@@ -1774,7 +1774,7 @@
             const opt = document.createElement('option');
             opt.value = m.en;
             opt.textContent = `Dari: ${m.id} 2026`;
-            opt.className = "bg-slate-900 text-slate-100 py-1.5 px-2";
+            opt.className = "bg-white text-slate-900 py-1.5 px-2 font-medium";
             opt.style.backgroundColor = "#0F172A";
             opt.style.color = "#F8FAFC";
             if (m.en === 'January') opt.selected = true;
@@ -1787,7 +1787,7 @@
           const opt = document.createElement('option');
           opt.value = m.en;
           opt.textContent = `Sampai: ${m.id} 2026`;
-          opt.className = "bg-slate-900 text-slate-100 py-1.5 px-2";
+          opt.className = "bg-white text-slate-900 py-1.5 px-2 font-medium";
           opt.style.backgroundColor = "#0F172A";
           opt.style.color = "#F8FAFC";
           if (m.en === 'September') opt.selected = true;
@@ -1803,7 +1803,7 @@
           const opt = document.createElement('option');
           opt.value = q;
           opt.textContent = `${q} 2026 (${desc})`;
-          opt.className = "bg-slate-900 text-slate-100 py-1.5 px-2";
+          opt.className = "bg-white text-slate-900 py-1.5 px-2 font-medium";
           opt.style.backgroundColor = "#0F172A";
           opt.style.color = "#F8FAFC";
           if (q === 'Q3') opt.selected = true;
@@ -2675,8 +2675,8 @@
       const renderRow = (label, values, totalStr, isBadge = false, isHeader = false) => {
         if (isHeader) {
           return `
-            <tr class="bg-slate-900/80 text-amber-300 font-bold">
-              <td colspan="12" class="py-2 px-3 tracking-wide text-[11px] uppercase">${label}</td>
+            <tr class="bg-slate-100 text-slate-900 font-black border-y border-slate-200">
+              <td colspan="12" class="py-2.5 px-3 tracking-wide text-xs uppercase font-black text-slate-900">${label}</td>
             </tr>
           `;
         }
@@ -2685,16 +2685,16 @@
           if (isBadge) {
             const num = parseFloat(v);
             const isGreen = num >= 100;
-            return `<td class="py-2 px-2 text-center"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isGreen ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">${v}</span></td>`;
+            return `<td class="py-2 px-2 text-center"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isGreen ? 'bg-emerald-50 text-emerald-700 border border-emerald-300' : 'bg-red-50 text-red-700 border border-red-300'}">${v}</span></td>`;
           }
-          return `<td class="py-2 px-2 text-center text-slate-300 text-[11px]">${v}</td>`;
+          return `<td class="py-2 px-2 text-center text-slate-900 font-semibold text-xs">${v}</td>`;
         }).join('');
 
         return `
           <tr class="hover:bg-slate-50/70 transition">
-            <td class="py-2 px-3 font-semibold text-slate-200 text-xs">${label}</td>
+            <td class="py-2 px-3 font-bold text-slate-950 text-xs">${label}</td>
             ${cells}
-            <td class="py-2 px-3 text-right bg-slate-100/60 font-bold text-amber-400 text-xs">${totalStr}</td>
+            <td class="py-2 px-3 text-right bg-slate-100 font-black text-slate-950 text-xs border-l border-slate-200">${totalStr}</td>
           </tr>
         `;
       };
@@ -3016,18 +3016,18 @@
         } else {
           tbody.innerHTML = sortedRows.map(([name, mData]) => `
             <tr class="hover:bg-slate-50/70 transition">
-              <td class="py-2 px-3 font-semibold text-slate-200">${name}</td>
-              <td class="py-2 px-2 text-center ${mData.January > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.January || '-'}</td>
-              <td class="py-2 px-2 text-center ${mData.February > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.February || '-'}</td>
-              <td class="py-2 px-2 text-center ${mData.March > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.March || '-'}</td>
-              <td class="py-2 px-2 text-center ${mData.April > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.April || '-'}</td>
-              <td class="py-2 px-2 text-center ${mData.May > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.May || '-'}</td>
-              <td class="py-2 px-2 text-center ${mData.June > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.June || '-'}</td>
-              <td class="py-2 px-2 text-center ${mData.July > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.July || '-'}</td>
-              <td class="py-2 px-2 text-center ${mData.August > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.August || '-'}</td>
-              <td class="py-2 px-2 text-center ${mData.September > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.September || '-'}</td>
-              <td class="py-2 px-2 text-center ${mData.October > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.October || '-'}</td>
-              <td class="py-2 px-3 text-right bg-red-600/10 text-red-400 font-extrabold">${mData.total}</td>
+              <td class="py-2 px-3 font-bold text-slate-900">${name}</td>
+              <td class="py-2 px-2 text-center ${mData.January > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}">${mData.January || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.February > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}">${mData.February || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.March > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}">${mData.March || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.April > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}">${mData.April || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.May > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}">${mData.May || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.June > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}">${mData.June || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.July > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}">${mData.July || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.August > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}">${mData.August || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.September > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}">${mData.September || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.October > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}">${mData.October || '-'}</td>
+              <td class="py-2 px-3 text-right font-black text-red-700 bg-red-50 border-l border-red-200">${mData.total}</td>
             </tr>
           `).join('');
         }
@@ -3252,12 +3252,12 @@
         const penawaranFmt = penVal > 0 ? 'Rp ' + Math.round(penVal).toLocaleString('id-ID') : '-';
         
         const dealBadge = isDeal 
-          ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Deal</span>'
+          ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">Deal</span>'
           : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Proses / Batal</span>';
 
         const appBadge = isApp
-          ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">Appraised</span>'
-          : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400">Belum</span>';
+          ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-300">Appraised</span>'
+          : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Belum</span>';
 
         const brandDisplay = r.old_brand || r.merek || '';
         const modelDisplay = r.old_model || r.model || '';
@@ -3266,18 +3266,18 @@
 
         return `
           <tr class="hover:bg-slate-50/70 transition">
-            <td class="py-2.5 px-3 text-slate-400">${r.no || (idx + 1)}</td>
-            <td class="py-2.5 px-3 font-medium text-slate-300">${r.month || r.bulan || '-'}</td>
-            <td class="py-2.5 px-3 text-slate-200 font-semibold">${r.sales || '-'}</td>
-            <td class="py-2.5 px-3 text-slate-400">${r.spv || '-'}</td>
-            <td class="py-2.5 px-3 text-white font-bold">${r.new_car || r.mobil_baru || '-'}</td>
-            <td class="py-2.5 px-3 text-slate-200 font-medium">${carDisplay}</td>
-            <td class="py-2.5 px-3 text-slate-400">${r.year || r.tahun || '-'}</td>
-            <td class="py-2.5 px-3 font-mono text-[11px] text-amber-300">${r.plate || r.plat || '-'}</td>
-            <td class="py-2.5 px-3">${appBadge}</td>
-            <td class="py-2.5 px-3 text-slate-300 font-medium">${penawaranFmt}</td>
-            <td class="py-2.5 px-3">${dealBadge}</td>
-            <td class="py-2.5 px-3 text-slate-400 truncate max-w-[200px]" title="${soldDisplay}">${soldDisplay}</td>
+            <td class="py-2.5 px-3 text-slate-500 font-medium">${r.no || (idx + 1)}</td>
+            <td class="py-2.5 px-3 font-semibold text-slate-800">${r.month || r.bulan || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-900 font-bold">${r.sales || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-700 font-medium">${r.spv || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-950 font-black">${r.new_car || r.mobil_baru || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-900 font-semibold">${carDisplay}</td>
+            <td class="py-2.5 px-3 text-slate-700 text-center font-medium">${r.year || r.tahun || '-'}</td>
+            <td class="py-2.5 px-3 font-mono text-[11px] text-slate-900 font-semibold">${r.plate || r.plat || '-'}</td>
+            <td class="py-2.5 px-3 text-center">${appBadge}</td>
+            <td class="py-2.5 px-3 text-right font-black text-slate-950 font-mono">${penawaranFmt}</td>
+            <td class="py-2.5 px-3 text-center">${dealBadge}</td>
+            <td class="py-2.5 px-3 text-slate-700 font-medium truncate max-w-[200px]" title="${soldDisplay}">${soldDisplay}</td>
           </tr>
         `;
       }).join('');
@@ -3617,23 +3617,23 @@
             ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">Released</span>`
             : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Closed</span>`;
 
-          const finCoDisplay = (r.financing_company && r.financing_company !== '-') ? r.financing_company : '<span class="text-slate-500">Cash / Non-Leasing</span>';
+          const finCoDisplay = (r.financing_company && r.financing_company !== '-') ? r.financing_company : '<span class="text-slate-400 italic">Cash / Non-Leasing</span>';
 
           rowsHtml += `
             <tr class="hover:bg-slate-50/70 transition">
-              <td class="py-2.5 px-3 text-slate-500 text-center">${rowNum}</td>
-              <td class="py-2.5 px-3 font-semibold text-white tracking-wide font-mono text-[11px]">${r.inv_no}</td>
-              <td class="py-2.5 px-3 text-slate-300">${formatDateID(r.trx_date)}</td>
-              <td class="py-2.5 px-3 text-slate-300">${formatDateID(r.due_date)}</td>
+              <td class="py-2.5 px-3 text-slate-500 text-center font-medium">${rowNum}</td>
+              <td class="py-2.5 px-3 font-bold text-slate-900 tracking-wide font-mono text-[11px]">${r.inv_no}</td>
+              <td class="py-2.5 px-3 text-slate-700 font-medium">${formatDateID(r.trx_date)}</td>
+              <td class="py-2.5 px-3 text-slate-700 font-medium">${formatDateID(r.due_date)}</td>
               <td class="py-2.5 px-3 text-center">${overdueBadge}</td>
-              <td class="py-2.5 px-3 font-semibold text-slate-100 max-w-[200px] truncate" title="${r.customer}">${r.customer}</td>
-              <td class="py-2.5 px-3 text-right font-medium text-slate-200">${formatCurrencyFull(r.inv_amount)}</td>
-              <td class="py-2.5 px-3 text-slate-300 max-w-[200px] truncate" title="${r.financing_company}">${finCoDisplay}</td>
-              <td class="py-2.5 px-3 text-right ${r.fin_co_balance > 0 ? 'text-rose-400 font-bold' : 'text-slate-400'}">${formatCurrencyFull(r.fin_co_balance)}</td>
-              <td class="py-2.5 px-3 text-right text-emerald-400 font-medium">${formatCurrencyFull(r.receipt_amount)}</td>
-              <td class="py-2.5 px-3 text-right ${r.balance > 0 ? 'text-rose-400 font-bold' : 'text-slate-400'}">${formatCurrencyFull(r.balance)}</td>
-              <td class="py-2.5 px-3 text-right text-slate-300">${formatCurrencyFull(r.fin_co_inv_amount)}</td>
-              <td class="py-2.5 px-3 text-right ${r.fin_co_receipt_amount > 0 ? 'text-emerald-400 font-semibold' : 'text-slate-500'}">${formatCurrencyFull(r.fin_co_receipt_amount)}</td>
+              <td class="py-2.5 px-3 font-bold text-slate-950 max-w-[200px] truncate" title="${r.customer}">${r.customer}</td>
+              <td class="py-2.5 px-3 text-right font-black text-slate-950 font-mono">${formatCurrencyFull(r.inv_amount)}</td>
+              <td class="py-2.5 px-3 text-slate-800 font-medium max-w-[200px] truncate" title="${r.financing_company}">${finCoDisplay}</td>
+              <td class="py-2.5 px-3 text-right ${r.fin_co_balance > 0 ? 'text-rose-600 font-bold font-mono' : 'text-slate-500 font-mono'}">${formatCurrencyFull(r.fin_co_balance)}</td>
+              <td class="py-2.5 px-3 text-right text-emerald-700 font-bold font-mono">${formatCurrencyFull(r.receipt_amount)}</td>
+              <td class="py-2.5 px-3 text-right ${r.balance > 0 ? 'text-rose-600 font-bold font-mono' : 'text-slate-500 font-mono'}">${formatCurrencyFull(r.balance)}</td>
+              <td class="py-2.5 px-3 text-right text-slate-800 font-mono font-medium">${formatCurrencyFull(r.fin_co_inv_amount)}</td>
+              <td class="py-2.5 px-3 text-right ${r.fin_co_receipt_amount > 0 ? 'text-emerald-700 font-bold font-mono' : 'text-slate-500 font-mono'}">${formatCurrencyFull(r.fin_co_receipt_amount)}</td>
               <td class="py-2.5 px-3 text-center">${infoBadge}</td>
               <td class="py-2.5 px-3 text-center">${stateBadge}</td>
             </tr>
@@ -4681,7 +4681,7 @@
           nonToyota: formatRp(ntCoe),
           bkToyota: `Bunga: ${(rate * 100)}%`,
           bkNonToyota: `Bunga: ${(rate * 100)}%`,
-          cls: 'bg-slate-850 font-bold text-amber-300'
+          cls: 'bg-slate-100 font-bold text-slate-900 border-y border-slate-200'
         },
         {
           label: 'RESALE VALUE',
@@ -4689,7 +4689,7 @@
           nonToyota: formatRp(ntRv),
           bkToyota: '',
           bkNonToyota: '',
-          cls: 'text-emerald-400 font-semibold'
+          cls: 'text-emerald-700 font-bold'
         },
         {
           label: '% (Depresiasi Nilai)',
@@ -4697,7 +4697,7 @@
           nonToyota: formatPct(ntDeprec),
           bkToyota: '',
           bkNonToyota: '',
-          cls: 'text-slate-400'
+          cls: 'text-slate-500 font-medium'
         },
         {
           label: 'NCO (Nett Cost of Ownership)',
@@ -4705,7 +4705,7 @@
           nonToyota: formatRp(ntNco),
           bkToyota: '',
           bkNonToyota: '',
-          cls: 'bg-emerald-950/40 text-emerald-300 font-black text-sm md:text-base border-y-2 border-emerald-500/60'
+          cls: 'bg-emerald-50 text-emerald-800 font-black text-sm md:text-base border-y-2 border-emerald-500'
         },
         {
           label: 'NCO/YEAR',
@@ -4727,19 +4727,19 @@
           nonToyota: formatRp(ntNcoDay),
           bkToyota: '',
           bkNonToyota: '',
-          cls: 'bg-cyan-950/40 text-cyan-300 font-black text-sm md:text-base border-t-2 border-cyan-500/60'
+          cls: 'bg-cyan-50 text-cyan-900 font-black text-sm md:text-base border-t-2 border-cyan-500'
         }
       ];
 
       const tbody = document.getElementById('ncoTableBody');
       if (tbody) {
         tbody.innerHTML = rows.map(r => `
-          <tr class="${r.cls || 'hover:bg-slate-850/50'} transition">
-            <td class="p-3 border-r border-slate-200 text-slate-800 font-bold text-xs md:text-sm">${r.label}</td>
-            <td class="p-3 border-r border-slate-200 bg-red-950/10 text-red-200 text-xs md:text-sm font-semibold">${r.toyota}</td>
-            <td class="p-3 border-r border-slate-200 bg-blue-950/10 text-blue-200 text-xs md:text-sm font-semibold">${r.nonToyota}</td>
-            <td class="p-2 border-r border-slate-200 text-center text-xs text-slate-400">${r.bkToyota || '-'}</td>
-            <td class="p-2 text-center text-xs text-slate-400">${r.bkNonToyota || '-'}</td>
+          <tr class="${r.cls || 'hover:bg-slate-50/70'} transition">
+            <td class="p-3 border-r border-slate-200 text-slate-900 font-bold text-xs md:text-sm">${r.label}</td>
+            <td class="p-3 border-r border-slate-200 bg-red-50/40 text-red-700 text-xs md:text-sm font-bold">${r.toyota}</td>
+            <td class="p-3 border-r border-slate-200 bg-blue-50/40 text-blue-700 text-xs md:text-sm font-bold">${r.nonToyota}</td>
+            <td class="p-2 border-r border-slate-200 text-center text-xs text-slate-700 font-medium">${r.bkToyota || '-'}</td>
+            <td class="p-2 text-center text-xs text-slate-700 font-medium">${r.bkNonToyota || '-'}</td>
           </tr>
         `).join('');
       }
