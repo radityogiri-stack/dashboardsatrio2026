@@ -1612,9 +1612,20 @@
           if (chartRev) chartRev.resize();
           if (chartGP) chartGP.resize();
         }
-        if (tabId === 'tabVehicles' && chartVehBar) { chartVehBar.resize(); chartVehPie.resize(); }
-        if (tabId === 'tabTradeIn' && chartTradeInBrands) { chartTradeInBrands.resize(); chartTradeInStatus.resize(); }
-        if (tabId === 'tabAR' && chartARBalance) { chartARBalance.resize(); }
+        if (tabId === 'tabVehicles') {
+          renderVehicleTab();
+          if (chartVehBar) chartVehBar.resize();
+          if (chartVehPie) chartVehPie.resize();
+        }
+        if (tabId === 'tabTradeIn') {
+          renderTradeInTab();
+          if (chartTradeInBrands) chartTradeInBrands.resize();
+          if (chartTradeInStatus) chartTradeInStatus.resize();
+        }
+        if (tabId === 'tabAR') {
+          renderARTab();
+          if (chartARBalance) chartARBalance.resize();
+        }
         if (tabId === 'tabPolreg') {
           renderPolregTab();
           if (chartPolregBar) { chartPolregBar.resize(); chartPolregPie.resize(); }
@@ -2600,6 +2611,318 @@
 
     // Backward compatibility aliases
     function renderExecutiveKPI() { renderDashboardAchievement(); }
+    
+    // ==============================================================================
+    // --- TAB 2: RS AFI & KENDARAAN (TYPE GRP) ENGINE ---
+    // ==============================================================================
+    function renderVehicleTab() {
+      const records = appData.rs_afi || [];
+
+      // Filter records according to selected SPV & Period Mode
+      const filtered = records.filter(r => {
+        // SPV filter
+        if (currentSpv && currentSpv !== 'ALL') {
+          const s = String(r.spv || '').toUpperCase();
+          if (currentSpv === 'SATRIYO KRESNO AJI') {
+            if (!s.includes('SATRIO') && !s.includes('SATRIYO')) return false;
+          } else if (currentSpv === 'YAMES') {
+            if (!s.includes('YAMES') && !s.includes('JAMES')) return false;
+          } else {
+            if (!s.includes(currentSpv.toUpperCase())) return false;
+          }
+        }
+
+        // Period filter
+        if (currentMode === 'MONTH') {
+          return r.month === currentPeriod;
+        } else if (currentMode === 'YTM') {
+          const endIdx = MONTHS.indexOf(currentPeriod);
+          const rIdx = MONTHS.indexOf(r.month);
+          return rIdx <= endIdx;
+        } else if (currentMode === 'QUARTER') {
+          return r.quarter === currentPeriod;
+        }
+        return true;
+      });
+
+      // Aggregate by TYPE GRP
+      const typeGrpCounts = {};
+      filtered.forEach(r => {
+        const grp = r.type_grp || 'Lainnya';
+        typeGrpCounts[grp] = (typeGrpCounts[grp] || 0) + (r.qty || 1);
+      });
+
+      // Sort descending
+      const sortedTypes = Object.entries(typeGrpCounts).sort((a, b) => b[1] - a[1]);
+      const topLabels = sortedTypes.map(x => x[0]);
+      const topValues = sortedTypes.map(x => x[1]);
+      const totalFilteredUnits = topValues.reduce((a, b) => a + b, 0);
+
+      // Top Summary Badges
+      const sumDiv = document.getElementById('vehicleTopSummary');
+      if (sumDiv) {
+        const topPct = totalFilteredUnits > 0 ? (((topValues[0] || 0) / totalFilteredUnits) * 100).toFixed(1) : '0';
+        sumDiv.innerHTML = `
+          <div class="flex justify-between font-bold text-white">
+            <span>Total Unit di Periode Ini:</span>
+            <span class="text-emerald-400 font-extrabold">${totalFilteredUnits} Unit</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Kontributor Tertinggi:</span>
+            <span class="text-slate-200 font-semibold">${topLabels[0] || '-'} (${topValues[0] || 0} Unit - ${topPct}%)</span>
+          </div>
+        `;
+      }
+
+      // Horizontal Bar Chart with Numbers and Percentages
+      const ctxVehBar = document.getElementById('chartVehicleBar')?.getContext('2d');
+      if (ctxVehBar) {
+        if (chartVehBar) chartVehBar.destroy();
+
+        const maxVal = topValues.length > 0 ? Math.max(...topValues.slice(0, 10)) : 1;
+
+        chartVehBar = new Chart(ctxVehBar, {
+          type: 'bar',
+          data: {
+            labels: topLabels.slice(0, 10),
+            datasets: [{
+              label: 'Jumlah Unit',
+              data: topValues.slice(0, 10),
+              backgroundColor: [
+                '#D71920', '#EF4444', '#F97316', '#F59E0B', '#10B981',
+                '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'
+              ],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+              padding: { right: 85 }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                titleColor: '#F8FAFC',
+                bodyColor: '#38BDF8',
+                borderColor: '#334155',
+                borderWidth: 1,
+                padding: 10,
+                callbacks: {
+                  label: function(context) {
+                    const val = context.raw || 0;
+                    const pct = totalFilteredUnits > 0 ? ((val / totalFilteredUnits) * 100).toFixed(1) : '0';
+                    return ` Volume: ${val} Unit (${pct}%)`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { color: '#94A3B8' },
+                suggestedMax: Math.ceil(maxVal * 1.3)
+              },
+              y: {
+                grid: { display: false },
+                ticks: { color: '#E2E8F0', font: { weight: '600' } }
+              }
+            }
+          },
+          plugins: [{
+            id: 'barLabelsWithPct',
+            afterDatasetsDraw(chart) {
+              const { ctx } = chart;
+              ctx.save();
+              chart.data.datasets.forEach((dataset, datasetIndex) => {
+                const meta = chart.getDatasetMeta(datasetIndex);
+                meta.data.forEach((bar, index) => {
+                  const val = dataset.data[index];
+                  if (val === undefined || val === null) return;
+                  const pct = totalFilteredUnits > 0 ? ((val / totalFilteredUnits) * 100).toFixed(1) : '0';
+                  const text = `${val} Unit (${pct}%)`;
+                  ctx.fillStyle = '#F8FAFC';
+                  ctx.font = 'bold 11px Inter, sans-serif';
+                  ctx.textAlign = 'left';
+                  ctx.textBaseline = 'middle';
+                  ctx.fillText(text, bar.x + 8, bar.y);
+                });
+              });
+              ctx.restore();
+            }
+          }]
+        });
+      }
+
+      // Doughnut / Pie Chart
+      const ctxVehPie = document.getElementById('chartVehiclePie')?.getContext('2d');
+      if (ctxVehPie) {
+        if (chartVehPie) chartVehPie.destroy();
+
+        chartVehPie = new Chart(ctxVehPie, {
+          type: 'doughnut',
+          data: {
+            labels: topLabels.slice(0, 6),
+            datasets: [{
+              data: topValues.slice(0, 6),
+              backgroundColor: ['#D71920', '#EF4444', '#F97316', '#F59E0B', '#10B981', '#3B82F6'],
+              borderWidth: 2,
+              borderColor: '#0F172A'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  color: '#94A3B8',
+                  boxWidth: 10,
+                  generateLabels: function(chart) {
+                    const data = chart.data;
+                    if (data.labels.length && data.datasets.length) {
+                      return data.labels.map((label, i) => {
+                        const val = data.datasets[0].data[i] || 0;
+                        const pct = totalFilteredUnits > 0 ? ((val / totalFilteredUnits) * 100).toFixed(1) : '0';
+                        const meta = chart.getDatasetMeta(0);
+                        const style = meta.controller.getStyle(i);
+                        return {
+                          text: `${label}: ${val} Unit (${pct}%)`,
+                          fillStyle: style.backgroundColor,
+                          strokeStyle: style.borderColor,
+                          lineWidth: style.borderWidth,
+                          hidden: !chart.isDatasetVisible(0),
+                          index: i
+                        };
+                      });
+                    }
+                    return [];
+                  }
+                }
+              },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                titleColor: '#F8FAFC',
+                bodyColor: '#38BDF8',
+                borderColor: '#334155',
+                borderWidth: 1,
+                padding: 10,
+                callbacks: {
+                  label: function(context) {
+                    const val = context.raw || 0;
+                    const pct = totalFilteredUnits > 0 ? ((val / totalFilteredUnits) * 100).toFixed(1) : '0';
+                    return ` ${context.label}: ${val} Unit (${pct}%)`;
+                  }
+                }
+              }
+            },
+            cutout: '65%'
+          }
+        });
+      }
+
+      // Salesman Leaderboard Under Selected Supervisor
+      const salesCounts = {};
+      filtered.forEach(r => {
+        const s = r.salesman || 'Non-Sales';
+        if (s && s !== 'Non-Sales' && s !== '#N/A' && s !== 'None') {
+          salesCounts[s] = (salesCounts[s] || 0) + (r.qty || 1);
+        }
+      });
+      const sortedSales = Object.entries(salesCounts).sort((a, b) => b[1] - a[1]);
+      const salesDiv = document.getElementById('salesmanList');
+      if (salesDiv) {
+        if (sortedSales.length === 0) {
+          salesDiv.innerHTML = `<div class="col-span-full py-4 text-center text-slate-500 text-xs">Tidak ada data salesman untuk supervisor / periode ini.</div>`;
+        } else {
+          salesDiv.innerHTML = sortedSales.map(([name, count], idx) => {
+            const pct = totalFilteredUnits > 0 ? ((count / totalFilteredUnits) * 100).toFixed(1) : '0';
+            return `
+              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition">
+                <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                  <span class="w-6 h-6 rounded-full ${idx === 0 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : idx === 1 ? 'bg-slate-300/20 text-slate-200 border border-slate-400/30' : idx === 2 ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 'bg-slate-800 text-slate-400'} font-bold flex items-center justify-center text-[10px] shrink-0">
+                    ${idx + 1}
+                  </span>
+                  <span class="font-semibold text-slate-200 text-xs truncate" title="${name}">${name}</span>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="px-2 py-0.5 rounded font-extrabold bg-red-500/10 text-red-400 text-xs border border-red-500/20 inline-block">
+                    ${count} Unit
+                  </span>
+                  <span class="block text-[10px] text-slate-400 font-medium mt-0.5">${pct}%</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      // Render Matrix Table
+      renderVehicleTables();
+    }
+
+    function renderVehicleTables() {
+      const records = appData.rs_afi || [];
+      const searchKey = (document.getElementById('vehicleSearch')?.value || '').toLowerCase();
+
+      // Group all records by TYPE GRP x Month
+      const matrix = {};
+      records.forEach(r => {
+        if (currentSpv && currentSpv !== 'ALL') {
+          const s = String(r.spv || '').toUpperCase();
+          if (currentSpv === 'SATRIYO KRESNO AJI') {
+            if (!s.includes('SATRIO') && !s.includes('SATRIYO')) return;
+          } else if (currentSpv === 'YAMES') {
+            if (!s.includes('YAMES') && !s.includes('JAMES')) return;
+          } else {
+            if (!s.includes(currentSpv.toUpperCase())) return;
+          }
+        }
+
+        const grp = r.type_grp || 'Lainnya';
+        if (searchKey && !grp.toLowerCase().includes(searchKey)) return;
+
+        if (!matrix[grp]) {
+          matrix[grp] = { total: 0 };
+          MONTHS.forEach(m => matrix[grp][m] = 0);
+        }
+        const m = r.month;
+        if (matrix[grp][m] !== undefined) {
+          matrix[grp][m] += (r.qty || 1);
+          matrix[grp].total += (r.qty || 1);
+        }
+      });
+
+      const sortedRows = Object.entries(matrix).sort((a, b) => b[1].total - a[1].total);
+      const tbody = document.getElementById('vehicleMatrixBody');
+      if (tbody) {
+        if (sortedRows.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="12" class="py-4 text-center text-slate-500 text-xs">Tidak ada data tipe kendaraan ditemukan.</td></tr>`;
+        } else {
+          tbody.innerHTML = sortedRows.map(([name, mData]) => `
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="py-2 px-3 font-semibold text-slate-200">${name}</td>
+              <td class="py-2 px-2 text-center ${mData.January > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.January || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.February > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.February || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.March > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.March || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.April > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.April || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.May > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.May || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.June > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.June || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.July > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.July || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.August > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.August || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.September > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.September || '-'}</td>
+              <td class="py-2 px-2 text-center ${mData.October > 0 ? 'text-white font-bold' : 'text-slate-600'}">${mData.October || '-'}</td>
+              <td class="py-2 px-3 text-right bg-red-600/10 text-red-400 font-extrabold">${mData.total}</td>
+            </tr>
+          `).join('');
+        }
+      }
+    }
+
     // --- TAB 4: TRADE-IN MONITORING ---
     function renderTradeInTab() {
       const allRecords = appData.trade_in || [];
