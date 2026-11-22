@@ -81,6 +81,16 @@
       backdrop-filter: blur(12px);
       border: 1px solid rgba(51, 65, 85, 0.6);
     }
+  
+    select, select option {
+      background-color: #0F172A !important;
+      color: #F8FAFC !important;
+    }
+    select option:hover, select option:checked {
+      background-color: #DC2626 !important;
+      color: #FFFFFF !important;
+    }
+
   </style>
 
   <!-- Preloaded Data from Excel / GDrive -->
@@ -100,9 +110,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-lg font-bold text-white tracking-wide">TUNAS TOYOTA BEKASI</h1>
-            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-red-500/20 text-red-400 border border-red-500/30">
-              KONTES SATRIO 2026
-            </span>
+            
           </div>
           <p class="text-xs text-slate-400">Dashboard Monitoring Sales Supervisor & Kinerja Penjualan Unit</p>
         </div>
@@ -170,8 +178,16 @@
         <!-- Dynamic Period Dropdown -->
         <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
           <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
-          <span class="text-xs text-slate-400">Pilih Periode:</span>
-          <select id="filterPeriod" onchange="applyFilters()" class="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer">
+          <span id="periodFilterLabel" class="text-xs text-slate-400 whitespace-nowrap">Bulan:</span>
+          
+          <!-- Start Month for YTM Range (Dari Bulan) -->
+          <select id="filterYtmStart" onchange="applyFilters()" style="display: none; background-color: #0F172A; color: #F8FAFC;" class="bg-slate-900 border border-slate-700 text-xs font-semibold text-white rounded-lg px-2 py-1 focus:outline-none focus:border-red-500 cursor-pointer">
+            <!-- Populated via JS -->
+          </select>
+          <span id="ytmSeparator" class="text-xs text-slate-400 font-semibold" style="display: none;">s/d</span>
+
+          <!-- Main Period Dropdown (Sampai Bulan / Bulan Tunggal / Kuartal) -->
+          <select id="filterPeriod" onchange="applyFilters()" style="background-color: #0F172A; color: #F8FAFC;" class="bg-slate-900 border border-slate-700 text-xs font-semibold text-white rounded-lg px-2.5 py-1 focus:outline-none focus:border-red-500 cursor-pointer">
             <!-- Populated via JS based on mode -->
           </select>
         </div>
@@ -1634,6 +1650,48 @@
     }
 
     // --- PERIOD MODE SWITCHING ---
+    function getActiveMonths() {
+      if (currentMode === 'MONTH') {
+        return [currentPeriod || 'September'];
+      }
+      if (currentMode === 'YTM') {
+        const startSel = document.getElementById('filterYtmStart');
+        const startMonth = startSel ? startSel.value : 'January';
+        const endMonth = currentPeriod || 'September';
+        let startIdx = MONTHS.indexOf(startMonth);
+        let endIdx = MONTHS.indexOf(endMonth);
+        if (startIdx === -1) startIdx = 0;
+        if (endIdx === -1) endIdx = 8;
+        if (startIdx > endIdx) {
+          const t = startIdx; startIdx = endIdx; endIdx = t;
+        }
+        return MONTHS.slice(startIdx, endIdx + 1);
+      }
+      if (currentMode === 'QUARTER') {
+        if (currentPeriod === 'Q1') return ['January', 'February', 'March'];
+        if (currentPeriod === 'Q2') return ['April', 'May', 'June'];
+        if (currentPeriod === 'Q3') return ['July', 'August', 'September'];
+        if (currentPeriod === 'Q4') return ['October', 'November', 'December'];
+        return ['July', 'August', 'September'];
+      }
+      return ['September'];
+    }
+
+    const MONTHS_DISPLAY = [
+      { en: 'January', id: 'Januari' },
+      { en: 'February', id: 'Februari' },
+      { en: 'March', id: 'Maret' },
+      { en: 'April', id: 'April' },
+      { en: 'May', id: 'Mei' },
+      { en: 'June', id: 'Juni' },
+      { en: 'July', id: 'Juli' },
+      { en: 'August', id: 'Agustus' },
+      { en: 'September', id: 'September' },
+      { en: 'October', id: 'Oktober' },
+      { en: 'November', id: 'November' },
+      { en: 'December', id: 'Desember' }
+    ];
+
     function setPeriodMode(mode) {
       currentMode = mode;
       
@@ -1642,12 +1700,12 @@
       const btnQuarter = document.getElementById('btnModeQuarter');
 
       [btnMonth, btnYTM, btnQuarter].forEach(btn => {
-        btn.className = "px-3 py-1 rounded-md font-medium transition text-slate-400 hover:text-white";
+        if (btn) btn.className = "px-3 py-1 rounded-md font-medium transition text-slate-400 hover:text-white";
       });
 
-      if (mode === 'MONTH') btnMonth.className = "px-3 py-1 rounded-md font-medium transition bg-red-600 text-white shadow";
-      if (mode === 'YTM') btnYTM.className = "px-3 py-1 rounded-md font-medium transition bg-red-600 text-white shadow";
-      if (mode === 'QUARTER') btnQuarter.className = "px-3 py-1 rounded-md font-medium transition bg-red-600 text-white shadow";
+      if (mode === 'MONTH' && btnMonth) btnMonth.className = "px-3 py-1 rounded-md font-medium transition bg-red-600 text-white shadow";
+      if (mode === 'YTM' && btnYTM) btnYTM.className = "px-3 py-1 rounded-md font-medium transition bg-red-600 text-white shadow";
+      if (mode === 'QUARTER' && btnQuarter) btnQuarter.className = "px-3 py-1 rounded-md font-medium transition bg-red-600 text-white shadow";
 
       initPeriodDropdown();
       applyFilters();
@@ -1655,30 +1713,69 @@
 
     function initPeriodDropdown() {
       const select = document.getElementById('filterPeriod');
+      const selectStart = document.getElementById('filterYtmStart');
+      const label = document.getElementById('periodFilterLabel');
+      const sep = document.getElementById('ytmSeparator');
+      if (!select) return;
+
       select.innerHTML = '';
+      if (selectStart) selectStart.innerHTML = '';
 
       if (currentMode === 'MONTH') {
-        MONTHS.slice(0, 10).forEach(m => {
+        if (label) label.textContent = 'Pilih Bulan:';
+        if (selectStart) selectStart.style.display = 'none';
+        if (sep) sep.style.display = 'none';
+
+        MONTHS_DISPLAY.slice(0, 10).forEach(m => {
           const opt = document.createElement('option');
-          opt.value = m;
-          opt.textContent = m + ' 2026';
-          if (m === 'September') opt.selected = true;
+          opt.value = m.en;
+          opt.textContent = `${m.id} 2026`;
+          opt.className = "bg-slate-900 text-slate-100 py-1.5 px-2";
+          opt.style.backgroundColor = "#0F172A";
+          opt.style.color = "#F8FAFC";
+          if (m.en === 'September' || m.en === currentPeriod) opt.selected = true;
           select.appendChild(opt);
         });
       } else if (currentMode === 'YTM') {
-        MONTHS.slice(0, 10).forEach(m => {
+        if (label) label.textContent = 'Pilih Periode YTM:';
+        if (selectStart) {
+          selectStart.style.display = 'inline-block';
+          MONTHS_DISPLAY.slice(0, 10).forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.en;
+            opt.textContent = `Dari: ${m.id} 2026`;
+            opt.className = "bg-slate-900 text-slate-100 py-1.5 px-2";
+            opt.style.backgroundColor = "#0F172A";
+            opt.style.color = "#F8FAFC";
+            if (m.en === 'January') opt.selected = true;
+            selectStart.appendChild(opt);
+          });
+        }
+        if (sep) sep.style.display = 'inline-block';
+
+        MONTHS_DISPLAY.slice(0, 10).forEach(m => {
           const opt = document.createElement('option');
-          opt.value = m;
-          opt.textContent = 'YTM Sampai ' + m + ' (Jan - ' + m + ')';
-          if (m === 'September') opt.selected = true;
+          opt.value = m.en;
+          opt.textContent = `Sampai: ${m.id} 2026`;
+          opt.className = "bg-slate-900 text-slate-100 py-1.5 px-2";
+          opt.style.backgroundColor = "#0F172A";
+          opt.style.color = "#F8FAFC";
+          if (m.en === 'September') opt.selected = true;
           select.appendChild(opt);
         });
       } else if (currentMode === 'QUARTER') {
+        if (label) label.textContent = 'Pilih Kuartal:';
+        if (selectStart) selectStart.style.display = 'none';
+        if (sep) sep.style.display = 'none';
+
         QUARTERS.forEach((q, idx) => {
-          const desc = ['Jan–Mar', 'Apr–Jun', 'Jul–Sep', 'Okt–Des'][idx];
+          const desc = ['Januari – Maret', 'April – Juni', 'Juli – September', 'Oktober – Desember'][idx];
           const opt = document.createElement('option');
           opt.value = q;
-          opt.textContent = q + ' 2026 (' + desc + ')';
+          opt.textContent = `${q} 2026 (${desc})`;
+          opt.className = "bg-slate-900 text-slate-100 py-1.5 px-2";
+          opt.style.backgroundColor = "#0F172A";
+          opt.style.color = "#F8FAFC";
           if (q === 'Q3') opt.selected = true;
           select.appendChild(opt);
         });
@@ -1709,25 +1806,23 @@
       const chipSpv = document.getElementById('chipActiveSpv');
       if (chipSpv) chipSpv.textContent = (currentSpv === 'ALL') ? 'SEMUA SPV (CABANG BEKASI)' : currentSpv;
       const chipPeriod = document.getElementById('chipActivePeriod');
-      if (chipPeriod) chipPeriod.textContent = currentPeriod + ' 2026';
+      if (chipPeriod) {
+        if (currentMode === 'MONTH') {
+          const mObj = MONTHS_DISPLAY.find(x => x.en === currentPeriod);
+          chipPeriod.textContent = (mObj ? mObj.id : currentPeriod) + ' 2026';
+        } else if (currentMode === 'YTM') {
+          const startSel = document.getElementById('filterYtmStart');
+          const startMonth = startSel ? startSel.value : 'January';
+          const sObj = MONTHS_DISPLAY.find(x => x.en === startMonth);
+          const eObj = MONTHS_DISPLAY.find(x => x.en === currentPeriod);
+          chipPeriod.textContent = `YTM 2026 (${sObj ? sObj.id : startMonth} s/d ${eObj ? eObj.id : currentPeriod})`;
+        } else if (currentMode === 'QUARTER') {
+          chipPeriod.textContent = currentPeriod + ' 2026';
+        }
+      }
 
       // Helper for sum up to month
-      const getMonthsList = () => {
-        if (currentMode === 'MONTH') return [currentPeriod];
-        if (currentMode === 'YTM') {
-          const endIdx = MONTHS.indexOf(currentPeriod);
-          return MONTHS.slice(0, endIdx + 1);
-        }
-        if (currentMode === 'QUARTER') {
-          if (currentPeriod === 'Q1') return ['January', 'February', 'March'];
-          if (currentPeriod === 'Q2') return ['April', 'May', 'June'];
-          if (currentPeriod === 'Q3') return ['July', 'August', 'September'];
-          if (currentPeriod === 'Q4') return ['October', 'November', 'December'];
-        }
-        return ['September'];
-      };
-
-      const activeMonths = getMonthsList();
+      const activeMonths = getActiveMonths();
       let target = 0, actual = 0, prevActual = 0, cash = 0, credit = 0, revenue = 0, gp = 0;
 
       activeMonths.forEach(m => {
@@ -2627,16 +2722,8 @@
         }
 
         // Period filter
-        if (currentMode === 'MONTH') {
-          return r.month === currentPeriod;
-        } else if (currentMode === 'YTM') {
-          const endIdx = MONTHS.indexOf(currentPeriod);
-          const rIdx = MONTHS.indexOf(r.month);
-          return rIdx <= endIdx;
-        } else if (currentMode === 'QUARTER') {
-          return r.quarter === currentPeriod;
-        }
-        return true;
+        const activeMonths = getActiveMonths();
+        return activeMonths.includes(r.month);
       });
 
       // Aggregate by TYPE GRP
@@ -3287,21 +3374,7 @@
       });
 
       // 2. Get active months based on currentPeriod & currentMode
-      const getMonthsList = () => {
-        if (currentMode === 'MONTH') return [currentPeriod];
-        if (currentMode === 'YTM') {
-          const endIdx = MONTHS.indexOf(currentPeriod);
-          return MONTHS.slice(0, endIdx + 1);
-        }
-        if (currentMode === 'QUARTER') {
-          if (currentPeriod === 'Q1') return ['January', 'February', 'March'];
-          if (currentPeriod === 'Q2') return ['April', 'May', 'June'];
-          if (currentPeriod === 'Q3') return ['July', 'August', 'September'];
-          if (currentPeriod === 'Q4') return ['October', 'November', 'December'];
-        }
-        return ['September'];
-      };
-      const activeMonths = getMonthsList();
+      const activeMonths = getActiveMonths();
 
       // 3. Filter by Active Months
       let spvPeriodRecords = spvFiltered.filter(r => {
@@ -3851,7 +3924,7 @@
         formulaBox.innerHTML = `Contoh Aktif: Toyota (${toyotaEntry.qty.toLocaleString('id-ID')}) ÷ All Market (${totalMarket.toLocaleString('id-ID')}) = <strong class="text-red-400 font-bold">${toyotaEntry.market_share}% Market Share</strong>`;
       }
 
-      // 2. Update Map Markers & Polygons (KHUSUS KOTA BEKASI SAJA, BERSIH DARI CLUTTER LUAR)
+      // 2. Update Map Markers & Polygons
       if (polregMap) {
         polregMarkers.forEach(m => polregMap.removeLayer(m));
         polregMarkers = [];
@@ -3882,105 +3955,235 @@
         polregMarkers.push(outerCityBorder);
 
         Object.entries(kecData).forEach(([kecName, info]) => {
-          // Strictly render Kota Bekasi ONLY as requested by user!
-          if (!info.is_bekasi_city) return;
+          const isCity = info.is_bekasi_city;
+          const lat = (isCity && KEC_LOCATIONS[kecName]) ? KEC_LOCATIONS[kecName].lat : (info.lat || -6.25);
+          const lng = (isCity && KEC_LOCATIONS[kecName]) ? KEC_LOCATIONS[kecName].lng : (info.lng || 107.00);
 
-          const lat = KEC_LOCATIONS[kecName] ? KEC_LOCATIONS[kecName].lat : (info.lat || -6.25);
-          const lng = KEC_LOCATIONS[kecName] ? KEC_LOCATIONS[kecName].lng : (info.lng || 107.00);
-          const color = tierColors[info.tier] || '#10B981';
+          if (isCity) {
+            // === KOTA BEKASI: PARAGON POLYGON (SHAPE LINE HITAM + WARNA SESUAI TIER) + RANK PIN ===
+            const color = tierColors[info.tier] || '#10B981';
 
-          // 1. Polygon Region dengan Shape Line Hitam Tegas & Fill Warna Market
-          const polyCoords = KEC_POLYGONS[kecName];
-          if (polyCoords) {
-            const poly = L.polygon(polyCoords, {
-              color: '#000000',                 // Shape line warna hitam untuk mengetahui perbatasan
-              weight: 2.8,                       // Garis hitam tebal dan tajam
-              opacity: 1.0,
-              fillColor: color,                  // Warna berbeda berdasarkan penjualan
-              fillOpacity: 0.45,
-              smoothFactor: 1.0
-            }).addTo(polregMap);
+            // 1. Polygon Region dengan Shape Line Hitam Tegas & Fill Warna Market
+            const polyCoords = KEC_POLYGONS[kecName];
+            if (polyCoords) {
+              const poly = L.polygon(polyCoords, {
+                color: '#000000',
+                weight: 2.8,
+                opacity: 1.0,
+                fillColor: color,
+                fillOpacity: 0.45,
+                smoothFactor: 1.0
+              }).addTo(polregMap);
 
-            poly.on('mouseover', function() {
-              this.setStyle({ fillOpacity: 0.75, weight: 3.5 });
-            });
-            poly.on('mouseout', function() {
-              this.setStyle({ fillOpacity: 0.45, weight: 2.8 });
-            });
-            poly.on('click', function() {
-              openKecamatanModal(kecName);
-            });
+              poly.on('mouseover', function() {
+                this.setStyle({ fillOpacity: 0.75, weight: 3.5 });
+              });
+              poly.on('mouseout', function() {
+                this.setStyle({ fillOpacity: 0.45, weight: 2.8 });
+              });
+              poly.on('click', function() {
+                openKecamatanModal(kecName);
+              });
 
-            const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: 'TOYOTA', qty: 0 };
-            poly.bindTooltip(`
-              <div class="px-2 py-1 text-center font-sans">
-                <div class="font-extrabold text-xs text-slate-900">Kec. ${kecName}</div>
-                <div class="text-[11px] font-bold text-blue-700">${info.qty.toLocaleString('id-ID')} Unit (#${info.rank})</div>
-                <div class="text-[10px] text-slate-500">Market Leader: ${topBrand.brand}</div>
-              </div>
-            `, { sticky: true, className: 'gmaps-tooltip' });
-
-            polregMarkers.push(poly);
-          }
-
-          // 2. Custom Rank Badge Pin Marker matching Image 7
-          const rankIcon = L.divIcon({
-            html: `
-              <div onclick="openKecamatanModal('${kecName}')" class="group cursor-pointer flex flex-col items-center" style="transform: translate(-50%, -100%);">
-                <!-- Circular Rank Badge Pin -->
-                <div class="relative flex items-center justify-center w-8 h-8 rounded-full border-2 border-white shadow-xl text-white font-black text-xs transition-transform duration-200 transform group-hover:scale-125" style="background-color: ${color};">
-                  <span>#${info.rank}</span>
-                  <div class="absolute -bottom-1.5 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px]" style="border-t-color: ${color};"></div>
+              const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: 'TOYOTA', qty: 0 };
+              poly.bindTooltip(`
+                <div class="px-2 py-1 text-center font-sans">
+                  <div class="font-extrabold text-xs text-slate-900">Kec. ${kecName}</div>
+                  <div class="text-[11px] font-bold text-blue-700">${info.qty.toLocaleString('id-ID')} Unit (#${info.rank})</div>
+                  <div class="text-[10px] text-slate-500">Market Leader: ${topBrand.brand}</div>
                 </div>
-                <!-- Bottom Label Capsule (Kecamatan + Total Sales) -->
-                <div class="mt-2 px-2 py-0.5 rounded-full bg-slate-950/90 text-white text-[10px] font-bold border border-slate-700/80 shadow-lg flex items-center gap-1 whitespace-nowrap group-hover:border-amber-400 group-hover:scale-110 transition">
-                  <span>${kecName}</span>
-                  <span style="color: ${color};">(${info.qty.toLocaleString('id-ID')})</span>
+              `, { sticky: true, className: 'gmaps-tooltip' });
+
+              polregMarkers.push(poly);
+            }
+
+            // 2. Custom Rank Badge Pin Marker (#1..#12)
+            const rankIcon = L.divIcon({
+              html: `
+                <div onclick="openKecamatanModal('${kecName}')" class="group cursor-pointer flex flex-col items-center" style="transform: translate(-50%, -100%);">
+                  <div class="relative flex items-center justify-center w-8 h-8 rounded-full border-2 border-white shadow-xl text-white font-black text-xs transition-transform duration-200 transform group-hover:scale-125" style="background-color: ${color};">
+                    <span>#${info.rank}</span>
+                    <div class="absolute -bottom-1.5 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px]" style="border-t-color: ${color};"></div>
+                  </div>
+                  <div class="mt-2 px-2 py-0.5 rounded-full bg-slate-950/90 text-white text-[10px] font-bold border border-slate-700/80 shadow-lg flex items-center gap-1 whitespace-nowrap group-hover:border-amber-400 group-hover:scale-110 transition">
+                    <span>${kecName}</span>
+                    <span style="color: ${color};">(${info.qty.toLocaleString('id-ID')})</span>
+                  </div>
+                </div>
+              `,
+              className: 'gmaps-bekasi-rank-pin',
+              iconSize: [32, 48],
+              iconAnchor: [16, 48],
+              popupAnchor: [0, -48]
+            });
+
+            const marker = L.marker([lat, lng], { icon: rankIcon, zIndexOffset: 1000 - (info.rank * 10) }).addTo(polregMap);
+            const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: '-', qty: 0 };
+
+            const popupHtml = `
+              <div class="p-2 min-w-[220px] font-sans text-slate-900">
+                <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-200">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${color};"></span>
+                    <strong class="font-extrabold text-xs text-slate-950">Kec. ${kecName}</strong>
+                  </div>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-bold" style="background: ${color}25; color: ${color}; border: 1px solid ${color}60;">#${info.rank} Kota Bekasi</span>
+                </div>
+                <div class="text-[11px] text-slate-600 mb-1">
+                  Volume: <strong class="text-slate-950 font-bold">${info.qty.toLocaleString('id-ID')} Unit</strong>
+                </div>
+                <div class="text-[11px] text-slate-600 mb-2">
+                  Brand #1: <strong class="text-red-600 font-bold">${topBrand.brand}</strong> (${topBrand.qty} unit)
+                </div>
+                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100">
+                  <button onclick="openKecamatanModal('${kecName}')" class="flex-1 py-1 px-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded transition shadow text-center">
+                    Rincian Merk & Tipe
+                  </button>
+                  <a href="https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}+Kota+Bekasi" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[10px] rounded transition border border-slate-300 flex items-center gap-0.5" title="Buka di Google Maps Web">
+                    <span>GMaps</span> ↗
+                  </a>
                 </div>
               </div>
-            `,
-            className: 'gmaps-bekasi-rank-pin',
-            iconSize: [32, 48],
-            iconAnchor: [16, 48],
-            popupAnchor: [0, -48]
-          });
+            `;
+            marker.bindPopup(popupHtml);
+            polregMarkers.push(marker);
 
-          const marker = L.marker([lat, lng], { icon: rankIcon, zIndexOffset: 1000 - (info.rank * 10) }).addTo(polregMap);
-          const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: '-', qty: 0 };
+          } else {
+            // === KECAMATAN LAIN (LUAR KOTA BEKASI - JABODETABEK) ===
+            // Ramping dan rapi sehingga penjualan kecamatan lain tetap terlihat di peta
+            const otherIcon = L.divIcon({
+              html: `
+                <div onclick="openKecamatanModal('${kecName}')" class="group cursor-pointer flex flex-col items-center" style="transform: translate(-50%, -100%);">
+                  <div class="transition-transform duration-200 transform group-hover:scale-125 filter drop-shadow">
+                    <svg width="12" height="16" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 0C5.373 0 0 5.373 0 12C0 21 12 32 12 32C12 32 24 21 24 12C24 5.373 18.627 0 12 0Z" fill="#2563EB" stroke="#FFFFFF" stroke-width="1.8"/>
+                      <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+                    </svg>
+                  </div>
+                  <div class="mt-0.5 px-1.5 py-0.2 rounded bg-slate-900/90 text-slate-300 text-[8px] font-semibold border border-slate-700 shadow-sm flex items-center gap-1 whitespace-nowrap group-hover:scale-110 group-hover:border-blue-400 group-hover:text-white transition">
+                    <span>${kecName}</span>
+                    <span class="text-sky-400 font-bold">(${info.qty.toLocaleString('id-ID')})</span>
+                  </div>
+                </div>
+              `,
+              className: 'gmaps-other-pin',
+              iconSize: [12, 16],
+              iconAnchor: [6, 16],
+              popupAnchor: [0, -18]
+            });
 
-          const popupHtml = `
-            <div class="p-2 min-w-[220px] font-sans text-slate-900">
-              <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-200">
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${color};"></span>
+            const otherMarker = L.marker([lat, lng], { icon: otherIcon }).addTo(polregMap);
+            const topBrand = (info.top_brands && info.top_brands.length > 0) ? info.top_brands[0] : { brand: '-', qty: 0 };
+
+            const otherPopupHtml = `
+              <div class="p-2 min-w-[200px] font-sans text-slate-900">
+                <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-200">
                   <strong class="font-extrabold text-xs text-slate-950">Kec. ${kecName}</strong>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">${info.wilayah || 'Luar Bekasi'}</span>
                 </div>
-                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold" style="background: ${color}25; color: ${color}; border: 1px solid ${color}60;">#${info.rank} Kota Bekasi</span>
+                <div class="text-[11px] text-slate-600 mb-1">
+                  Volume Terdaftar: <strong class="text-slate-950 font-bold">${info.qty.toLocaleString('id-ID')} Unit</strong>
+                </div>
+                <div class="text-[11px] text-slate-600 mb-2">
+                  Brand #1: <strong class="text-blue-600 font-bold">${topBrand.brand}</strong> (${topBrand.qty} unit)
+                </div>
+                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100">
+                  <button onclick="openKecamatanModal('${kecName}')" class="flex-1 py-1 px-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded transition shadow text-center">
+                    Rincian Merk & Tipe
+                  </button>
+                  <a href="https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[10px] rounded transition border border-slate-300 flex items-center gap-0.5" title="Buka di Google Maps Web">
+                    <span>GMaps</span> ↗
+                  </a>
+                </div>
               </div>
-              <div class="text-[11px] text-slate-600 mb-1">
-                Volume: <strong class="text-slate-950 font-bold">${info.qty.toLocaleString('id-ID')} Unit</strong>
-              </div>
-              <div class="text-[11px] text-slate-600 mb-2">
-                Brand #1: <strong class="text-red-600 font-bold">${topBrand.brand}</strong> (${topBrand.qty} unit)
-              </div>
-              <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100">
-                <button onclick="openKecamatanModal('${kecName}')" class="flex-1 py-1 px-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] rounded transition shadow text-center">
-                  Rincian Merk & Tipe
-                </button>
-                <a href="https://www.google.com/maps/search/?api=1&query=Kecamatan+${encodeURIComponent(kecName)}+Kota+Bekasi" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[10px] rounded transition border border-slate-300 flex items-center gap-0.5" title="Buka di Google Maps Web">
-                  <span>GMaps</span> ↗
-                </a>
-              </div>
-            </div>
-          `;
-          marker.bindPopup(popupHtml);
-          polregMarkers.push(marker);
+            `;
+            otherMarker.bindPopup(otherPopupHtml);
+            polregMarkers.push(otherMarker);
+          }
         });
       }
 
-      // 3. Render Top 10 Table & Kecamatan Grid
-      renderPolregTable(top10, totalMarket);
-      renderPolregKecamatanGrid(kecData);
+      // 3. Render Top 10 Table Directly Into Table Body
+      const tbody = document.getElementById('polregTop10TableBody');
+      if (tbody) {
+        if (!top10 || top10.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500">Tidak ada data Top 10 Brand.</td></tr>`;
+        } else {
+          tbody.innerHTML = top10.map((item, idx) => {
+            const isToyota = (item.brand || '').toUpperCase() === 'TOYOTA';
+            const isByd = (item.brand || '').toUpperCase() === 'BYD';
+            const isJaecoo = (item.brand || '').toUpperCase() === 'JAECOO';
+
+            const rankBadge = item.rank === 1 ? '<span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-black flex items-center justify-center text-xs border border-amber-500/30">1</span>'
+                            : item.rank === 2 ? '<span class="w-6 h-6 rounded-full bg-slate-300/20 text-slate-200 font-bold flex items-center justify-center text-xs border border-slate-300/30">2</span>'
+                            : item.rank === 3 ? '<span class="w-6 h-6 rounded-full bg-amber-700/20 text-amber-500 font-bold flex items-center justify-center text-xs border border-amber-700/30">3</span>'
+                            : `<span class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 font-semibold flex items-center justify-center text-xs">${item.rank || (idx + 1)}</span>`;
+
+            const brandClass = isToyota ? 'font-extrabold text-white text-sm flex items-center gap-2' : 'font-semibold text-slate-200 text-sm';
+            const logoPill = isToyota ? '<span class="px-2 py-0.5 rounded text-[10px] font-black bg-red-600 text-white shadow-sm">TOYOTA</span>' : item.brand;
+
+            const barColor = isToyota ? 'bg-red-600' : (isByd ? 'bg-blue-500' : (isJaecoo ? 'bg-cyan-400' : 'bg-slate-500'));
+
+            const statusBadge = item.rank === 1 ? '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Market Leader #1</span>'
+                              : item.rank <= 3 ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">Main Competitor</span>'
+                              : '<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-slate-400">Challenger</span>';
+
+            const modelsDesc = (item.top_models && item.top_models.length > 0) ? item.top_models.join(', ') : '-';
+
+            return `
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="py-3 px-3 text-center">${rankBadge}</td>
+                <td class="py-3 px-4 ${brandClass}">
+                  ${logoPill}
+                </td>
+                <td class="py-3 px-4 text-xs text-slate-300 truncate max-w-[200px]" title="${modelsDesc}">${modelsDesc}</td>
+                <td class="py-3 px-4 text-right font-extrabold text-white text-sm">${item.qty.toLocaleString('id-ID')}</td>
+                <td class="py-3 px-6 text-center">
+                  <div class="flex items-center gap-3">
+                    <div class="flex-1 bg-slate-800 rounded-full h-2 overflow-hidden">
+                      <div class="${barColor} h-2 rounded-full transition-all duration-500" style="width: ${Math.min(100, item.market_share * 3)}%;"></div>
+                    </div>
+                    <span class="w-12 text-right font-black text-xs ${isToyota ? 'text-red-400' : 'text-slate-200'}">${item.market_share}%</span>
+                  </div>
+                </td>
+                <td class="py-3 px-4 text-center">${statusBadge}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+
+      // 4. Update 12 Kecamatan Grid
+      const gridEl = document.getElementById('polregKecamatanGrid');
+      if (gridEl) {
+        const bekasiList = Object.entries(kecData).filter(([_, info]) => info.is_bekasi_city).sort((a,b) => (a[1].rank || 99) - (b[1].rank || 99));
+        gridEl.innerHTML = bekasiList.map(([name, kInfo]) => {
+          const badgeColor = kInfo.tier === 1 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                           : kInfo.tier === 2 ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                           : kInfo.tier === 3 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                           : 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+          const borderClass = kInfo.tier === 1 ? 'border-emerald-500/30 hover:border-emerald-400 bg-slate-900/80'
+                            : kInfo.tier === 2 ? 'border-cyan-500/30 hover:border-cyan-400 bg-slate-900/80'
+                            : kInfo.tier === 3 ? 'border-amber-500/30 hover:border-amber-400 bg-slate-900/80'
+                            : 'border-rose-500/30 hover:border-rose-400 bg-slate-900/80';
+          return `
+            <div onclick="openKecamatanModal('${name}')" class="p-3 rounded-xl border ${borderClass} cursor-pointer transition transform hover:-translate-y-1">
+              <div class="flex items-center justify-between mb-1">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold border ${badgeColor}">
+                  #${kInfo.rank}
+                </span>
+                <span class="text-[10px] text-slate-500">Tier ${kInfo.tier}</span>
+              </div>
+              <h5 class="text-xs font-bold text-white truncate">${name}</h5>
+              <div class="text-sm font-black text-slate-100 mt-1">${kInfo.qty.toLocaleString('id-ID')} <span class="text-[10px] font-normal text-slate-400">Unit</span></div>
+              <div class="mt-2 text-[10px] text-slate-400 flex items-center justify-between border-t border-slate-800 pt-1.5">
+                <span>Rincian Detail</span>
+                <span class="text-red-400 font-bold">&rarr;</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
     // Modal Kecamatan Drilldown (Supports both Kota Bekasi & Non-Kota Bekasi)
