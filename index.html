@@ -5052,15 +5052,40 @@
         const mFull = monthMap[bShort] || 'September';
         const qVal = quarterMap[mFull] || 'Q3';
 
+        const smRaw = String(item['Salesman'] || item['Payment Code'] || '').trim();
+        const smUpper = smRaw.toUpperCase();
+        const satrioSalesmenOct = [
+          'ALEX IWANI', 'RHISNA EKA KURNIAWATY', 'RIKI', 'DESVIANA', 'DEFIE',
+          'RAFNIE ARIZTIANI', 'RATRIE FERIANIE', 'DASUKI ADNAN', 'ADITYO FIRMANSYAH',
+          'SUHENDRO IRWANSYAH', 'WACHYUDIN', 'SHERLY MUHARI', 'WIDO PRASETYO',
+          'FRANS MUHAMMAD SYAHRIAL'
+        ];
+        const yamesSalesmenOct = [
+          'LUKAS MICHAEL', 'MALVIN OSMOND', 'EDHY SUHARDIMAN HERMAWAN',
+          'LINGGA IMAN DAYA WAHYU WIJAYA', 'LINGGA IMAN DAYA', 'YAYAN KURNIAWAN',
+          'ASIH FITRIANA', 'AGENG PRAMONO', 'MUADAM', 'ARIF HIDAYAT', 'ARI UTOMO'
+        ];
+
+        let spvFinal = 'LAINNYA';
+        const rawSpv = String(item['SPV'] || '').trim().toUpperCase();
+        if (rawSpv.includes('SATRIYO') || rawSpv.includes('SATRIO')) {
+          spvFinal = 'SATRIYO KRESNO AJI';
+        } else if (rawSpv.includes('YAMES')) {
+          spvFinal = 'YAMES';
+        } else if (rawSpv) {
+          spvFinal = String(item['SPV']).trim();
+        } else if (mFull === 'October') {
+          if (satrioSalesmenOct.some(s => smUpper.includes(s))) {
+            spvFinal = 'SATRIYO KRESNO AJI';
+          } else if (yamesSalesmenOct.some(s => smUpper.includes(s))) {
+            spvFinal = 'YAMES';
+          }
+        }
+
         records.push({
           spk: String(item['SPK No'] || ''),
-          spv: (function() {
-          const raw = String(item['SPV'] || '').trim().toUpperCase();
-          if (raw.includes('SATRIYO')) return 'SATRIYO KRESNO AJI';
-          if (raw.includes('YAMES')) return 'YAMES';
-          return raw ? String(item['SPV']).trim() : 'LAINNYA';
-        })(),
-          salesman: String(item['Salesman'] || ''),
+          spv: spvFinal,
+          salesman: smRaw || 'Non-Sales',
           model: String(item['Model'] || ''),
           type: String(item['Type'] || ''),
           type_grp: String(item['TYPE GRP'] || 'Lainnya'),
