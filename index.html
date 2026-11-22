@@ -214,7 +214,7 @@
       </button>
       <button onclick="switchTab('tabAR')" id="nav-tabAR" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
         <i data-lucide="file-text" class="w-4 h-4"></i>
-        <span>AR & Piutang Leasing</span>
+        <span>AR Invoice</span>
       </button>
       <button onclick="switchTab('tabPolreg')" id="nav-tabPolreg" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
         <i data-lucide="map" class="w-4 h-4"></i>
@@ -798,29 +798,183 @@
     <!-- TAB 5: AR & AGING PIUTANG LEASING -->
     <!-- ============================================================ -->
     <div id="tabAR" class="tab-pane hidden space-y-6">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="glass-card rounded-2xl p-5">
-          <span class="text-xs text-slate-400">Total Invoice Nilai Tagihan</span>
-          <div class="text-2xl font-extrabold text-white mt-1" id="arTotalInv">Rp 0</div>
-          <span class="text-[11px] text-slate-400">Akumulasi invoice penagihan</span>
+      <!-- AR Header & Sub-Menu Filters -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 border border-slate-800">
+        <div>
+          <div class="flex items-center gap-3">
+            <span class="p-2.5 rounded-xl bg-red-600/15 text-red-400 border border-red-500/30 flex items-center justify-center">
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+            </span>
+            <div>
+              <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                AR Invoice (Account Receivable)
+                <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  Data Real Spreadsheet
+                </span>
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Monitoring penagihan, status jatuh tempo (overdue), piutang customer, dan rekonsiliasi pembayaran leasing.
+              </p>
+            </div>
+          </div>
         </div>
-        <div class="glass-card rounded-2xl p-5">
-          <span class="text-xs text-slate-400">Total Pembayaran Diterima</span>
-          <div class="text-2xl font-extrabold text-emerald-400 mt-1" id="arTotalReceipt">Rp 0</div>
-          <span class="text-[11px] text-emerald-500 font-semibold">Telah masuk kas</span>
-        </div>
-        <div class="glass-card rounded-2xl p-5">
-          <span class="text-xs text-slate-400">Sisa Piutang (Outstanding Balance)</span>
-          <div class="text-2xl font-extrabold text-red-400 mt-1" id="arTotalBalance">Rp 0</div>
-          <span class="text-[11px] text-red-500 font-semibold" id="arBalanceDesc">Tertunggak / Belum Cair</span>
+
+        <!-- Sub-Menu Filter: ALL, Released, Closed -->
+        <div class="flex flex-wrap items-center gap-2 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800">
+          <button onclick="setARStateFilter('ALL')" id="arBtnFilterAll" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-red-600 text-white shadow-md shadow-red-600/30">
+            <span>Semua Status (ALL)</span>
+            <span id="arBadgeCountAll" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-bold">0</span>
+          </button>
+          <button onclick="setARStateFilter('Released')" id="arBtnFilterReleased" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>Released (Belum Terbayarkan)</span>
+            <span id="arBadgeCountReleased" class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/20 text-amber-300 font-bold">0</span>
+          </button>
+          <button onclick="setARStateFilter('Closed')" id="arBtnFilterClosed" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Closed (Sudah Terbayar)</span>
+            <span id="arBadgeCountClosed" class="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-bold">0</span>
+          </button>
         </div>
       </div>
 
-      <div class="glass-card rounded-2xl p-5">
-        <h3 class="text-sm font-bold text-white mb-2">Tren Sisa Piutang (Balance Overdue per Bulan)</h3>
-        <p class="text-xs text-slate-400 mb-4">Saldo tertunggak mulai muncul pada Agustus, September, dan Oktober</p>
-        <div class="h-64">
+      <!-- 3 Metric Cards (Gambar 2) -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Card 1: Total Invoice Nilai Tagihan -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-800 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400">Total Invoice Nilai Tagihan</span>
+            <span class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <i data-lucide="receipt" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="text-2xl font-black text-white mt-2 tracking-tight" id="arTotalInv">Rp 0</div>
+          <div class="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
+            <span>Akumulasi invoice penagihan</span>
+            <span id="arTotalInvCount" class="font-bold text-slate-300">0 Invoice</span>
+          </div>
+          <div id="arInvBreakdown" class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-800/80">
+            DP Cust: Rp 0 | Leasing: Rp 0
+          </div>
+        </div>
+
+        <!-- Card 2: Total Pembayaran Diterima -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-800 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400">Total Pembayaran Diterima</span>
+            <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="text-2xl font-black text-emerald-400 mt-2 tracking-tight" id="arTotalReceipt">Rp 0</div>
+          <div class="text-[11px] text-emerald-500 font-semibold mt-1 flex items-center justify-between">
+            <span>Telah masuk kas</span>
+            <span id="arReceiptPct" class="font-bold">0% Lunas</span>
+          </div>
+          <div id="arReceiptBreakdown" class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-800/80">
+            Kas Cust: Rp 0 | Cair Leasing: Rp 0
+          </div>
+        </div>
+
+        <!-- Card 3: Sisa Piutang (Outstanding Balance) -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-800 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400">Sisa Piutang (Outstanding Balance)</span>
+            <span class="p-2 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="text-2xl font-black text-rose-400 mt-2 tracking-tight" id="arTotalBalance">Rp 0</div>
+          <div class="text-[11px] text-rose-500 font-semibold mt-1 flex items-center justify-between">
+            <span id="arBalanceDesc">Tertunggak / Belum Cair</span>
+            <span id="arOutstandingCount" class="font-bold">0 Unpaid</span>
+          </div>
+          <div id="arBalanceBreakdown" class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-800/80">
+            Piutang Cust: Rp 0 | Sisa Leasing: Rp 0
+          </div>
+        </div>
+      </div>
+
+      <!-- Trend Chart: Balance Overdue per Bulan -->
+      <div class="glass-card rounded-2xl p-5 border border-slate-800">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-rose-400"></i>
+              Tren Sisa Piutang (Balance Overdue per Bulan)
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Saldo tertunggak mulai muncul pada Agustus, September, dan Oktober</p>
+          </div>
+          <span class="text-[11px] text-slate-400 bg-slate-900/90 px-3 py-1 rounded-lg border border-slate-800">
+            Data Sumber: Sheet Januari - Oktober 2026
+          </span>
+        </div>
+        <div class="h-60">
           <canvas id="chartARBalance"></canvas>
+        </div>
+      </div>
+
+      <!-- Table: Data Seluruh Transaksi AR Invoice -->
+      <div class="glass-card rounded-2xl p-5 border border-slate-800">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="table" class="w-4 h-4 text-emerald-400"></i>
+              Data Seluruh Transaksi AR Invoice (Sesuai Spreadsheet)
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Rincian lengkap nomor invoice, tanggal transaksi, jatuh tempo, umur piutang, customer, tagihan, dan leasing.
+            </p>
+          </div>
+
+          <!-- Search & Count Badge -->
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <input type="text" id="arSearchInput" oninput="handleARSearch()" placeholder="Cari No Inv, Customer, Leasing..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 pl-8 text-xs text-slate-200 focus:outline-none focus:border-red-500 w-56 sm:w-72">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5 pointer-events-none"></i>
+            </div>
+            <span id="arTableRowCountBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-200 whitespace-nowrap">
+              0 Transaksi
+            </span>
+          </div>
+        </div>
+
+        <!-- Responsive Table Container -->
+        <div class="overflow-x-auto custom-scrollbar max-h-[500px] border border-slate-800/80 rounded-xl">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-slate-900/95 text-slate-300 sticky top-0 backdrop-blur z-10 border-b border-slate-800 font-semibold">
+              <tr class="whitespace-nowrap">
+                <th class="py-2.5 px-3">No</th>
+                <th class="py-2.5 px-3">No. Invoice</th>
+                <th class="py-2.5 px-3">Transaction Date</th>
+                <th class="py-2.5 px-3">Due Date</th>
+                <th class="py-2.5 px-3 text-center">AR Over Due</th>
+                <th class="py-2.5 px-3">Nama Customer</th>
+                <th class="py-2.5 px-3 text-right">Invoice Amount</th>
+                <th class="py-2.5 px-3">Financing Company</th>
+                <th class="py-2.5 px-3 text-right">Financing Co. Balance</th>
+                <th class="py-2.5 px-3 text-right">Total Receipt Amount</th>
+                <th class="py-2.5 px-3 text-right">Balance</th>
+                <th class="py-2.5 px-3 text-right">Financing Co. Inv Amount</th>
+                <th class="py-2.5 px-3 text-right">Financing Co. Receipt Amount</th>
+                <th class="py-2.5 px-3 text-center">Information</th>
+                <th class="py-2.5 px-3 text-center">State</th>
+              </tr>
+            </thead>
+            <tbody id="arTableBody" class="divide-y divide-slate-800/70 text-slate-300 whitespace-nowrap font-normal">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 text-xs text-slate-400">
+          <div id="arPaginationInfo">
+            Menampilkan 0 - 0 dari 0 transaksi
+          </div>
+          <div class="flex items-center gap-1.5" id="arPaginationButtons">
+            <!-- Rendered via JS -->
+          </div>
         </div>
       </div>
     </div>
@@ -2507,47 +2661,249 @@
       renderTradeInTableRows(filtered);
     }
 
-    // --- TAB 5: AR & AGING MONITORING ---
-    function renderARTab() {
-      const records = appData.ar_data || [];
-      
-      let totalInv = 0;
-      let totalReceipt = 0;
-      let totalBalance = 0;
+    // --- TAB 5: AR INVOICE (ACCOUNT RECEIVABLE) ---
+    let currentARStateFilter = 'ALL'; // 'ALL', 'Released', 'Closed'
+    let arSearchQuery = '';
+    let currentARPage = 1;
+    const AR_PAGE_SIZE = 25;
+    let filteredARDataCache = [];
 
+    function setARStateFilter(state) {
+      currentARStateFilter = state;
+      currentARPage = 1;
+      
+      const btnAll = document.getElementById('arBtnFilterAll');
+      const btnRel = document.getElementById('arBtnFilterReleased');
+      const btnCls = document.getElementById('arBtnFilterClosed');
+      
+      const resetStyle = "px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5";
+      const activeAll = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-red-600 text-white shadow-md shadow-red-600/30";
+      const activeRel = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-amber-600 text-white shadow-md shadow-amber-600/30";
+      const activeCls = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-md shadow-emerald-600/30";
+      
+      if (btnAll) btnAll.className = (state === 'ALL') ? activeAll : resetStyle;
+      if (btnRel) btnRel.className = (state === 'Released') ? activeRel : resetStyle;
+      if (btnCls) btnCls.className = (state === 'Closed') ? activeCls : resetStyle;
+      
+      renderARTab();
+    }
+
+    function handleARSearch() {
+      const input = document.getElementById('arSearchInput');
+      arSearchQuery = input ? input.value.trim().toLowerCase() : '';
+      currentARPage = 1;
+      renderARTableOnly();
+    }
+
+    function changeARPage(page) {
+      currentARPage = page;
+      renderARTableOnly();
+    }
+
+    function formatCurrencyFull(val) {
+      if (val === undefined || val === null || isNaN(val)) return 'Rp 0';
+      return 'Rp ' + Math.round(val).toLocaleString('id-ID');
+    }
+
+    function formatCurrencyCompact(val) {
+      if (!val || val === 0) return 'Rp 0';
+      const absVal = Math.abs(val);
+      if (absVal >= 1000000000) {
+        return (val < 0 ? '-Rp ' : 'Rp ') + (absVal / 1000000000).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 2 }) + ' M';
+      }
+      if (absVal >= 1000000) {
+        return (val < 0 ? '-Rp ' : 'Rp ') + (absVal / 1000000).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' Jt';
+      }
+      return (val < 0 ? '-Rp ' : 'Rp ') + Math.round(absVal).toLocaleString('id-ID');
+    }
+
+    function formatDateID(dateStr) {
+      if (!dateStr) return '-';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+      return dateStr;
+    }
+
+    function calculateAROverdue(dueDateStr, state, balance, finCoBal) {
+      const totalOutstanding = (balance || 0) + (finCoBal || 0);
+      if (state === 'Closed' || totalOutstanding <= 0) {
+        return `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Lunas (0 Hari)</span>`;
+      }
+      if (!dueDateStr) return `<span class="text-slate-400 text-xs">-</span>`;
+      
+      const due = new Date(dueDateStr);
+      const refDate = new Date('2026-11-22');
+      const diffMs = refDate.getTime() - due.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > 0) {
+        return `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 whitespace-nowrap">${diffDays} Hari (Overdue)</span>`;
+      } else if (diffDays === 0) {
+        return `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 whitespace-nowrap">Jatuh Tempo Hari Ini</span>`;
+      } else {
+        return `<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-blue-500/15 text-blue-400 border border-blue-500/30 whitespace-nowrap">H-${Math.abs(diffDays)} Jatuh Tempo</span>`;
+      }
+    }
+
+    function renderARTab() {
+      const allRecords = appData.ar_data || [];
+      
+      // 1. Get active months based on currentPeriod & currentMode
+      const getMonthsList = () => {
+        if (currentMode === 'MONTH') return [currentPeriod];
+        if (currentMode === 'YTM') {
+          const endIdx = MONTHS.indexOf(currentPeriod);
+          return MONTHS.slice(0, endIdx + 1);
+        }
+        if (currentMode === 'QUARTER') {
+          if (currentPeriod === 'Q1') return ['January', 'February', 'March'];
+          if (currentPeriod === 'Q2') return ['April', 'May', 'June'];
+          if (currentPeriod === 'Q3') return ['July', 'August', 'September'];
+          if (currentPeriod === 'Q4') return ['October', 'November', 'December'];
+        }
+        return ['September'];
+      };
+      const activeMonths = getMonthsList();
+
+      // 2. Filter by Supervisor
+      let spvFiltered = allRecords.filter(r => {
+        if (currentSpv === 'ALL') return true;
+        if (currentSpv === 'SATRIYO KRESNO AJI') {
+          return r.spv && r.spv.toUpperCase().includes('SATRIYO');
+        }
+        if (currentSpv === 'YAMES') {
+          return r.spv && (r.spv.toUpperCase().includes('YAMES') || r.spv.toUpperCase().includes('JAMES'));
+        }
+        return true;
+      });
+
+      // 3. Filter by Active Months
+      let spvPeriodRecords = spvFiltered.filter(r => {
+        return activeMonths.includes(r.month_en) || activeMonths.includes(r.month);
+      });
+
+      // 4. Update Sub-Menu Count Badges
+      const countAll = spvPeriodRecords.length;
+      const countRel = spvPeriodRecords.filter(r => r.state === 'Released').length;
+      const countCls = spvPeriodRecords.filter(r => r.state === 'Closed').length;
+
+      const badgeAll = document.getElementById('arBadgeCountAll');
+      if (badgeAll) badgeAll.textContent = countAll.toLocaleString('id-ID');
+      const badgeRel = document.getElementById('arBadgeCountReleased');
+      if (badgeRel) badgeRel.textContent = countRel.toLocaleString('id-ID');
+      const badgeCls = document.getElementById('arBadgeCountClosed');
+      if (badgeCls) badgeCls.textContent = countCls.toLocaleString('id-ID');
+
+      // 5. Filter by State Sub-Menu
+      let stateFiltered = spvPeriodRecords;
+      if (currentARStateFilter === 'Released') {
+        stateFiltered = spvPeriodRecords.filter(r => r.state === 'Released');
+      } else if (currentARStateFilter === 'Closed') {
+        stateFiltered = spvPeriodRecords.filter(r => r.state === 'Closed');
+      }
+
+      // 6. Calculate Totals for Metric Cards
+      let totalCustInv = 0;
+      let totalFinInv = 0;
+      let totalCustRec = 0;
+      let totalFinRec = 0;
+      let totalCustBal = 0;
+      let totalFinBal = 0;
+      let outstandingInvoices = 0;
+
+      stateFiltered.forEach(r => {
+        totalCustInv += (r.inv_amount || 0);
+        totalFinInv += (r.fin_co_inv_amount || 0);
+        totalCustRec += (r.receipt_amount || 0);
+        totalFinRec += (r.fin_co_receipt_amount || 0);
+        totalCustBal += (r.balance || 0);
+        totalFinBal += (r.fin_co_balance || 0);
+
+        if ((r.balance > 0 || r.fin_co_balance > 0) || r.state === 'Released') {
+          outstandingInvoices++;
+        }
+      });
+
+      const grandTotalInv = totalCustInv + totalFinInv;
+      const grandTotalRec = totalCustRec + totalFinRec;
+      const grandTotalBal = totalCustBal + totalFinBal;
+
+      // Update Card 1: Total Invoice Nilai Tagihan
+      const elInv = document.getElementById('arTotalInv');
+      if (elInv) elInv.textContent = formatCurrencyCompact(grandTotalInv);
+      const elInvCount = document.getElementById('arTotalInvCount');
+      if (elInvCount) elInvCount.textContent = stateFiltered.length.toLocaleString('id-ID') + ' Inv';
+      const elInvBreakdown = document.getElementById('arInvBreakdown');
+      if (elInvBreakdown) {
+        elInvBreakdown.textContent = `DP Pelanggan: ${formatCurrencyCompact(totalCustInv)} | Leasing: ${formatCurrencyCompact(totalFinInv)}`;
+      }
+
+      // Update Card 2: Total Pembayaran Diterima
+      const elRec = document.getElementById('arTotalReceipt');
+      if (elRec) elRec.textContent = formatCurrencyCompact(grandTotalRec);
+      const elRecPct = document.getElementById('arReceiptPct');
+      const recPct = grandTotalInv > 0 ? ((grandTotalRec / grandTotalInv) * 100).toFixed(1) : 0;
+      if (elRecPct) elRecPct.textContent = `${recPct}% Masuk Kas`;
+      const elRecBreakdown = document.getElementById('arReceiptBreakdown');
+      if (elRecBreakdown) {
+        elRecBreakdown.textContent = `Kas Masuk DP: ${formatCurrencyCompact(totalCustRec)} | Cair Leasing: ${formatCurrencyCompact(totalFinRec)}`;
+      }
+
+      // Update Card 3: Sisa Piutang (Outstanding Balance)
+      const elBal = document.getElementById('arTotalBalance');
+      if (elBal) elBal.textContent = formatCurrencyCompact(grandTotalBal);
+      const elBalDesc = document.getElementById('arBalanceDesc');
+      if (elBalDesc) {
+        elBalDesc.textContent = grandTotalBal > 0 ? 'Tertunggak / Belum Cair' : 'Lunas Seluruhnya';
+      }
+      const elOutstandingCount = document.getElementById('arOutstandingCount');
+      if (elOutstandingCount) {
+        elOutstandingCount.textContent = grandTotalBal > 0 ? `${outstandingInvoices} Belum Lunas` : '0 Outstanding';
+      }
+      const elBalBreakdown = document.getElementById('arBalanceBreakdown');
+      if (elBalBreakdown) {
+        elBalBreakdown.textContent = `Piutang Cust: ${formatCurrencyCompact(totalCustBal)} | Sisa Leasing: ${formatCurrencyCompact(totalFinBal)}`;
+      }
+
+      // 7. Update Chart AR Balance
+      renderARBalanceChart(spvFiltered);
+
+      // 8. Cache filtered data and render table
+      filteredARDataCache = stateFiltered;
+      renderARTableOnly();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function renderARBalanceChart(records) {
       const monthlyBalance = {
         'Januari': 0, 'Februari': 0, 'Maret': 0, 'April': 0, 'Mei': 0,
         'Juni': 0, 'Juli': 0, 'Agustus': 0, 'September': 0, 'Oktober': 0
       };
 
       records.forEach(r => {
-        totalInv += (r.inv_amount || 0);
-        totalReceipt += (r.receipt_amount || 0);
-        totalBalance += (r.balance || 0);
-
+        const bal = (r.balance || 0) + (r.fin_co_balance || 0);
         if (monthlyBalance[r.month] !== undefined) {
-          monthlyBalance[r.month] += (r.balance || 0);
+          monthlyBalance[r.month] += bal;
         }
       });
 
-      document.getElementById('arTotalInv').textContent = 'Rp ' + (totalInv / 1000000000).toFixed(1) + ' M';
-      document.getElementById('arTotalReceipt').textContent = 'Rp ' + (totalReceipt / 1000000000).toFixed(1) + ' M';
-      document.getElementById('arTotalBalance').textContent = 'Rp ' + (totalBalance / 1000000000).toFixed(1) + ' M';
-
-      const ctxAR = document.getElementById('chartARBalance').getContext('2d');
+      const ctxAR = document.getElementById('chartARBalance');
+      if (!ctxAR) return;
       if (chartARBalance) chartARBalance.destroy();
 
       const labels = Object.keys(monthlyBalance);
       const valsInBillion = Object.values(monthlyBalance).map(v => (v / 1000000000));
 
-      chartARBalance = new Chart(ctxAR, {
+      chartARBalance = new Chart(ctxAR.getContext('2d'), {
         type: 'bar',
         data: {
           labels: labels,
           datasets: [{
             label: 'Saldo Piutang Tertunggak (Rp Miliar)',
             data: valsInBillion,
-            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+            backgroundColor: valsInBillion.map(v => v > 0 ? 'rgba(239, 68, 68, 0.85)' : 'rgba(16, 185, 129, 0.6)'),
             borderRadius: 6
           }]
         },
@@ -2558,7 +2914,10 @@
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: ctx => `Outstanding: Rp ${ctx.raw.toFixed(2)} Miliar`
+                label: ctx => {
+                  const val = ctx.raw;
+                  return val > 0 ? `Tertunggak: Rp ${val.toFixed(2)} Miliar` : 'Lunas (Rp 0)';
+                }
               }
             }
           },
@@ -2568,6 +2927,123 @@
           }
         }
       });
+    }
+
+    function renderARTableOnly() {
+      let data = filteredARDataCache;
+      
+      // Apply search query
+      if (arSearchQuery) {
+        data = data.filter(r => {
+          return (r.inv_no && r.inv_no.toLowerCase().includes(arSearchQuery)) ||
+                 (r.customer && r.customer.toLowerCase().includes(arSearchQuery)) ||
+                 (r.financing_company && r.financing_company.toLowerCase().includes(arSearchQuery)) ||
+                 (r.state && r.state.toLowerCase().includes(arSearchQuery));
+        });
+      }
+
+      const totalRows = data.length;
+      const badgeCount = document.getElementById('arTableRowCountBadge');
+      if (badgeCount) badgeCount.textContent = totalRows.toLocaleString('id-ID') + ' Transaksi';
+
+      const totalPages = Math.ceil(totalRows / AR_PAGE_SIZE) || 1;
+      if (currentARPage > totalPages) currentARPage = totalPages;
+      if (currentARPage < 1) currentARPage = 1;
+
+      const startIdx = (currentARPage - 1) * AR_PAGE_SIZE;
+      const endIdx = Math.min(startIdx + AR_PAGE_SIZE, totalRows);
+      const pageData = data.slice(startIdx, endIdx);
+
+      const tbody = document.getElementById('arTableBody');
+      if (!tbody) return;
+
+      if (pageData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="15" class="py-8 text-center text-slate-500 text-xs">Tidak ada transaksi AR yang cocok dengan filter atau kata kunci pencarian.</td></tr>`;
+      } else {
+        let rowsHtml = '';
+        pageData.forEach((r, idx) => {
+          const rowNum = startIdx + idx + 1;
+          const overdueBadge = calculateAROverdue(r.due_date, r.state, r.balance, r.fin_co_balance);
+          
+          // Information logic according to user prompt:
+          let infoBadge = '';
+          const isFinCoZero = (r.fin_co_receipt_amount === 0 || r.fin_co_receipt_amount === 0.0);
+          const hasBalance = ((r.balance || 0) > 0 || (r.fin_co_balance || 0) > 0);
+          
+          if (r.state === 'Released' || (isFinCoZero && (r.fin_co_inv_amount || 0) > 0) || hasBalance) {
+            infoBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30 whitespace-nowrap">Belum Terbayarkan</span>`;
+          } else {
+            infoBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">Sudah Terbayar</span>`;
+          }
+
+          // State badge
+          const stateBadge = r.state === 'Released'
+            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">Released</span>`
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Closed</span>`;
+
+          const finCoDisplay = (r.financing_company && r.financing_company !== '-') ? r.financing_company : '<span class="text-slate-500">Cash / Non-Leasing</span>';
+
+          rowsHtml += `
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="py-2.5 px-3 text-slate-500 text-center">${rowNum}</td>
+              <td class="py-2.5 px-3 font-semibold text-white tracking-wide font-mono text-[11px]">${r.inv_no}</td>
+              <td class="py-2.5 px-3 text-slate-300">${formatDateID(r.trx_date)}</td>
+              <td class="py-2.5 px-3 text-slate-300">${formatDateID(r.due_date)}</td>
+              <td class="py-2.5 px-3 text-center">${overdueBadge}</td>
+              <td class="py-2.5 px-3 font-semibold text-slate-100 max-w-[200px] truncate" title="${r.customer}">${r.customer}</td>
+              <td class="py-2.5 px-3 text-right font-medium text-slate-200">${formatCurrencyFull(r.inv_amount)}</td>
+              <td class="py-2.5 px-3 text-slate-300 max-w-[200px] truncate" title="${r.financing_company}">${finCoDisplay}</td>
+              <td class="py-2.5 px-3 text-right ${r.fin_co_balance > 0 ? 'text-rose-400 font-bold' : 'text-slate-400'}">${formatCurrencyFull(r.fin_co_balance)}</td>
+              <td class="py-2.5 px-3 text-right text-emerald-400 font-medium">${formatCurrencyFull(r.receipt_amount)}</td>
+              <td class="py-2.5 px-3 text-right ${r.balance > 0 ? 'text-rose-400 font-bold' : 'text-slate-400'}">${formatCurrencyFull(r.balance)}</td>
+              <td class="py-2.5 px-3 text-right text-slate-300">${formatCurrencyFull(r.fin_co_inv_amount)}</td>
+              <td class="py-2.5 px-3 text-right ${r.fin_co_receipt_amount > 0 ? 'text-emerald-400 font-semibold' : 'text-slate-500'}">${formatCurrencyFull(r.fin_co_receipt_amount)}</td>
+              <td class="py-2.5 px-3 text-center">${infoBadge}</td>
+              <td class="py-2.5 px-3 text-center">${stateBadge}</td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = rowsHtml;
+      }
+
+      // Pagination Information
+      const elInfo = document.getElementById('arPaginationInfo');
+      if (elInfo) {
+        if (totalRows === 0) {
+          elInfo.textContent = 'Menampilkan 0 - 0 dari 0 transaksi';
+        } else {
+          elInfo.textContent = `Menampilkan ${startIdx + 1} - ${endIdx} dari ${totalRows.toLocaleString('id-ID')} transaksi (Halaman ${currentARPage} dari ${totalPages})`;
+        }
+      }
+
+      // Pagination Buttons
+      const elBtns = document.getElementById('arPaginationButtons');
+      if (elBtns) {
+        if (totalPages <= 1) {
+          elBtns.innerHTML = '';
+        } else {
+          let btnHtml = '';
+          btnHtml += `<button onclick="changeARPage(${currentARPage - 1})" ${currentARPage === 1 ? 'disabled' : ''} class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed">Prev</button>`;
+          
+          let startP = Math.max(1, currentARPage - 2);
+          let endP = Math.min(totalPages, currentARPage + 2);
+          if (startP > 1) {
+            btnHtml += `<button onclick="changeARPage(1)" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 hover:text-white">1</button>`;
+            if (startP > 2) btnHtml += `<span class="px-1 text-slate-600">...</span>`;
+          }
+          for (let p = startP; p <= endP; p++) {
+            const isActive = (p === currentARPage);
+            btnHtml += `<button onclick="changeARPage(${p})" class="px-2.5 py-1 rounded ${isActive ? 'bg-red-600 text-white font-bold' : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'}">${p}</button>`;
+          }
+          if (endP < totalPages) {
+            if (endP < totalPages - 1) btnHtml += `<span class="px-1 text-slate-600">...</span>`;
+            btnHtml += `<button onclick="changeARPage(${totalPages})" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 hover:text-white">${totalPages}</button>`;
+          }
+
+          btnHtml += `<button onclick="changeARPage(${currentARPage + 1})" ${currentARPage === totalPages ? 'disabled' : ''} class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed">Next</button>`;
+          elBtns.innerHTML = btnHtml;
+        }
+      }
     }
 
     // --- TAB 6: FINANCIAL PERFORMANCE ---
