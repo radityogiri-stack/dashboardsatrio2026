@@ -220,10 +220,6 @@
         <i data-lucide="map" class="w-4 h-4"></i>
         <span>Market Share & Polreg 2026</span>
       </button>
-      <button onclick="switchTab('tabSyncInfo')" id="nav-tabSyncInfo" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
-        <i data-lucide="cloud-cog" class="w-4 h-4"></i>
-        <span>Panduan Sync Spreadsheet</span>
-      </button>
     </div>
   </nav>
 
@@ -1154,75 +1150,7 @@
       </div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- TAB 8: INTEGRASI & AUTO-SYNC GOOGLE SHEETS -->
-    <!-- ============================================================ -->
-    <div id="tabSyncInfo" class="tab-pane hidden space-y-6">
-      <div class="glass-card rounded-2xl p-6">
-        <div class="flex items-start justify-between gap-4 mb-6">
-          <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <i data-lucide="cloud" class="w-5 h-5 text-blue-400"></i>
-              Sinkronisasi Otomatis dengan Google Sheets
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">
-              Setiap kali Anda mengedit atau menambah data baru di Google Sheets, Web Monitoring ini akan otomatis memperbarui grafik dan metriknya tanpa perlu refresh halaman.
-            </p>
-          </div>
-          <button onclick="triggerSync()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-xs font-bold text-white transition flex items-center gap-2">
-            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-            <span>Test Sinkronisasi Sekarang</span>
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Step by Step -->
-          <div class="space-y-4 text-xs text-slate-300">
-            <h3 class="font-bold text-white text-sm flex items-center gap-2">
-              <span class="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px]">1</span>
-              Cara Memasang Script di Google Sheets
-            </h3>
-            <ol class="list-decimal list-inside space-y-2 text-slate-300">
-              <li>Buka Google Sheets data Anda di Google Drive.</li>
-              <li>Klik menu <strong>Extensions (Ekstensi)</strong> &rarr; <strong>Apps Script</strong>.</li>
-              <li>Salin script dari file <code class="text-red-400 bg-slate-900 px-1.5 py-0.5 rounded">Code_Dashboard_Sync.gs</code> yang sudah disiapkan.</li>
-              <li>Klik tombol <strong>Deploy</strong> (kanan atas) &rarr; <strong>New deployment</strong>.</li>
-              <li>Pilih tipe <strong>Web app</strong>, atur <em>Who has access</em> ke <strong>Anyone</strong>.</li>
-              <li>Salin URL Web App yang dihasilkan, lalu masukkan ke kolom di sebelah kanan.</li>
-            </ol>
-          </div>
-
-          <!-- Configuration Form -->
-          <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-            <h3 class="font-bold text-white text-sm flex items-center gap-2">
-              <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">2</span>
-              Pengaturan Koneksi Web App
-            </h3>
-
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Google Apps Script Web App URL:</label>
-              <input type="text" id="cfgScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Interval Pembaruan Otomatis (Auto-Refresh):</label>
-              <select id="cfgAutoSyncInterval" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
-                <option value="0">Manual (Hanya saat klik tombol)</option>
-                <option value="30000" selected>Otomatis Setiap 30 Detik</option>
-                <option value="60000">Otomatis Setiap 1 Menit</option>
-                <option value="300000">Otomatis Setiap 5 Menit</option>
-              </select>
-            </div>
-
-            <button onclick="saveSyncConfig()" class="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">
-              Simpan & Aktifkan Real-Time Auto Sync
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </main>
+    </main>
 
   <!-- MODAL PENGATURAN SYNC -->
   <div id="syncModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -1718,7 +1646,10 @@
 
       const cashVals = labels.map((_, i) => isSatrio ? (kpiSatrio.cash_satrio?.[MONTHS[i]] || 0) : Math.round((kpiSatrio.cash_satrio?.[MONTHS[i]] || 0) * 2.2));
       const creditVals = labels.map((_, i) => isSatrio ? (kpiSatrio.credit_satrio?.[MONTHS[i]] || 0) : Math.round((kpiSatrio.credit_satrio?.[MONTHS[i]] || 0) * 2.2));
+      const totalVals = labels.map((_, i) => cashVals[i] + creditVals[i]);
+      const maxTotal = Math.max(...totalVals, 1);
 
+      // --- Chart 1: Cash vs Kredit (Stacked Bar with Numbers & Percentages) ---
       const ctxCC = document.getElementById('chartCashCredit')?.getContext('2d');
       if (ctxCC) {
         if (chartCashCredit) chartCashCredit.destroy();
@@ -1735,9 +1666,21 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+              padding: { top: 22 }
+            },
             plugins: {
-              legend: { labels: { color: '#CBD5E1', boxWidth: 10 } },
+              legend: {
+                position: 'top',
+                labels: { color: '#CBD5E1', boxWidth: 10, font: { size: 11, weight: '600' } }
+              },
               tooltip: {
+                backgroundColor: '#0F172A',
+                titleColor: '#F8FAFC',
+                bodyColor: '#CBD5E1',
+                borderColor: '#334155',
+                borderWidth: 1,
+                padding: 10,
                 callbacks: {
                   afterBody: (context) => {
                     const idx = context[0].dataIndex;
@@ -1746,23 +1689,88 @@
                     const tot = c + cr;
                     const crPct = tot > 0 ? ((cr / tot) * 100).toFixed(1) : 0;
                     const cPct = tot > 0 ? ((c / tot) * 100).toFixed(1) : 0;
-                    return `Porsi Kredit: ${crPct}%\nPorsi Cash: ${cPct}%\nTotal: ${tot} Unit`;
+                    return `Kredit: ${cr} Unit (${crPct}%)\nCash: ${c} Unit (${cPct}%)\nTotal: ${tot} Unit (100%)`;
                   }
                 }
               }
             },
             scales: {
               x: { stacked: true, grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } },
-              y: { stacked: true, grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } }
+              y: {
+                stacked: true,
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { color: '#94A3B8' },
+                suggestedMax: Math.ceil(maxTotal * 1.15)
+              }
             }
-          }
+          },
+          plugins: [{
+            id: 'cashCreditLabels',
+            afterDatasetsDraw(chart) {
+              const { ctx } = chart;
+              ctx.save();
+              const metaCr = chart.getDatasetMeta(0);
+              const metaC = chart.getDatasetMeta(1);
+
+              labels.forEach((_, idx) => {
+                const cr = creditVals[idx];
+                const c = cashVals[idx];
+                const tot = cr + c;
+                if (tot === 0) return;
+
+                const crPct = ((cr / tot) * 100).toFixed(0);
+                const cPct = ((c / tot) * 100).toFixed(0);
+
+                // 1. Credit label inside blue bar
+                const barCr = metaCr.data[idx];
+                if (barCr && cr > 0) {
+                  const h = Math.abs(barCr.base - barCr.y);
+                  if (h >= 14) {
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.font = 'bold 9px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const crMidY = (barCr.base + barCr.y) / 2;
+                    ctx.fillText(`${cr} (${crPct}%)`, barCr.x, crMidY);
+                  }
+                }
+
+                // 2. Cash label inside green bar
+                const barC = metaC.data[idx];
+                if (barC && c > 0) {
+                  const h = Math.abs(barC.base - barC.y);
+                  if (h >= 14) {
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.font = 'bold 9px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const cMidY = (barC.base + barC.y) / 2;
+                    ctx.fillText(`${c} (${cPct}%)`, barC.x, cMidY);
+                  }
+                }
+
+                // 3. Total units on top of the stacked bar
+                const topY = (barC && c > 0) ? barC.y : (barCr ? barCr.y : 0);
+                if (topY > 0) {
+                  ctx.fillStyle = '#F8FAFC';
+                  ctx.font = 'bold 10px Inter, sans-serif';
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'bottom';
+                  ctx.fillText(`${tot}`, barCr.x, topY - 3);
+                }
+              });
+              ctx.restore();
+            }
+          }]
         });
       }
 
-      // Leasing Share
+      // --- Chart 2: Leasing Share (Line Chart with Numbers & Percentages on Points) ---
       const tvc = labels.map((_, i) => kpiSatrio.tvc_unit?.[MONTHS[i]] || 0);
       const mtf = labels.map((_, i) => kpiSatrio.mtf_unit?.[MONTHS[i]] || 0);
       const others = labels.map((_, i) => kpiSatrio.others_unit?.[MONTHS[i]] || 0);
+      const totalLeasing = labels.map((_, i) => tvc[i] + mtf[i] + others[i]);
+      const maxLease = Math.max(...tvc, ...mtf, 1);
 
       const ctxLease = document.getElementById('chartLeasingShare')?.getContext('2d');
       if (ctxLease) {
@@ -1773,33 +1781,145 @@
           data: {
             labels: labels,
             datasets: [
-              { label: 'TVC (TAF)', data: tvc, borderColor: '#D71920', backgroundColor: '#D71920', tension: 0.2, borderWidth: 2.5, pointRadius: 4 },
-              { label: 'MTF', data: mtf, borderColor: '#F59E0B', backgroundColor: '#F59E0B', tension: 0.2, borderWidth: 2.5, pointRadius: 4 },
-              { label: 'Others', data: others, borderColor: '#94A3B8', backgroundColor: '#94A3B8', tension: 0.2, borderWidth: 2, borderDash: [4, 4], pointRadius: 3 }
+              {
+                label: 'TVC (TAF)',
+                data: tvc,
+                borderColor: '#D71920',
+                backgroundColor: '#D71920',
+                tension: 0.25,
+                borderWidth: 2.5,
+                pointRadius: 4.5,
+                pointHoverRadius: 6.5,
+                pointBackgroundColor: '#D71920'
+              },
+              {
+                label: 'MTF',
+                data: mtf,
+                borderColor: '#F59E0B',
+                backgroundColor: '#F59E0B',
+                tension: 0.25,
+                borderWidth: 2.5,
+                pointRadius: 4.5,
+                pointHoverRadius: 6.5,
+                pointBackgroundColor: '#F59E0B'
+              },
+              {
+                label: 'Others',
+                data: others,
+                borderColor: '#94A3B8',
+                backgroundColor: '#94A3B8',
+                tension: 0.25,
+                borderWidth: 1.8,
+                borderDash: [4, 4],
+                pointRadius: 3.5,
+                pointHoverRadius: 5,
+                pointBackgroundColor: '#94A3B8'
+              }
             ]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+              padding: { top: 25, bottom: 12 }
+            },
             plugins: {
-              legend: { labels: { color: '#CBD5E1', boxWidth: 10 } },
+              legend: {
+                position: 'top',
+                labels: { color: '#CBD5E1', boxWidth: 10, font: { size: 11, weight: '600' } }
+              },
               tooltip: {
+                backgroundColor: '#0F172A',
+                titleColor: '#F8FAFC',
+                bodyColor: '#CBD5E1',
+                borderColor: '#334155',
+                borderWidth: 1,
+                padding: 10,
                 callbacks: {
                   afterBody: (context) => {
                     const idx = context[0].dataIndex;
-                    const tot = (tvc[idx] || 0) + (mtf[idx] || 0) + (others[idx] || 0);
-                    const tvcPct = tot > 0 ? (((tvc[idx] || 0) / tot) * 100).toFixed(1) : 0;
-                    const mtfPct = tot > 0 ? (((mtf[idx] || 0) / tot) * 100).toFixed(1) : 0;
-                    return `Porsi TVC (TAF): ${tvcPct}%\nPorsi MTF: ${mtfPct}%\nTotal Leasing: ${tot} Unit`;
+                    const tot = totalLeasing[idx] || 1;
+                    const tvcPct = ((tvc[idx] / tot) * 100).toFixed(1);
+                    const mtfPct = ((mtf[idx] / tot) * 100).toFixed(1);
+                    const othPct = ((others[idx] / tot) * 100).toFixed(1);
+                    return `TVC (TAF): ${tvc[idx]} Unit (${tvcPct}%)\nMTF: ${mtf[idx]} Unit (${mtfPct}%)\nOthers: ${others[idx]} Unit (${othPct}%)\nTotal: ${tot} Unit`;
                   }
                 }
               }
             },
             scales: {
               x: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } },
-              y: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94A3B8' } }
+              y: {
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { color: '#94A3B8' },
+                suggestedMax: Math.ceil(maxLease * 1.25)
+              }
             }
-          }
+          },
+          plugins: [{
+            id: 'leasingLabels',
+            afterDatasetsDraw(chart) {
+              const { ctx } = chart;
+              ctx.save();
+              const metaTVC = chart.getDatasetMeta(0);
+              const metaMTF = chart.getDatasetMeta(1);
+              const metaOth = chart.getDatasetMeta(2);
+
+              labels.forEach((_, idx) => {
+                const tot = totalLeasing[idx] || 1;
+                const vTVC = tvc[idx];
+                const vMTF = mtf[idx];
+                const vOth = others[idx];
+
+                const pTVC = ((vTVC / tot) * 100).toFixed(0);
+                const pMTF = ((vMTF / tot) * 100).toFixed(0);
+                const pOth = ((vOth / tot) * 100).toFixed(0);
+
+                const ptTVC = metaTVC.data[idx];
+                const ptMTF = metaMTF.data[idx];
+                const ptOth = metaOth.data[idx];
+
+                ctx.font = 'bold 9px Inter, sans-serif';
+                ctx.textAlign = 'center';
+
+                // Intelligent vertical placement to avoid collision between TVC & MTF:
+                if (vTVC >= vMTF) {
+                  // TVC above, MTF below
+                  if (ptTVC) {
+                    ctx.fillStyle = '#EF4444';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(`${vTVC} (${pTVC}%)`, ptTVC.x, ptTVC.y - 6);
+                  }
+                  if (ptMTF) {
+                    ctx.fillStyle = '#F59E0B';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(`${vMTF} (${pMTF}%)`, ptMTF.x, ptMTF.y + 6);
+                  }
+                } else {
+                  // MTF above, TVC below
+                  if (ptMTF) {
+                    ctx.fillStyle = '#F59E0B';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(`${vMTF} (${pMTF}%)`, ptMTF.x, ptMTF.y - 6);
+                  }
+                  if (ptTVC) {
+                    ctx.fillStyle = '#EF4444';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(`${vTVC} (${pTVC}%)`, ptTVC.x, ptTVC.y + 6);
+                  }
+                }
+
+                // Others text
+                if (ptOth && vOth > 0) {
+                  ctx.fillStyle = '#94A3B8';
+                  ctx.font = '8px Inter, sans-serif';
+                  ctx.textBaseline = 'top';
+                  ctx.fillText(`${vOth} (${pOth}%)`, ptOth.x, ptOth.y + 7);
+                }
+              });
+              ctx.restore();
+            }
+          }]
         });
       }
     }
