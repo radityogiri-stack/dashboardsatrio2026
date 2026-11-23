@@ -1536,9 +1536,47 @@
         </div>
       </div>
 
-      <!-- SCORECARDS ROW (4 CARDS) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- SCORECARDS ROW (5 CARDS: TABEL SKOR NPS + 4 KPI KINERJA) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         
+        <!-- Card 0: Tabel Skor NPS (Net Promoter Score) - Diletakkan di sebelah kiri Pencapaian RS AFI -->
+        <div class="glass-card rounded-2xl p-4 relative overflow-hidden group border border-slate-200/90 shadow-sm flex flex-col justify-between hover:border-emerald-300 transition">
+          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-600/10 rounded-full blur-xl group-hover:bg-emerald-600/20 transition"></div>
+          
+          <div>
+            <div class="flex items-center justify-between text-slate-500 text-xs mb-1.5">
+              <span class="font-bold text-slate-700 flex items-center gap-1.5 truncate">
+                <i data-lucide="smile" class="w-4 h-4 text-emerald-600"></i>
+                <span>Tabel Skor NPS</span>
+              </span>
+              <button type="button" onclick="openNpsModal()" title="Buka Rincian Tabel Data NPS" class="p-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition">
+                <i data-lucide="table" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+
+            <div class="flex items-baseline gap-2">
+              <span id="scNpsScore" class="text-3xl font-black text-slate-950">100%</span>
+              <span id="scNpsPeriodTag" class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">BULANAN</span>
+            </div>
+          </div>
+
+          <div class="mt-2.5 pt-2 border-t border-slate-200 text-xs space-y-1">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-500 font-medium">Target: <strong class="text-slate-900 font-bold">&ge;90%</strong></span>
+              <span id="scNpsBadge" class="px-2 py-0.5 rounded font-extrabold text-[10px] bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                100% Excellent ★★★★★
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-[10px] pt-1 text-slate-500 border-t border-slate-100">
+              <span id="scNpsSpvLabel" class="truncate font-semibold text-slate-600 max-w-[130px]">SPV: SATRIYO K. A.</span>
+              <button type="button" onclick="openNpsModal()" class="text-emerald-700 hover:text-emerald-900 font-extrabold hover:underline flex items-center gap-0.5">
+                <span>Rincian</span>
+                <i data-lucide="chevron-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Card 1: RS AFI vs Target Unit -->
         <div class="glass-card rounded-2xl p-5 relative overflow-hidden group">
           <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-red-600/10 rounded-full blur-xl group-hover:bg-red-600/20 transition"></div>
@@ -2708,6 +2746,111 @@
 
     </main>
 
+  <!-- MODAL DETAIL DATA NPS (SHEET: DATA NPS) -->
+  <div id="npsDetailModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-emerald-600 via-teal-700 to-slate-900 p-5 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 text-white">
+            <i data-lucide="award" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-bold uppercase tracking-wider mb-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+              <span>Sheet Data NPS &bull; gid 302155534</span>
+            </div>
+            <h3 class="text-lg md:text-xl font-black">Tabel Monitoring Net Promoter Score (NPS)</h3>
+            <p class="text-xs text-emerald-100">Evaluasi indeks kepuasan pelanggan per Supervisor secara Bulanan, YTM, dan Kuartal.</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeNpsModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Active Indicator Banner -->
+      <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-slate-500 font-medium">Filter SPV Aktif:</span>
+          <span class="font-bold text-slate-900 px-2.5 py-1 rounded-lg bg-white border border-slate-200 shadow-sm" id="modalNpsSpv">
+            SATRIYO KRESNO AJI
+          </span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-slate-500 font-medium">Skor Sesuai Periode:</span>
+          <span class="text-base font-black text-emerald-600 px-3 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200" id="modalNpsActiveScore">
+            100%
+          </span>
+          <span class="text-[11px] font-extrabold text-slate-500">Target Cabang: &ge;90%</span>
+        </div>
+      </div>
+
+      <!-- Table Content -->
+      <div class="p-5 space-y-4">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-[10px] font-black text-slate-700 uppercase border-b border-slate-200 tracking-wider">
+                <th class="py-2.5 px-3">Nama Supervisor</th>
+                <th class="py-2.5 px-2 text-center">Jan</th>
+                <th class="py-2.5 px-2 text-center">Feb</th>
+                <th class="py-2.5 px-2 text-center">Mar</th>
+                <th class="py-2.5 px-2 text-center">Apr</th>
+                <th class="py-2.5 px-2 text-center">Mei</th>
+                <th class="py-2.5 px-2 text-center">Jun</th>
+                <th class="py-2.5 px-2 text-center">Jul</th>
+                <th class="py-2.5 px-2 text-center">Agu</th>
+                <th class="py-2.5 px-2 text-center">Sep</th>
+                <th class="py-2.5 px-2 text-center">Okt</th>
+                <th class="py-2.5 px-3 text-right bg-blue-50/60 text-blue-900 font-black">YTM Rata2</th>
+                <th class="py-2.5 px-3 text-center">Target Status</th>
+              </tr>
+            </thead>
+            <tbody id="modalNpsTableBody" class="divide-y divide-slate-100 text-slate-800">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Kuartal Summary Cards inside modal -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <span class="text-[10px] font-bold text-slate-500 uppercase block">Kuartal 1 (Q1)</span>
+            <div class="text-base font-black text-emerald-600 mt-0.5">100%</div>
+            <span class="text-[9px] text-slate-400">Januari – Maret</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <span class="text-[10px] font-bold text-slate-500 uppercase block">Kuartal 2 (Q2)</span>
+            <div class="text-base font-black text-emerald-600 mt-0.5">99.0%</div>
+            <span class="text-[9px] text-slate-400">April – Juni (Satrio 97%)</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <span class="text-[10px] font-bold text-slate-500 uppercase block">Kuartal 3 (Q3)</span>
+            <div class="text-base font-black text-emerald-600 mt-0.5">100%</div>
+            <span class="text-[9px] text-slate-400">Juli – September</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <span class="text-[10px] font-bold text-slate-500 uppercase block">Kuartal 4 (Q4)</span>
+            <div class="text-base font-black text-emerald-600 mt-0.5">100%</div>
+            <span class="text-[9px] text-slate-400">Oktober – Desember</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between">
+        <span class="text-xs text-slate-500">Sumber Data: <strong>Sheet Data NPS (gid 302155534)</strong></span>
+        <button type="button" onclick="closeNpsModal()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- MODAL PENGATURAN SYNC -->
   <div id="syncModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="glass-card rounded-2xl max-w-lg w-full p-6 border border-slate-300 space-y-4">
@@ -3103,6 +3246,9 @@
       if (document.getElementById('quickTarget')) document.getElementById('quickTarget').textContent = Math.round(target) + ' unit';
       if (document.getElementById('quickActual')) document.getElementById('quickActual').textContent = Math.round(actual) + ' unit';
       if (document.getElementById('quickAch')) document.getElementById('quickAch').textContent = ach.toFixed(0) + '%';
+
+      // Update NPS Card
+      updateNpsCard();
 
       // Sub-renderers
       renderUnitAchievementChart(isSatrio);
@@ -3900,6 +4046,29 @@
         renderRow("Target GP (Rp Jt)", gpTgt.map(v => Math.round(v)), Math.round(totGpTgt)),
         renderRow("Realisasi GP (Rp Jt)", gpAct.map(v => v > 0 ? Math.round(v) : '-'), Math.round(totGpAct)),
         renderRow("% Achievement GP", gpAch.map((v, idx) => gpAct[idx] > 0 ? v.toFixed(0) + '%' : '-'), totGpAch.toFixed(0) + '%', true),
+
+        // Section NPS (Sheet Data NPS)
+        renderRow("E. KEPUASAN PELANGGAN (DATA NPS)", [], "", false, true),
+        renderRow("Skor NPS (%)", (() => {
+          const npsDataMap = getNpsDataset();
+          const npsSpvKey = isSatrio ? 'SATRIYO KRESNO AJI' : 'YAMES REIMOND';
+          return months.map(m => {
+            let v;
+            if (currentSpv === 'ALL') {
+              const s = npsDataMap['SATRIYO KRESNO AJI']?.[m];
+              const y = npsDataMap['YAMES REIMOND']?.[m];
+              if (s != null && y != null) v = (s + y) / 2;
+              else v = (s != null) ? s : (y != null ? y : null);
+            } else {
+              v = npsDataMap[npsSpvKey]?.[m];
+            }
+            if (v == null) return '-';
+            return (v % 1 === 0 ? v : v.toFixed(1)) + '%';
+          });
+        })(), (() => {
+          const v = calculateNpsScore(currentSpv, months);
+          return (v % 1 === 0 ? v : v.toFixed(1)) + '%';
+        })(), true),
       ].join('');
     }
 
@@ -6899,6 +7068,202 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
       const input = document.getElementById('custCardQuickSearch');
       if (input) input.value = '';
       onCustomerNopolChange(nopol);
+    }
+
+
+    // --- NPS DATA & CALCULATION LOGIC (SHEET: DATA NPS) ---
+    const DEFAULT_DATA_NPS = {
+      "SATRIYO KRESNO AJI": {
+        "January": 100, "February": 100, "March": 100, "April": 100, "May": 100,
+        "June": 97, "July": 100, "August": 100, "September": 100, "October": 100,
+        "November": null, "December": null, "Total": 100
+      },
+      "YAMES REIMOND": {
+        "January": 100, "February": 100, "March": 100, "April": 100, "May": 100,
+        "June": 100, "July": 100, "August": 100, "September": 100, "October": 100,
+        "November": null, "December": null, "Total": 100
+      }
+    };
+
+    function getNpsDataset() {
+      return (appData && appData.data_nps) ? appData.data_nps : DEFAULT_DATA_NPS;
+    }
+
+    function calculateNpsScore(spv, activeMonths) {
+      const npsData = getNpsDataset();
+      const satrioData = npsData["SATRIYO KRESNO AJI"] || {};
+      const yamesData = npsData["YAMES REIMOND"] || {};
+
+      let validScores = [];
+      const isAll = (spv === 'ALL');
+      const isSatrio = (spv === 'SATRIYO KRESNO AJI');
+      const isYames = (spv === 'YAMES' || spv === 'YAMES REIMOND');
+
+      activeMonths.forEach(m => {
+        if (isAll) {
+          const sVal = satrioData[m];
+          const yVal = yamesData[m];
+          let mVals = [];
+          if (typeof sVal === 'number') mVals.push(sVal);
+          if (typeof yVal === 'number') mVals.push(yVal);
+          if (mVals.length > 0) {
+            validScores.push(mVals.reduce((a, b) => a + b, 0) / mVals.length);
+          }
+        } else if (isSatrio) {
+          const val = satrioData[m];
+          if (typeof val === 'number') validScores.push(val);
+        } else if (isYames) {
+          const val = yamesData[m];
+          if (typeof val === 'number') validScores.push(val);
+        }
+      });
+
+      if (validScores.length === 0) return 100;
+      const avg = validScores.reduce((a, b) => a + b, 0) / validScores.length;
+      return avg;
+    }
+
+    function updateNpsCard() {
+      const activeMonths = getActiveMonths();
+      const npsScore = calculateNpsScore(currentSpv, activeMonths);
+
+      const scoreEl = document.getElementById('scNpsScore');
+      if (scoreEl) {
+        // Display integer or 1 decimal if not whole
+        scoreEl.textContent = (npsScore % 1 === 0) ? (npsScore + '%') : (npsScore.toFixed(1) + '%');
+      }
+
+      const tagEl = document.getElementById('scNpsPeriodTag');
+      if (tagEl) {
+        if (currentMode === 'MONTH') {
+          tagEl.textContent = 'BULANAN';
+          tagEl.className = 'text-[10px] font-black uppercase px-2 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-300';
+        } else if (currentMode === 'YTM') {
+          tagEl.textContent = 'YTM';
+          tagEl.className = 'text-[10px] font-black uppercase px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-300';
+        } else if (currentMode === 'QUARTER') {
+          tagEl.textContent = currentPeriod || 'KUARTAL';
+          tagEl.className = 'text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300';
+        }
+      }
+
+      const badgeEl = document.getElementById('scNpsBadge');
+      if (badgeEl) {
+        if (npsScore >= 95) {
+          badgeEl.textContent = `${(npsScore % 1 === 0 ? npsScore : npsScore.toFixed(1))}% Excellent ★★★★★`;
+          badgeEl.className = 'px-2 py-0.5 rounded font-extrabold text-[10px] bg-emerald-500/10 text-emerald-600 border border-emerald-500/20';
+        } else if (npsScore >= 90) {
+          badgeEl.textContent = `${npsScore.toFixed(1)}% Good ★★★★☆`;
+          badgeEl.className = 'px-2 py-0.5 rounded font-extrabold text-[10px] bg-blue-500/10 text-blue-600 border border-blue-500/20';
+        } else {
+          badgeEl.textContent = `${npsScore.toFixed(1)}% Perlu Peningkatan`;
+          badgeEl.className = 'px-2 py-0.5 rounded font-extrabold text-[10px] bg-red-500/10 text-red-600 border border-red-500/20';
+        }
+      }
+
+      const spvLabel = document.getElementById('scNpsSpvLabel');
+      if (spvLabel) {
+        if (currentSpv === 'ALL') {
+          spvLabel.textContent = 'SPV: SEMUA CABANG';
+        } else if (currentSpv === 'YAMES' || currentSpv === 'YAMES REIMOND') {
+          spvLabel.textContent = 'SPV: YAMES REIMOND';
+        } else {
+          spvLabel.textContent = 'SPV: SATRIYO K. A.';
+        }
+      }
+    }
+
+    function openNpsModal() {
+      const modal = document.getElementById('npsDetailModal');
+      if (!modal) return;
+      renderNpsModalTable();
+      modal.classList.remove('hidden');
+    }
+
+    function closeNpsModal() {
+      const modal = document.getElementById('npsDetailModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderNpsModalTable() {
+      const npsData = getNpsDataset();
+      const satrio = npsData["SATRIYO KRESNO AJI"] || {};
+      const yames = npsData["YAMES REIMOND"] || {};
+      const months = MONTHS.slice(0, 10); // Jan - Oct
+
+      // Active status info
+      const spvTitle = (currentSpv === 'ALL') ? 'Semua SPV (Cabang Bekasi)' : (currentSpv === 'YAMES' ? 'Yames Reimond' : currentSpv);
+      const activeScore = calculateNpsScore(currentSpv, getActiveMonths());
+      
+      const spvEl = document.getElementById('modalNpsSpv');
+      if (spvEl) spvEl.textContent = spvTitle;
+      const scoreEl = document.getElementById('modalNpsActiveScore');
+      if (scoreEl) scoreEl.textContent = (activeScore % 1 === 0 ? activeScore : activeScore.toFixed(1)) + '%';
+
+      const tbody = document.getElementById('modalNpsTableBody');
+      if (!tbody) return;
+
+      const satrioYtm = calculateNpsScore('SATRIYO KRESNO AJI', months);
+      const yamesYtm = calculateNpsScore('YAMES', months);
+      const allYtm = calculateNpsScore('ALL', months);
+
+      const rows = [
+        {
+          name: "SATRIYO KRESNO AJI",
+          isCur: (currentSpv === 'SATRIYO KRESNO AJI'),
+          badge: "Supervisor Aktif",
+          scores: months.map(m => satrio[m]),
+          ytm: satrioYtm
+        },
+        {
+          name: "YAMES REIMOND",
+          isCur: (currentSpv === 'YAMES' || currentSpv === 'YAMES REIMOND'),
+          badge: "Supervisor",
+          scores: months.map(m => yames[m]),
+          ytm: yamesYtm
+        },
+        {
+          name: "RATA-RATA CABANG BEKASI",
+          isCur: (currentSpv === 'ALL'),
+          badge: "Konsolidasi Cabang",
+          scores: months.map((m, i) => {
+            const s = satrio[m]; const y = yames[m];
+            if (s != null && y != null) return (s + y) / 2;
+            return s != null ? s : y;
+          }),
+          ytm: allYtm
+        }
+      ];
+
+      tbody.innerHTML = rows.map((r, idx) => {
+        const bgRow = r.isCur ? 'bg-emerald-50/80 font-bold border-l-4 border-emerald-500' : (idx === 2 ? 'bg-slate-100 font-black' : 'hover:bg-slate-50');
+        const scoreCells = r.scores.map(s => {
+          if (s == null) return '<td class="py-2.5 px-2 text-center text-slate-400 font-mono text-[11px]">-</td>';
+          const isJunDrop = (s < 100);
+          const colorCls = isJunDrop ? 'text-amber-600 font-extrabold' : 'text-emerald-700 font-bold';
+          return `<td class="py-2.5 px-2 text-center font-mono text-xs ${colorCls}">${s % 1 === 0 ? s : s.toFixed(1)}%</td>`;
+        }).join('');
+
+        const ytmFormatted = (r.ytm % 1 === 0 ? r.ytm : r.ytm.toFixed(1)) + '%';
+
+        return `
+          <tr class="${bgRow} transition">
+            <td class="py-2.5 px-3">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-black text-slate-950">${r.name}</span>
+                ${r.isCur ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-600 text-white uppercase">Aktif</span>' : ''}
+              </div>
+            </td>
+            ${scoreCells}
+            <td class="py-2.5 px-3 text-right font-mono font-black text-xs text-blue-700 bg-blue-50/40">${ytmFormatted}</td>
+            <td class="py-2.5 px-3 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                &ge;90% Ach
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     // --- DATA CLEANSING INTERACTIVE TABLE LOGIC ---
