@@ -1071,22 +1071,382 @@
 
       </div>
 
-      <!-- SECTION 6: DATA CLEANSING INTERACTIVE TABLE (Sesuai Permintaan User) -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <!-- SECTION 6: DATA CLEANSING INTERACTIVE TABLE & REKONSILIASI DATABASE -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-6">
         
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <div class="flex items-center gap-2">
               <i data-lucide="database" class="w-5 h-5 text-emerald-600"></i>
-              <h3 class="font-extrabold text-slate-950 text-base">DATA Cleansing — Database Master Pelanggan</h3>
+              <h3 class="font-extrabold text-slate-950 text-base">DATA Cleansing — Database Master Pelanggan & Audit Kolom A & B</h3>
             </div>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Data sheet <strong>DATA Cleansing (gid 921666428)</strong>. Klik tombol <strong>"Lihat Customer Card"</strong> pada baris manapun untuk langsung memuat data mobil tersebut ke Dashboard di atas.
+            <p class="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
+              Data terintegrasi sheet <strong>DATA Cleansing (gid 921666428)</strong>. Menampilkan audit konsolidasi total database kendaraan, validasi Customer ID unik (Kolom A), dan indeks baris unit (Kolom B).
             </p>
           </div>
-          <div class="flex items-center gap-2">
-            <span id="cleansingTotalBadge" class="px-3 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-800 border border-blue-200">20.555 Pelanggan</span>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-3 py-1.5 rounded-xl text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-sm flex items-center gap-1.5">
+              <i data-lucide="database" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>Total Database: 20.555 Unit</span>
+            </span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-black bg-blue-50 text-blue-800 border border-blue-300 shadow-sm flex items-center gap-1.5">
+              <i data-lucide="users" class="w-3.5 h-3.5 text-blue-600"></i>
+              <span>Customer ID (Kolom A): 15.585 Unik</span>
+            </span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-black bg-indigo-50 text-indigo-800 border border-indigo-300 shadow-sm flex items-center gap-1.5">
+              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-indigo-600"></i>
+              <span>CUST ID ROW (Kolom B): 20.555 Entri</span>
+            </span>
           </div>
+        </div>
+
+
+        <!-- SUB-SECTION 6A: RINGKASAN DATABASE & REKONSILIASI CUSTOMER ID (KOLOM A & B) -->
+        <div class="space-y-4 pt-1">
+          
+          <!-- 4 KPI Highlight Cards: Sheet DATA Cleansing (Kolom A & B) -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            
+            <!-- Card 1: Total Database Record -->
+            <div class="bg-gradient-to-br from-slate-50 to-emerald-50/40 p-4 rounded-xl border border-emerald-200/80 shadow-sm relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Database Record</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">Sheet Cleansing</span>
+              </div>
+              <div class="text-2xl font-black text-emerald-700 mt-1">20.555 <span class="text-xs font-bold text-slate-500">Unit</span></div>
+              <p class="text-[11px] text-slate-600 mt-1 flex items-center gap-1">
+                <i data-lucide="layers" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <span>Total baris kendaraan terdaftar di spreadsheet</span>
+              </p>
+            </div>
+
+            <!-- Card 2: Jumlah Customer ID Unik (Kolom A) -->
+            <div class="bg-gradient-to-br from-slate-50 to-blue-50/40 p-4 rounded-xl border border-blue-200/80 shadow-sm relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Customer ID (Kolom A)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-300">Kolom A: CUST ID</span>
+              </div>
+              <div class="text-2xl font-black text-blue-700 mt-1">15.585 <span class="text-xs font-bold text-slate-500">Pelanggan</span></div>
+              <p class="text-[11px] text-slate-600 mt-1 flex items-center gap-1">
+                <i data-lucide="users" class="w-3.5 h-3.5 text-blue-600"></i>
+                <span>Jumlah Customer ID unik (Format CSTBK)</span>
+              </p>
+            </div>
+
+            <!-- Card 3: Total Baris ID Terindeks (Kolom B) -->
+            <div class="bg-gradient-to-br from-slate-50 to-indigo-50/40 p-4 rounded-xl border border-indigo-200/80 shadow-sm relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">CUST ID ROW (Kolom B)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-indigo-100 text-indigo-800 border border-indigo-300">Kolom B: Index Row</span>
+              </div>
+              <div class="text-2xl font-black text-indigo-700 mt-1">20.555 <span class="text-xs font-bold text-slate-500">Entri</span></div>
+              <p class="text-[11px] text-slate-600 mt-1 flex items-center gap-1">
+                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-indigo-600"></i>
+                <span>Sub-ID kendaraan terindeks (20.245 ID unik)</span>
+              </p>
+            </div>
+
+            <!-- Card 4: Rasio Kepemilikan Unit -->
+            <div class="bg-gradient-to-br from-slate-50 to-amber-50/40 p-4 rounded-xl border border-amber-200/80 shadow-sm relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rasio Unit / Customer</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Retail & Fleet</span>
+              </div>
+              <div class="text-2xl font-black text-amber-700 mt-1">1,32 <span class="text-xs font-bold text-slate-500">Unit/ID</span></div>
+              <p class="text-[11px] text-slate-600 mt-1 flex items-center gap-1">
+                <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-amber-600"></i>
+                <span>89.8% Retail (1 Unit) &bull; 10.2% Fleet/Multi-Car</span>
+              </p>
+            </div>
+
+          </div>
+
+          <!-- TABEL 1: Rekonsiliasi Struktur Database & Validasi Kolom A & B -->
+          <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+            <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <i data-lucide="table-properties" class="w-4 h-4 text-slate-700"></i>
+                <span class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Tabel 1: Rekonsiliasi Struktur Database & Validasi Kolom A & B (Sheet DATA Cleansing)</span>
+              </div>
+              <span class="text-[11px] font-bold text-slate-500">Sumber: Google Sheets (gid 921666428) &bull; Kolom A s/d E</span>
+            </div>
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-[10px] font-black text-slate-700 uppercase border-b border-slate-200 tracking-wider">
+                  <th class="py-2.5 px-3 text-center w-12">No</th>
+                  <th class="py-2.5 px-3">Kolom Spreadsheet</th>
+                  <th class="py-2.5 px-4">Nama Field Header</th>
+                  <th class="py-2.5 px-3">Tipe & Fungsi Data</th>
+                  <th class="py-2.5 px-3 text-right">Total Terisi (Record)</th>
+                  <th class="py-2.5 px-3 text-right">Jumlah Nilai Unik</th>
+                  <th class="py-2.5 px-4">Contoh Nilai Kolom</th>
+                  <th class="py-2.5 px-4">Keterangan & Logika Database</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-slate-800">
+                <tr class="bg-blue-50/50 hover:bg-blue-50 transition">
+                  <td class="py-2.5 px-3 text-center font-bold text-blue-700">1</td>
+                  <td class="py-2.5 px-3 font-mono font-black text-blue-900">
+                    <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono font-bold">Kolom A</span>
+                  </td>
+                  <td class="py-2.5 px-4 font-black text-slate-950">
+                    CUST ID
+                    <span class="block text-[10px] font-normal text-blue-600">Master Identitas Pelanggan</span>
+                  </td>
+                  <td class="py-2.5 px-3 text-slate-700">ID Utama Pelanggan</td>
+                  <td class="py-2.5 px-3 text-right font-bold text-slate-900">20.555 <span class="text-[10px] text-emerald-600 font-semibold">(100%)</span></td>
+                  <td class="py-2.5 px-3 text-right font-black text-blue-700 text-sm">15.585 <span class="text-[10px] font-normal text-blue-500">ID Unik</span></td>
+                  <td class="py-2.5 px-4 font-mono text-[11px] text-slate-900">
+                    <code>CSTBK-0001</code>, <code>CSTBK-11131</code>
+                  </td>
+                  <td class="py-2.5 px-4 text-[11px] text-slate-600 leading-snug">
+                    <strong class="text-blue-900">1 Customer ID</strong> dapat memiliki lebih dari 1 mobil (retail tunggal atau armada fleet korporat).
+                  </td>
+                </tr>
+
+                <tr class="bg-indigo-50/40 hover:bg-indigo-50 transition">
+                  <td class="py-2.5 px-3 text-center font-bold text-indigo-700">2</td>
+                  <td class="py-2.5 px-3 font-mono font-black text-indigo-900">
+                    <span class="px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-mono font-bold">Kolom B</span>
+                  </td>
+                  <td class="py-2.5 px-4 font-black text-slate-950">
+                    CUST ID ROW
+                    <span class="block text-[10px] font-normal text-indigo-600">Indeks Sub-ID Kendaraan</span>
+                  </td>
+                  <td class="py-2.5 px-3 text-slate-700">Baris Unit per Customer</td>
+                  <td class="py-2.5 px-3 text-right font-bold text-slate-900">20.555 <span class="text-[10px] text-emerald-600 font-semibold">(100%)</span></td>
+                  <td class="py-2.5 px-3 text-right font-black text-indigo-700 text-sm">20.245 <span class="text-[10px] font-normal text-indigo-500">Index Unik</span></td>
+                  <td class="py-2.5 px-4 font-mono text-[11px] text-slate-900">
+                    <code>CSTBK-0001-1</code>, <code>CSTBK-0008-708</code>
+                  </td>
+                  <td class="py-2.5 px-4 text-[11px] text-slate-600 leading-snug">
+                    Format <code>[CUST ID]-[No Urut Unit]</code> menghubungkan setiap kendaraan secara spesifik ke customer di Kolom A.
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-slate-50 transition">
+                  <td class="py-2.5 px-3 text-center font-bold text-slate-400">3</td>
+                  <td class="py-2.5 px-3 font-mono font-bold text-slate-700">
+                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono">Kolom C</span>
+                  </td>
+                  <td class="py-2.5 px-4 font-bold text-slate-900">Equipment No.</td>
+                  <td class="py-2.5 px-3 text-slate-600">Nomor Rangka (VIN)</td>
+                  <td class="py-2.5 px-3 text-right font-bold text-slate-900">20.555 <span class="text-[10px] text-emerald-600 font-semibold">(100%)</span></td>
+                  <td class="py-2.5 px-3 text-right font-bold text-slate-900">20.555 <span class="text-[10px] font-normal text-slate-500">VIN Unik</span></td>
+                  <td class="py-2.5 px-4 font-mono text-[11px] text-slate-700"><code>MHFAB1BY2N0051115</code></td>
+                  <td class="py-2.5 px-4 text-[11px] text-slate-500">Kunci fisik pabrik Toyota (1 VIN = 1 Unit Kendaraan).</td>
+                </tr>
+
+                <tr class="hover:bg-slate-50 transition">
+                  <td class="py-2.5 px-3 text-center font-bold text-slate-400">4</td>
+                  <td class="py-2.5 px-3 font-mono font-bold text-slate-700">
+                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono">Kolom D</span>
+                  </td>
+                  <td class="py-2.5 px-4 font-bold text-slate-900">Police Reg No.</td>
+                  <td class="py-2.5 px-3 text-slate-600">Nomor Polisi (NOPOL)</td>
+                  <td class="py-2.5 px-3 text-right font-bold text-slate-900">20.244 <span class="text-[10px] text-slate-400 font-semibold">(98.5%)</span></td>
+                  <td class="py-2.5 px-3 text-right font-bold text-slate-900">20.244 <span class="text-[10px] font-normal text-slate-500">Nopol Unik</span></td>
+                  <td class="py-2.5 px-4 font-mono text-[11px] text-slate-700"><code>B1980FIB</code>, <code>B2609BKL</code></td>
+                  <td class="py-2.5 px-4 text-[11px] text-slate-500">Plat Samsat aktif; 311 unit dalam proses penerbitan STNK baru.</td>
+                </tr>
+
+                <tr class="hover:bg-slate-50 transition">
+                  <td class="py-2.5 px-3 text-center font-bold text-slate-400">5</td>
+                  <td class="py-2.5 px-3 font-mono font-bold text-slate-700">
+                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono">Kolom E</span>
+                  </td>
+                  <td class="py-2.5 px-4 font-bold text-slate-900">Customer Name</td>
+                  <td class="py-2.5 px-3 text-slate-600">Nama Pelanggan/PT</td>
+                  <td class="py-2.5 px-3 text-right font-bold text-slate-900">20.555 <span class="text-[10px] text-emerald-600 font-semibold">(100%)</span></td>
+                  <td class="py-2.5 px-3 text-right font-bold text-slate-900">13.829 <span class="text-[10px] font-normal text-slate-500">Nama Unik</span></td>
+                  <td class="py-2.5 px-4 text-[11px] text-slate-700 font-medium truncate max-w-[200px]">SILIUS MASAARO GIAWA</td>
+                  <td class="py-2.5 px-4 text-[11px] text-slate-500">Nama pemilik perorangan atau badan usaha/perusahaan fleet.</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="bg-slate-100/90 font-black text-slate-900 border-t-2 border-slate-300">
+                  <td colspan="4" class="py-3 px-4 uppercase tracking-wider text-right font-black">
+                    TOTAL KONSOLIDASI SHEET DATA CLEANSING:
+                  </td>
+                  <td class="py-3 px-3 text-right text-emerald-700 text-sm font-black">
+                    20.555 Unit
+                  </td>
+                  <td class="py-3 px-3 text-right text-blue-700 text-sm font-black">
+                    15.585 ID Pelanggan
+                  </td>
+                  <td colspan="2" class="py-3 px-4 text-xs font-semibold text-slate-600">
+                    100% Data Terverifikasi Sesuai Google Sheets
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- DUA TABEL PENDUKUNG: DISTRIBUSI KEPEMILIKAN (KOLOM A vs B) & TOP 5 FLEET -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-1">
+            
+            <!-- Tabel 2: Distribusi Kepemilikan Unit (Analisis Kolom A vs Kolom B) (7 cols) -->
+            <div class="lg:col-span-7 overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white">
+              <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="pie-chart" class="w-4 h-4 text-blue-600"></i>
+                  <span class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Tabel 2: Segmentasi Kepemilikan (Kolom A vs Kolom B)</span>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">15.585 ID &rarr; 20.555 Unit</span>
+              </div>
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-100 text-[10px] font-black text-slate-700 uppercase border-b border-slate-200">
+                    <th class="py-2 px-3">Kategori Kepemilikan</th>
+                    <th class="py-2 px-3 text-right">Customer ID (Kol. A)</th>
+                    <th class="py-2 px-3 text-right">% Customer</th>
+                    <th class="py-2 px-3 text-right">Unit Mobil (Kol. B)</th>
+                    <th class="py-2 px-3 text-right">% Unit</th>
+                    <th class="py-2 px-3 text-center">Tipe Segmentasi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-800">
+                  <tr class="hover:bg-slate-50">
+                    <td class="py-2 px-3 font-bold text-slate-900 flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                      <span>1 Unit (Retail / Single Car)</span>
+                    </td>
+                    <td class="py-2 px-3 text-right font-extrabold text-slate-900">13.991</td>
+                    <td class="py-2 px-3 text-right font-semibold text-blue-700">89,8%</td>
+                    <td class="py-2 px-3 text-right font-extrabold text-slate-900">13.991</td>
+                    <td class="py-2 px-3 text-right font-semibold text-blue-700">68,1%</td>
+                    <td class="py-2 px-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Retail Dominan</span></td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="py-2 px-3 font-bold text-slate-900 flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      <span>2 - 5 Unit (Multi-Vehicle Family)</span>
+                    </td>
+                    <td class="py-2 px-3 text-right font-extrabold text-slate-900">1.535</td>
+                    <td class="py-2 px-3 text-right font-semibold text-emerald-700">9,8%</td>
+                    <td class="py-2 px-3 text-right font-extrabold text-slate-900">3.288</td>
+                    <td class="py-2 px-3 text-right font-semibold text-emerald-700">16,0%</td>
+                    <td class="py-2 px-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Pelanggan Loyal</span></td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="py-2 px-3 font-bold text-slate-900 flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                      <span>6 - 20 Unit (Small Fleet Commercial)</span>
+                    </td>
+                    <td class="py-2 px-3 text-right font-extrabold text-slate-900">44</td>
+                    <td class="py-2 px-3 text-right font-semibold text-amber-700">0,3%</td>
+                    <td class="py-2 px-3 text-right font-extrabold text-slate-900">409</td>
+                    <td class="py-2 px-3 text-right font-semibold text-amber-700">2,0%</td>
+                    <td class="py-2 px-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Armada Usaha</span></td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="py-2 px-3 font-bold text-slate-900 flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                      <span>&gt; 20 Unit (Corporate & Large Fleet)</span>
+                    </td>
+                    <td class="py-2 px-3 text-right font-extrabold text-purple-700">14</td>
+                    <td class="py-2 px-3 text-right font-semibold text-purple-700">0,1%</td>
+                    <td class="py-2 px-3 text-right font-extrabold text-purple-700">2.556</td>
+                    <td class="py-2 px-3 text-right font-semibold text-purple-700">12,4%</td>
+                    <td class="py-2 px-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">Fleet Korporat</span></td>
+                  </tr>
+                  <tr class="hover:bg-slate-50 text-slate-500">
+                    <td class="py-2 px-3 font-medium flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                      <span>Data Tanpa ID (#N/A)</span>
+                    </td>
+                    <td class="py-2 px-3 text-right font-bold">1</td>
+                    <td class="py-2 px-3 text-right">0,0%</td>
+                    <td class="py-2 px-3 text-right font-bold">311</td>
+                    <td class="py-2 px-3 text-right">1,5%</td>
+                    <td class="py-2 px-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">Dalam Proses</span></td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="bg-slate-100 font-black text-slate-900 border-t border-slate-200">
+                    <td class="py-2 px-3 font-black">TOTAL KONSOLIDASI</td>
+                    <td class="py-2 px-3 text-right text-blue-700 font-black">15.585 ID</td>
+                    <td class="py-2 px-3 text-right font-black">100,0%</td>
+                    <td class="py-2 px-3 text-right text-emerald-700 font-black">20.555 Unit</td>
+                    <td class="py-2 px-3 text-right font-black">100,0%</td>
+                    <td class="py-2 px-3 text-center text-[10px] text-emerald-700 font-extrabold">Rasio 1,32 Unit/Cust</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <!-- Tabel 3: Top 5 Customer Fleet Terbesar di Sheet DATA Cleansing (5 cols) -->
+            <div class="lg:col-span-5 overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white">
+              <div class="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="building-2" class="w-4 h-4 text-purple-600"></i>
+                  <span class="text-xs font-extrabold text-slate-950 uppercase tracking-wider">Tabel 3: Top 5 Customer Fleet (Kolom A)</span>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800">Multi-Row Kolom B</span>
+              </div>
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-100 text-[10px] font-black text-slate-700 uppercase border-b border-slate-200">
+                    <th class="py-2 px-2 text-center">No</th>
+                    <th class="py-2 px-2">CUST ID (A)</th>
+                    <th class="py-2 px-3">Nama Customer Fleet</th>
+                    <th class="py-2 px-2 text-right">Total Unit (B)</th>
+                    <th class="py-2 px-2 text-center">Rentang Kolom B</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-800">
+                  <tr class="hover:bg-purple-50/40">
+                    <td class="py-2 px-2 text-center font-bold text-slate-400">1</td>
+                    <td class="py-2 px-2 font-mono font-extrabold text-purple-700">CSTBK-0008</td>
+                    <td class="py-2 px-3 font-extrabold text-slate-900 truncate max-w-[150px]" title="PT. TEKNOLOGI PENGANGKUTAN INDONESIA">PT. TEKNOLOGI PENGANGKUTAN INDONESIA</td>
+                    <td class="py-2 px-2 text-right font-black text-purple-700">982 <span class="text-[10px] font-normal text-slate-500">u</span></td>
+                    <td class="py-2 px-2 text-center font-mono text-[10px] text-slate-600">...-1 s/d ...-982</td>
+                  </tr>
+                  <tr class="hover:bg-purple-50/40">
+                    <td class="py-2 px-2 text-center font-bold text-slate-400">2</td>
+                    <td class="py-2 px-2 font-mono font-extrabold text-purple-700">CSTBK-0062</td>
+                    <td class="py-2 px-3 font-extrabold text-slate-900 truncate max-w-[150px]" title="PT. SURYA SUDECO">PT. SURYA SUDECO</td>
+                    <td class="py-2 px-2 text-right font-black text-purple-700">503 <span class="text-[10px] font-normal text-slate-500">u</span></td>
+                    <td class="py-2 px-2 text-center font-mono text-[10px] text-slate-600">...-1 s/d ...-503</td>
+                  </tr>
+                  <tr class="hover:bg-purple-50/40">
+                    <td class="py-2 px-2 text-center font-bold text-slate-400">3</td>
+                    <td class="py-2 px-2 font-mono font-extrabold text-purple-700">CSTBK-2496</td>
+                    <td class="py-2 px-3 font-extrabold text-slate-900 truncate max-w-[150px]" title="PT. BENGKALIS KUDA LAUT">PT. BENGKALIS KUDA LAUT</td>
+                    <td class="py-2 px-2 text-right font-black text-purple-700">262 <span class="text-[10px] font-normal text-slate-500">u</span></td>
+                    <td class="py-2 px-2 text-center font-mono text-[10px] text-slate-600">...-1 s/d ...-262</td>
+                  </tr>
+                  <tr class="hover:bg-purple-50/40">
+                    <td class="py-2 px-2 text-center font-bold text-slate-400">4</td>
+                    <td class="py-2 px-2 font-mono font-extrabold text-purple-700">CSTBK-6477</td>
+                    <td class="py-2 px-3 font-extrabold text-slate-900 truncate max-w-[150px]" title="PT. MOVUS TECHNOLOGIES INDONESIA">PT. MOVUS TECHNOLOGIES INDONESIA</td>
+                    <td class="py-2 px-2 text-right font-black text-purple-700">197 <span class="text-[10px] font-normal text-slate-500">u</span></td>
+                    <td class="py-2 px-2 text-center font-mono text-[10px] text-slate-600">...-1 s/d ...-197</td>
+                  </tr>
+                  <tr class="hover:bg-purple-50/40">
+                    <td class="py-2 px-2 text-center font-bold text-slate-400">5</td>
+                    <td class="py-2 px-2 font-mono font-extrabold text-purple-700">CSTBK-3199</td>
+                    <td class="py-2 px-3 font-extrabold text-slate-900 truncate max-w-[150px]" title="PT. CSM CORPORATAMA">PT. CSM CORPORATAMA</td>
+                    <td class="py-2 px-2 text-right font-black text-purple-700">167 <span class="text-[10px] font-normal text-slate-500">u</span></td>
+                    <td class="py-2 px-2 text-center font-mono text-[10px] text-slate-600">...-1 s/d ...-167</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+        <!-- END SUB-SECTION 6A -->
+
+
+        <!-- SUB-SECTION 6B: PENCARIAN & RECORD LENGKAP DATA CLEANSING -->
+        <div class="pt-5 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <i data-lucide="search" class="w-4 h-4 text-blue-600"></i>
+            <h4 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider">Jelajahi Record Lengkap Database Pelanggan (Paginated Table)</h4>
+          </div>
+          <span id="cleansingTotalBadge" class="px-3 py-1 rounded-full text-xs font-black bg-slate-100 text-slate-700 border border-slate-200">20.555 Pelanggan Terdaftar</span>
         </div>
 
         <!-- Toolbar: Search & Model Filter -->
