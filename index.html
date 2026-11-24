@@ -171,9 +171,9 @@
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span id="syncStatusText">Data Preloaded Aktif</span>
+          <span id="syncStatusText">Menyinkronkan Google Sheets...</span>
           <span class="text-slate-300">|</span>
-          <span id="syncLastTime" class="text-slate-500 text-[11px] font-medium">Baru saja</span>
+          <span id="syncLastTime" class="text-slate-500 text-[11px] font-medium">Otomatis saat buka</span>
         </div>
 
         <!-- Sync Button -->
@@ -2921,14 +2921,31 @@
 
     // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', () => {
+      // 1. Hydrate cached live data from previous sync session if available
+      try {
+        const cachedStr = localStorage.getItem('tunas_live_app_data');
+        if (cachedStr) {
+          const cached = JSON.parse(cachedStr);
+          if (cached.rs_afi && cached.rs_afi.length > 0) appData.rs_afi = cached.rs_afi;
+          if (cached.dashboard_kpi) appData.dashboard_kpi = cached.dashboard_kpi;
+          if (cached.trade_in && cached.trade_in.length > 0) appData.trade_in = cached.trade_in;
+          if (cached.ar_data && cached.ar_data.length > 0) appData.ar_data = cached.ar_data;
+          if (cached.nco_data) appData.nco_data = cached.nco_data;
+          if (cached.data_nps) appData.data_nps = cached.data_nps;
+        }
+      } catch (e) {
+        console.warn('LocalStorage hydration error:', e);
+      }
+
       lucide.createIcons();
       initPeriodDropdown();
       loadSavedConfig();
       applyFilters();
       renderPolregTab();
       setupAutoSync();
-      // Auto-trigger live sync from Google Sheets on startup
-      setTimeout(triggerSync, 1000);
+
+      // 2. Auto-trigger live sync from Google Sheets IMMEDIATELY upon opening
+      triggerSync();
     });
 
     // --- TAB SWITCHING ---
@@ -4986,6 +5003,53 @@
       }
 
       renderARPaginationControls(totalPages);
+    }
+
+    function renderARPaginationControls(totalPages) {
+      const infoEl = document.getElementById('arPaginationInfo');
+      const btnsEl = document.getElementById('arPaginationButtons');
+      const totalRows = filteredARDataCache ? filteredARDataCache.length : 0;
+      
+      if (infoEl) {
+        if (totalRows === 0) {
+          infoEl.textContent = 'Menampilkan 0 dari 0 transaksi';
+        } else {
+          const start = (currentARPage - 1) * AR_PAGE_SIZE + 1;
+          const end = Math.min(currentARPage * AR_PAGE_SIZE, totalRows);
+          infoEl.textContent = `Menampilkan ${start} - ${end} dari ${totalRows.toLocaleString('id-ID')} transaksi`;
+        }
+      }
+      
+      if (btnsEl) {
+        if (totalPages <= 1) {
+          btnsEl.innerHTML = '';
+          return;
+        }
+        let btnsHtml = `
+          <button onclick="changeARPage(${currentARPage - 1})" ${currentARPage <= 1 ? 'disabled' : ''} class="px-2.5 py-1 rounded border border-slate-200 text-xs font-semibold ${currentARPage <= 1 ? 'opacity-40 cursor-not-allowed bg-slate-50 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-700'}">
+            &laquo; Prev
+          </button>
+        `;
+        const maxPagesToShow = 5;
+        let startPage = Math.max(1, currentARPage - 2);
+        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+        if (endPage - startPage < maxPagesToShow - 1) {
+          startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        }
+        for (let p = startPage; p <= endPage; p++) {
+          btnsHtml += `
+            <button onclick="changeARPage(${p})" class="px-2.5 py-1 rounded border text-xs font-semibold ${p === currentARPage ? 'bg-red-600 text-white border-red-600 shadow-xs' : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'}">
+              ${p}
+            </button>
+          `;
+        }
+        btnsHtml += `
+          <button onclick="changeARPage(${currentARPage + 1})" ${currentARPage >= totalPages ? 'disabled' : ''} class="px-2.5 py-1 rounded border border-slate-200 text-xs font-semibold ${currentARPage >= totalPages ? 'opacity-40 cursor-not-allowed bg-slate-50 text-slate-400' : 'bg-white hover:bg-slate-100 text-slate-700'}">
+            Next &raquo;
+          </button>
+        `;
+        btnsEl.innerHTML = btnsHtml;
+      }
     }
 
     // --- TAB 6: FINANCIAL PERFORMANCE ---
@@ -7418,6 +7482,35 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
       });
     }
 
+    function parseGvizToNps(table) {
+      if (!table || !table.rows) return null;
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const npsObj = {};
+      table.rows.forEach(r => {
+        if (!r.c || !r.c[0]) return;
+        const spv = String(r.c[0].v || '').trim().toUpperCase();
+        if (!spv) return;
+        npsObj[spv] = {};
+        months.forEach((m, idx) => {
+          const cell = r.c[idx + 1];
+          let val = (cell && cell.v !== null && cell.v !== undefined) ? cell.v : null;
+          if (typeof val === 'number') {
+            if (val <= 1.0) val = Math.round(val * 100);
+            else val = Math.round(val);
+          }
+          npsObj[spv][m] = val;
+        });
+        const totCell = r.c[13];
+        let totVal = (totCell && totCell.v !== null && totCell.v !== undefined) ? totCell.v : null;
+        if (typeof totVal === 'number') {
+          if (totVal <= 1.0) totVal = Math.round(totVal * 100);
+          else totVal = Math.round(totVal);
+        }
+        npsObj[spv]['Total'] = totVal;
+      });
+      return npsObj;
+    }
+
     function parseGvizToCustomerCard(table) {
       if (!table || !table.rows) return;
       const getVal = (r, c) => {
@@ -7471,6 +7564,8 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
       const customUrl = localStorage.getItem('tunas_sheets_sync_url');
       const icon = document.getElementById('syncIcon');
       if (icon) icon.classList.add('animate-spin');
+      const badgeEl = document.getElementById('syncStatusText');
+      if (badgeEl) badgeEl.textContent = 'Menyinkronkan Google Sheets...';
 
       // Method 1: Jika user mengatur Google Apps Script Web App
       if (customUrl) {
@@ -7499,13 +7594,14 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
 
       // Method 2: Direct Live Google Sheets GViz via JSONP (No CORS, Zero Config)
       try {
-        const [dashTable, rsTable, tradeInTable, arTable, encTable, ccTable] = await Promise.all([
+        const [dashTable, rsTable, tradeInTable, arTable, encTable, ccTable, npsTable] = await Promise.all([
           fetchGvizJsonp('Dashboard Achievement').catch(err => { console.warn('Sync Dash err:', err); return null; }),
           fetchGvizJsonp('RS Bekasi').catch(err => { console.warn('Sync RS err:', err); return null; }),
           fetchGvizJsonp('Trade In').catch(err => { console.warn('Sync Trade In err:', err); return null; }),
           fetchGvizJsonp('AR').catch(err => { console.warn('Sync AR err:', err); return null; }),
           fetchGvizJsonp('eNCOmpare', '&headers=0').catch(err => { console.warn('Sync eNCOmpare err:', err); return null; }),
-          fetchCustomerCardLive().catch(err => { console.warn('Sync Customer Card err:', err); return null; })
+          fetchCustomerCardLive().catch(err => { console.warn('Sync Customer Card err:', err); return null; }),
+          fetchGvizJsonp('Data NPS').catch(err => { console.warn('Sync NPS err:', err); return null; })
         ]);
 
         let hasAnyUpdate = false;
@@ -7559,6 +7655,14 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
           hasAnyUpdate = true;
         }
 
+        if (npsTable) {
+          const liveNps = parseGvizToNps(npsTable);
+          if (liveNps && Object.keys(liveNps).length > 0) {
+            appData.data_nps = liveNps;
+            hasAnyUpdate = true;
+          }
+        }
+
         if (hasAnyUpdate) {
           try {
             localStorage.setItem('tunas_live_app_data', JSON.stringify({
@@ -7567,6 +7671,7 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
               trade_in: appData.trade_in,
               ar_data: appData.ar_data,
               nco_data: appData.nco_data,
+              data_nps: appData.data_nps,
               timestamp: Date.now()
             }));
           } catch (e) {
