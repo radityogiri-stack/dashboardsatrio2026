@@ -1448,7 +1448,6 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             <i data-lucide="search" class="w-4 h-4 text-blue-600"></i>
             <h4 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider">Jelajahi Record Lengkap Database Pelanggan (Paginated Table)</h4>
           </div>
-          <span id="cleansingTotalBadge" class="px-3 py-1 rounded-full text-xs font-black bg-slate-100 text-slate-700 border border-slate-200">20.555 Pelanggan Terdaftar</span>
         </div>
 
         <!-- Toolbar: Search & Model Filter -->
@@ -7354,9 +7353,6 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
         }
         return true;
       });
-
-      const totalBadge = document.getElementById('cleansingTotalBadge');
-      if (totalBadge) totalBadge.textContent = `${(ccData.total_cleansing_rows || 20555).toLocaleString('id-ID')} Pelanggan Terdaftar`;
 
       const totalFilteredEl = document.getElementById('cleansingTotalFiltered');
       if (totalFilteredEl) totalFilteredEl.textContent = filtered.length.toLocaleString('id-ID');
