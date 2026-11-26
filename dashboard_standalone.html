@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -2933,6 +2933,10 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           if (cached.trade_in && cached.trade_in.length > 0) appData.trade_in = cached.trade_in;
           if (cached.ar_data && cached.ar_data.length > 0) appData.ar_data = cached.ar_data;
           if (cached.nco_data) appData.nco_data = cached.nco_data;
+          if (cached.nco_live_data) {
+            appData.nco_live_data = cached.nco_live_data;
+            window.encompareLiveData = cached.nco_live_data;
+          }
           if (cached.data_nps) appData.data_nps = cached.data_nps;
         }
       } catch (e) {
@@ -2944,6 +2948,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       loadSavedConfig();
       applyFilters();
       renderPolregTab();
+      if (typeof renderEncompareTab === 'function') renderEncompareTab();
       setupAutoSync();
 
       // 2. Auto-trigger live sync from Google Sheets IMMEDIATELY upon opening
@@ -2971,6 +2976,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       setTimeout(() => {
         if (tabId === 'tabEncompare') {
           renderEncompareTab();
+          if (typeof fetchLiveEncompareSheet === 'function') fetchLiveEncompareSheet();
         }
         if (tabId === 'tabCustomerCard') {
           renderCustomerCardTab();
@@ -6086,8 +6092,6 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
     function renderEncompareTab() {
       const ncoData = appData.nco_data || (window.PRELOADED_DASHBOARD_DATA && window.PRELOADED_DASHBOARD_DATA.nco_data);
-      if (!ncoData) return;
-
       const selToyota = document.getElementById('ncoToyotaSelect');
       const selNonToyota = document.getElementById('ncoNonToyotaSelect');
       const selUsage = document.getElementById('ncoUsageYear');
@@ -6095,7 +6099,8 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
       if (selToyota && selToyota.options.length <= 1) {
         selToyota.innerHTML = '';
-        Object.keys(ncoData.toyota_models || {}).forEach(name => {
+        const toyModels = (ncoData && ncoData.toyota_models) ? Object.keys(ncoData.toyota_models) : ['NEW VELOZ Q HYBRID', 'YARIS CROSS HYBRID', 'INNOVA ZENIX HYBRID'];
+        toyModels.forEach(name => {
           const opt = document.createElement('option');
           opt.value = name;
           opt.textContent = name;
@@ -6106,7 +6111,8 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
 
       if (selNonToyota && selNonToyota.options.length <= 1) {
         selNonToyota.innerHTML = '';
-        Object.keys(ncoData.non_toyota_models || {}).forEach(name => {
+        const nonToyModels = (ncoData && ncoData.non_toyota_models) ? Object.keys(ncoData.non_toyota_models) : ['BYD M6', 'HYUNDAI KONA EV', 'WULING BINGUO EV', 'CHERY OMODA E5'];
+        nonToyModels.forEach(name => {
           const opt = document.createElement('option');
           opt.value = name;
           opt.textContent = name;
@@ -6143,16 +6149,20 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
     }
 
     function recalculateEncompare() {
+      const live = appData.nco_live_data || window.encompareLiveData;
       const ncoData = appData.nco_data || (window.PRELOADED_DASHBOARD_DATA && window.PRELOADED_DASHBOARD_DATA.nco_data);
-      if (!ncoData) return;
 
       const years = parseInt(window.encompareState.usageYear) || 3;
       const kmDay = parseFloat(window.encompareState.mileageDay) || 60;
       const tKey = window.encompareState.toyotaModel || 'NEW VELOZ Q HYBRID';
       const ntKey = window.encompareState.nonToyotaModel || 'BYD M6';
 
-      const days = years * 365;
-      const totalKm = days * kmDay;
+      const sheetUsage = live ? (live.usageYear || 3) : 3;
+      const sheetMileage = live ? (live.mileageDay || 60) : 60;
+      const isExactSheetMatch = (years === sheetUsage && kmDay === sheetMileage);
+
+      const days = (live && live.daysCount && isExactSheetMatch) ? live.daysCount : (years * 365);
+      const totalKm = (live && live.totalKm && isExactSheetMatch) ? live.totalKm : (days * kmDay);
 
       // Update counters
       const daysEl = document.getElementById('ncoDaysCount');
@@ -6166,7 +6176,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       const thNonToyota = document.getElementById('thNonToyotaModelName');
       if (thNonToyota) thNonToyota.textContent = ntKey;
 
-      const tMod = (ncoData.toyota_models && ncoData.toyota_models[tKey]) || {
+      const tMod = (ncoData && ncoData.toyota_models && ncoData.toyota_models[tKey]) || {
         otr: 325000000,
         power_source: 'Intern. Comb Engine + Electric Motor',
         tax_year: 5529000,
@@ -6177,7 +6187,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         own_risk: 3000000
       };
 
-      const ntMod = (ncoData.non_toyota_models && ncoData.non_toyota_models[ntKey]) || {
+      const ntMod = (ncoData && ncoData.non_toyota_models && ncoData.non_toyota_models[ntKey]) || {
         otr: 433000000,
         power_source: 'Electric Motor',
         tax_year: 27000000,
@@ -6185,58 +6195,123 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
         maintenance: { 1: 0, 2: 0, 3: 16000000, 4: 16000000, 5: 16000000 },
         resale_value: { 1: 346400000, 2: 303100000, 3: 259800000, 4: 216500000, 5: 173200000 },
         own_risk: 3000000,
-        charging_cost_spreadsheet: 11853375000
+        charging_cost_spreadsheet: 19162500
       };
 
-      const interestRates = ncoData.interest_rates || { 1: 0.03, 2: 0.06, 3: 0.12, 4: 0.20, 5: 0.30 };
-      const rate = interestRates[years] || 0.12;
+      const interestRates = (ncoData && ncoData.interest_rates) || { 1: 0.03, 2: 0.06, 3: 0.12, 4: 0.20, 5: 0.30 };
+      const rate = (live && typeof live.leasingRate === 'number' && live.leasingRate > 0 && isExactSheetMatch)
+        ? live.leasingRate
+        : (interestRates[years] || 0.12);
 
-      // --- TOYOTA MATH ---
-      const tOtr = tMod.otr;
-      const tMaint = (tMod.maintenance && (tMod.maintenance[years] !== undefined ? tMod.maintenance[years] : tMod.maintenance[String(years)])) || 10000000;
-      const tTaxYr = tMod.tax_year || 5529000;
-      const tTax = tTaxYr * years;
-      const tFuelCons = tMod.fuel_consumption || 22;
-      const tFuelCostPerL = tMod.gasoline_cost || 12300;
-      const tFuelTotal = Math.round((totalKm / tFuelCons) * tFuelCostPerL);
-      const tDpLeasing = Math.round(tOtr * 0.2);
-      const tLeasing = Math.round((tOtr * 0.8) * rate);
-      const tOwnRisk = tMod.own_risk || 3000000;
-      const tCoe = tOtr + tMaint + tTax + tFuelTotal + tLeasing + tOwnRisk;
-      const tRv = (tMod.resale_value && (tMod.resale_value[years] !== undefined ? tMod.resale_value[years] : tMod.resale_value[String(years)])) || Math.round(tOtr * 0.84);
-      const tDeprec = tOtr > 0 ? (((tRv - tOtr) / tOtr) * 100) : 0;
-      const tNco = tCoe - tRv;
-      const tNcoYr = Math.round(tNco / years);
-      const tNcoMo = Math.round(tNco / (years * 12));
-      const tNcoDay = Math.round(tNcoMo / 31);
+      // Baseline values directly updated from live spreadsheet when available
+      let tOtr, ntOtr, tMaint, ntMaint, tTax, ntTax, tTaxYr, ntTaxYr, tFuelTotal, ntCharging;
+      let tFuelCostPerL, tFuelCons, ntChargingCostPerFull, ntRange, tDpLeasing, ntDpLeasing;
+      let tLeasing, ntLeasing, tOwnRisk, ntOwnRisk, tCoe, ntCoe, tRv, ntRv, tDeprec, ntDeprec;
+      let tNco, ntNco, tNcoYr, ntNcoYr, tNcoMo, ntNcoMo, tNcoDay, ntNcoDay;
 
-      // --- NON TOYOTA MATH ---
-      const ntOtr = ntMod.otr;
-      const ntMaint = (ntMod.maintenance && (ntMod.maintenance[years] !== undefined ? ntMod.maintenance[years] : ntMod.maintenance[String(years)])) || 16000000;
-      const ntTaxYr = ntMod.tax_year || 27000000;
-      const ntTax = ntTaxYr * years;
-      const ntCharging = ntMod.charging_cost_spreadsheet || 11853375000;
-      const ntRange = ntMod.range_km || 480;
-      const ntDpLeasing = Math.round(ntOtr * 0.2);
-      const ntLeasing = Math.round((ntOtr * 0.8) * rate);
-      const ntOwnRisk = ntMod.own_risk || 3000000;
-      const ntCoe = ntOtr + ntMaint + ntTax + ntCharging + ntLeasing + ntOwnRisk;
-      const ntRv = (ntMod.resale_value && (ntMod.resale_value[years] !== undefined ? ntMod.resale_value[years] : ntMod.resale_value[String(years)])) || Math.round(ntOtr * 0.60);
-      const ntDeprec = ntOtr > 0 ? (((ntRv - ntOtr) / ntOtr) * 100) : 0;
-      const ntNco = ntCoe - ntRv;
-      const ntNcoYr = Math.round(ntNco / years);
-      const ntNcoMo = Math.round(ntNco / (years * 12));
-      const ntNcoDay = Math.round(ntNcoMo / 31);
+      if (live && isExactSheetMatch) {
+        // --- 100% DIRECT FROM SPREADSHEET NUMBERS ---
+        tOtr = (live.otrToyota !== null) ? live.otrToyota : tMod.otr;
+        ntOtr = (live.otrNonToyota !== null) ? live.otrNonToyota : ntMod.otr;
+        tMaint = (live.maintToyota !== null) ? live.maintToyota : 10000000;
+        ntMaint = (live.maintNonToyota !== null) ? live.maintNonToyota : 16000000;
+        tTax = (live.taxToyota !== null) ? live.taxToyota : (5529000 * years);
+        ntTax = (live.taxNonToyota !== null) ? live.taxNonToyota : (143000 * years);
+        tTaxYr = (live.taxToyotaYr !== null) ? live.taxToyotaYr : Math.round(tTax / years);
+        ntTaxYr = (live.taxNonToyotaYr !== null) ? live.taxNonToyotaYr : Math.round(ntTax / years);
+        tFuelTotal = (live.fuelToyota !== null) ? live.fuelToyota : Math.round((totalKm / 22) * 12300);
+        ntCharging = (live.fuelNonToyota !== null) ? live.fuelNonToyota : 19162500;
+        tFuelCostPerL = (live.gasolineCost !== null) ? live.gasolineCost : 12300;
+        tFuelCons = (live.fuelCons !== null) ? live.fuelCons : 22;
+        ntChargingCostPerFull = (live.chargingCost !== null) ? live.chargingCost : 140000;
+        ntRange = (live.rangeKm !== null) ? live.rangeKm : 480;
+        tDpLeasing = (live.dpToyota !== null) ? live.dpToyota : Math.round(tOtr * 0.2);
+        ntDpLeasing = (live.dpNonToyota !== null) ? live.dpNonToyota : Math.round(ntOtr * 0.2);
+        tLeasing = (live.leasingToyota !== null) ? live.leasingToyota : Math.round((tOtr * 0.8) * rate);
+        ntLeasing = (live.leasingNonToyota !== null) ? live.leasingNonToyota : Math.round((ntOtr * 0.8) * rate);
+        tOwnRisk = (live.ownRiskToyota !== null) ? live.ownRiskToyota : 3000000;
+        ntOwnRisk = (live.ownRiskNonToyota !== null) ? live.ownRiskNonToyota : 3000000;
+        tCoe = (live.coeToyota !== null) ? live.coeToyota : (tOtr + tMaint + tTax + tFuelTotal + tLeasing + tOwnRisk);
+        ntCoe = (live.coeNonToyota !== null) ? live.coeNonToyota : (ntOtr + ntMaint + ntTax + ntCharging + ntLeasing + ntOwnRisk);
+        tRv = (live.rvToyota !== null) ? live.rvToyota : Math.round(tOtr * 0.84);
+        ntRv = (live.rvNonToyota !== null) ? live.rvNonToyota : Math.round(ntOtr * 0.60);
+        
+        // Depreciation calculation from spreadsheet
+        if (live.deprecToyota !== null) {
+          const raw = live.deprecToyota;
+          tDeprec = Math.abs(raw) <= 1 ? (raw * 100) : raw;
+        } else {
+          tDeprec = tOtr > 0 ? (((tRv - tOtr) / tOtr) * 100) : -16.0;
+        }
 
-      const formatRp = (num) => 'Rp ' + Math.round(num).toLocaleString('id-ID');
-      const formatPct = (num) => (num > 0 ? '+' : '') + num.toFixed(2).replace('.', ',') + '%';
+        if (live.deprecNonToyota !== null) {
+          const raw = live.deprecNonToyota;
+          ntDeprec = Math.abs(raw) <= 1 ? (raw * 100) : raw;
+        } else {
+          ntDeprec = ntOtr > 0 ? (((ntRv - ntOtr) / ntOtr) * 100) : -40.0;
+        }
 
-      // --- RENDER TABLE ROWS ---
+        tNco = (live.ncoToyota !== null) ? live.ncoToyota : (tCoe - tRv);
+        ntNco = (live.ncoNonToyota !== null) ? live.ncoNonToyota : (ntCoe - ntRv);
+        tNcoYr = (live.ncoYrToyota !== null) ? live.ncoYrToyota : Math.round(tNco / years);
+        ntNcoYr = (live.ncoYrNonToyota !== null) ? live.ncoYrNonToyota : Math.round(ntNco / years);
+        tNcoMo = (live.ncoMoToyota !== null) ? live.ncoMoToyota : Math.round(tNco / (years * 12));
+        ntNcoMo = (live.ncoMoNonToyota !== null) ? live.ncoMoNonToyota : Math.round(ntNco / (years * 12));
+        tNcoDay = (live.ncoDayToyota !== null) ? live.ncoDayToyota : Math.round(tNcoMo / 31);
+        ntNcoDay = (live.ncoDayNonToyota !== null) ? live.ncoDayNonToyota : Math.round(ntNcoMo / 31);
+      } else {
+        // --- DYNAMIC SIMULATION SCALED FROM LATEST SPREADSHEET BASELINES ---
+        tOtr = (live && live.otrToyota) || tMod.otr;
+        ntOtr = (live && live.otrNonToyota) || ntMod.otr;
+        tTaxYr = (live && live.taxToyotaYr) || tMod.tax_year || 5529000;
+        ntTaxYr = (live && live.taxNonToyotaYr) || 143000;
+        tTax = tTaxYr * years;
+        ntTax = ntTaxYr * years;
+        tFuelCons = (live && live.fuelCons) || tMod.fuel_consumption || 22;
+        tFuelCostPerL = (live && live.gasolineCost) || tMod.gasoline_cost || 12300;
+        tFuelTotal = Math.round((totalKm / tFuelCons) * tFuelCostPerL);
+        ntRange = (live && live.rangeKm) || ntMod.range_km || 480;
+        ntChargingCostPerFull = (live && live.chargingCost) || 140000;
+        ntCharging = Math.round((totalKm / ntRange) * ntChargingCostPerFull);
+        tMaint = (live && live.maintToyota && live.usageYear) ? Math.round(live.maintToyota * (years / live.usageYear)) : 10000000;
+        ntMaint = (live && live.maintNonToyota && live.usageYear) ? Math.round(live.maintNonToyota * (years / live.usageYear)) : 16000000;
+        tDpLeasing = Math.round(tOtr * 0.2);
+        ntDpLeasing = Math.round(ntOtr * 0.2);
+        tLeasing = Math.round((tOtr * 0.8) * rate);
+        ntLeasing = Math.round((ntOtr * 0.8) * rate);
+        tOwnRisk = (live && live.ownRiskToyota) || tMod.own_risk || 3000000;
+        ntOwnRisk = (live && live.ownRiskNonToyota) || ntMod.own_risk || 3000000;
+        tCoe = tOtr + tMaint + tTax + tFuelTotal + tLeasing + tOwnRisk;
+        ntCoe = ntOtr + ntMaint + ntTax + ntCharging + ntLeasing + ntOwnRisk;
+        
+        const rvBaseRateToyota = (live && live.deprecToyota !== null) ? (1 + (live.deprecToyota < 0 ? live.deprecToyota : -live.deprecToyota) / 3 * years) : (1 - (0.16 / 3 * years));
+        const rvBaseRateNonToyota = (live && live.deprecNonToyota !== null) ? (1 + (live.deprecNonToyota < 0 ? live.deprecNonToyota : -live.deprecNonToyota) / 3 * years) : (1 - (0.40 / 3 * years));
+        tRv = Math.round(tOtr * Math.max(0.4, rvBaseRateToyota));
+        ntRv = Math.round(ntOtr * Math.max(0.2, rvBaseRateNonToyota));
+        tDeprec = tOtr > 0 ? (((tRv - tOtr) / tOtr) * 100) : -16.0;
+        ntDeprec = ntOtr > 0 ? (((ntRv - ntOtr) / ntOtr) * 100) : -40.0;
+        tNco = tCoe - tRv;
+        ntNco = ntCoe - ntRv;
+        tNcoYr = Math.round(tNco / years);
+        ntNcoYr = Math.round(ntNco / years);
+        tNcoMo = Math.round(tNco / (years * 12));
+        ntNcoMo = Math.round(ntNco / (years * 12));
+        tNcoDay = Math.round(tNcoMo / 31);
+        ntNcoDay = Math.round(ntNcoMo / 31);
+      }
+
+      const formatRp = (num) => 'Rp ' + Math.round(Number(num) || 0).toLocaleString('id-ID');
+      const formatPct = (num) => {
+        const n = Number(num) || 0;
+        return (n > 0 ? '+' : '') + n.toFixed(2).replace('.', ',') + '%';
+      };
+
+      // --- RENDER TABLE ROWS (EXACT MATRIX DARI SPREADSHEET) ---
       const rows = [
         {
           label: 'POWER SOURCE',
-          toyota: tMod.power_source || 'Intern. Comb Engine + Electric Motor',
-          nonToyota: ntMod.power_source || 'Electric Motor',
+          toyota: (live && live.powerSourceToyota) || tMod.power_source || 'Intern. Comb Engine + Electric Motor',
+          nonToyota: (live && live.powerSourceNonToyota) || ntMod.power_source || 'Electric Motor',
           bkToyota: '-',
           bkNonToyota: '-',
           isText: true
@@ -6268,7 +6343,7 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           toyota: formatRp(tFuelTotal),
           nonToyota: formatRp(ntCharging),
           bkToyota: `${formatRp(tFuelCostPerL)} / ${tFuelCons} km/L`,
-          bkNonToyota: `Rp 86.600.000 / ${ntRange} km`
+          bkNonToyota: `${formatRp(ntChargingCostPerFull)} / ${ntRange} km`
         },
         {
           label: 'LEASING RATES',
@@ -6288,8 +6363,8 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
           label: 'COE (Cost of Ownership Experience)',
           toyota: formatRp(tCoe),
           nonToyota: formatRp(ntCoe),
-          bkToyota: `Bunga: ${(rate * 100)}%`,
-          bkNonToyota: `Bunga: ${(rate * 100)}%`,
+          bkToyota: `Bunga: ${Math.round(rate * 100)}%`,
+          bkNonToyota: `Bunga: ${Math.round(rate * 100)}%`,
           cls: 'bg-slate-100 font-bold text-slate-900 border-y border-slate-200'
         },
         {
@@ -6363,7 +6438,55 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
       const otrNtJuta = Math.round(ntOtr / 1000000);
 
       const bulletList = document.getElementById('aiInsightList');
-      if (bulletList) {
+      const econEl = document.getElementById('aiMostEconomical');
+      const badgeEl = document.getElementById('aiDailySavingsBadge');
+
+      if (badgeEl) badgeEl.textContent = `${formatRp(savingsPerDay)} / Hari`;
+
+      // Render Insight from live spreadsheet if available and matching
+      if (live && live.insightText && live.insightText.length > 30 && isExactSheetMatch) {
+        const text = live.insightText;
+        const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+        const bulletItems = [];
+        let econFound = '';
+        let readingBullets = false;
+
+        lines.forEach(line => {
+          if (line.toUpperCase().includes('INSIGHT DAN REKOMENDASI') || line.toUpperCase().includes('INSIGHT & REKOMENDASI')) {
+            readingBullets = true;
+            return;
+          }
+          if (line.toUpperCase().startsWith('PILIHAN PALING EKONOMIS:')) {
+            econFound = line.replace(/PILIHAN PALING EKONOMIS:\s*/i, '').trim();
+            readingBullets = false;
+            return;
+          }
+          if (line.toUpperCase().includes('KEUNGGULAN UTAMA TOYOTA')) {
+            readingBullets = false;
+            return;
+          }
+          if (/^\d+\./.test(line)) {
+            const match = line.match(/^(\d+\.\s*[^:]+:)(.*)$/);
+            if (match) {
+              bulletItems.push(`<p><strong>${match[1]}</strong>${match[2]}</p>`);
+            } else {
+              bulletItems.push(`<p>${line}</p>`);
+            }
+          } else if (readingBullets && line.length > 10) {
+            bulletItems.push(`<p>${line}</p>`);
+          }
+        });
+
+        if (bulletItems.length > 0 && bulletList) {
+          bulletList.innerHTML = `<div class="space-y-2.5">${bulletItems.join('')}</div>`;
+        }
+        if (econFound && econEl) {
+          econEl.textContent = econFound;
+        } else if (econEl) {
+          econEl.textContent = `Toyota ${tKey}`;
+        }
+      } else if (bulletList) {
+        // Dynamic formula-based fallback
         bulletList.innerHTML = `
           <div class="space-y-2.5">
             <p>
@@ -6392,93 +6515,209 @@ window.PRELOADED_DASHBOARD_DATA = {"dashboard_kpi": {"kpi_cabang": {"target_beka
             </p>
           </div>
         `;
+        if (econEl) econEl.textContent = `Toyota ${tKey}`;
       }
-
-      const econEl = document.getElementById('aiMostEconomical');
-      if (econEl) econEl.textContent = `Toyota ${tKey}`;
-
-      const badgeEl = document.getElementById('aiDailySavingsBadge');
-      if (badgeEl) badgeEl.textContent = `${formatRp(savingsPerDay)} / Hari`;
     }
 
-    // Helper parse GViz table to eNCOmpare records
+    // Helper parse GViz table to full eNCOmpare live records (Zero Data Loss)
     function parseGvizToEncompare(table) {
-      if (!table || !table.rows || table.rows.length === 0) return;
+      if (!table || !table.rows || table.rows.length === 0) return false;
 
       try {
-        let liveUsage = null;
-        let liveMileage = null;
-        let liveToyota = null;
-        let liveNonToyota = null;
+        const live = {
+          usageYear: null,
+          daysCount: null,
+          mileageDay: null,
+          totalKm: null,
+          powerSourceToyota: null,
+          powerSourceNonToyota: null,
+          otrToyota: null,
+          otrNonToyota: null,
+          maintToyota: null,
+          maintNonToyota: null,
+          taxToyota: null,
+          taxNonToyota: null,
+          taxToyotaYr: null,
+          taxNonToyotaYr: null,
+          fuelToyota: null,
+          fuelNonToyota: null,
+          gasolineCost: null,
+          fuelCons: null,
+          chargingCost: null,
+          rangeKm: null,
+          leasingToyota: null,
+          leasingNonToyota: null,
+          dpToyota: null,
+          dpNonToyota: null,
+          ownRiskToyota: null,
+          ownRiskNonToyota: null,
+          coeToyota: null,
+          coeNonToyota: null,
+          leasingRate: null,
+          rvToyota: null,
+          rvNonToyota: null,
+          deprecToyota: null,
+          deprecNonToyota: null,
+          ncoToyota: null,
+          ncoNonToyota: null,
+          ncoYrToyota: null,
+          ncoYrNonToyota: null,
+          ncoMoToyota: null,
+          ncoMoNonToyota: null,
+          ncoDayToyota: null,
+          ncoDayNonToyota: null,
+          insightText: ''
+        };
+
+        const getNum = (cell) => {
+          if (!cell) return null;
+          if (typeof cell.v === 'number') return cell.v;
+          if (typeof cell.v === 'string') {
+            const clean = cell.v.trim().replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+            const parsed = parseFloat(clean);
+            return isNaN(parsed) ? null : parsed;
+          }
+          return null;
+        };
+
+        const getStr = (cell) => {
+          if (!cell) return '';
+          if (cell.f) return String(cell.f).trim();
+          if (cell.v !== null && cell.v !== undefined) return String(cell.v).trim();
+          return '';
+        };
 
         table.rows.forEach(r => {
           if (!r || !r.c) return;
-          const label = String(r.c[1]?.v || r.c[0]?.v || '').trim().toUpperCase();
-          if (label === 'ESTIMATED USAGE') {
-            const v = r.c[2]?.v || r.c[1]?.v;
-            if (v) liveUsage = parseInt(v);
+          const label1 = getStr(r.c[1]);
+          const label0 = getStr(r.c[0]);
+          const label = (label1 || label0).trim();
+          const u = label.toUpperCase();
+
+          // Full text block for AI Insight & Rekomendasi
+          if (u.includes('INSIGHT DAN REKOMENDASI') || u.includes('INSIGHT & REKOMENDASI') || (u.includes('INSIGHT') && label.length > 60)) {
+            live.insightText = label;
+            return;
           }
-          if (label === 'MILEAGE ESTIMATION') {
-            const v = r.c[2]?.v || r.c[1]?.v;
-            if (v) liveMileage = parseFloat(v);
-          }
-          if (label === 'VARIABLE') {
-            const vToy = r.c[2]?.v || r.c[3]?.v;
-            const vNt = r.c[3]?.v || r.c[4]?.v;
-            if (vToy) liveToyota = String(vToy).replace(/^\d+/, '').trim();
-            if (vNt) liveNonToyota = String(vNt).replace(/^\d+/, '').trim();
+
+          if (u.includes('ESTIMATED USAGE')) {
+            live.usageYear = getNum(r.c[2]);
+            live.daysCount = getNum(r.c[4]) || (live.usageYear ? live.usageYear * 365 : null);
+          } else if (u.includes('MILEAGE ESTIMATION') || u.includes('MILEAGE ESTIMATED')) {
+            live.mileageDay = getNum(r.c[2]);
+            live.totalKm = getNum(r.c[4]) || (live.mileageDay && live.daysCount ? live.mileageDay * live.daysCount : null);
+          } else if (u.includes('POWER SOURCE')) {
+            live.powerSourceToyota = getStr(r.c[2]) || 'Intern. Comb Engine + Electric Motor';
+            live.powerSourceNonToyota = getStr(r.c[3]) || 'Electric Motor';
+          } else if (u.includes('OTR PRICE') || u === 'OTR') {
+            live.otrToyota = getNum(r.c[2]);
+            live.otrNonToyota = getNum(r.c[3]);
+          } else if (u.includes('MAINTENANCE')) {
+            live.maintToyota = getNum(r.c[2]);
+            live.maintNonToyota = getNum(r.c[3]);
+          } else if (u === 'TAX' || u.startsWith('TAX ') || u.includes('PAJAK')) {
+            live.taxToyota = getNum(r.c[2]);
+            live.taxNonToyota = getNum(r.c[3]);
+            live.taxToyotaYr = getNum(r.c[5]);
+            live.taxNonToyotaYr = getNum(r.c[6]);
+          } else if (u.includes('GASOLINE') || u.includes('CHARGING') || u.includes('BENSIN')) {
+            live.fuelToyota = getNum(r.c[2]);
+            live.fuelNonToyota = getNum(r.c[3]);
+            live.gasolineCost = getNum(r.c[4]) || 12300;
+            live.fuelCons = getNum(r.c[5]) || 22;
+            live.chargingCost = getNum(r.c[6]) || 140000;
+            live.rangeKm = getNum(r.c[7]) || 480;
+          } else if (u.includes('LEASING')) {
+            live.leasingToyota = getNum(r.c[2]);
+            live.leasingNonToyota = getNum(r.c[3]);
+            live.dpToyota = getNum(r.c[4]);
+            live.dpNonToyota = getNum(r.c[6]);
+          } else if (u.includes('OWN RISK') || u.includes('COST BP')) {
+            live.ownRiskToyota = getNum(r.c[2]) || 3000000;
+            live.ownRiskNonToyota = getNum(r.c[3]) || 3000000;
+          } else if (u.includes('COE') || u.includes('COST OF OWNERSHIP EXPERIENCE')) {
+            live.coeToyota = getNum(r.c[2]);
+            live.coeNonToyota = getNum(r.c[3]);
+            live.leasingRate = getNum(r.c[5]);
+          } else if (u.includes('RESALE VALUE') || u.includes('RESALE')) {
+            live.rvToyota = getNum(r.c[2]);
+            live.rvNonToyota = getNum(r.c[3]);
+          } else if (u === '%' || u.includes('DEPRESIASI')) {
+            live.deprecToyota = getNum(r.c[2]);
+            live.deprecNonToyota = getNum(r.c[3]);
+          } else if (u.includes('NCO/DAY') || u.includes('NCO / DAY') || u.includes('NCO/HARI')) {
+            live.ncoDayToyota = getNum(r.c[2]);
+            live.ncoDayNonToyota = getNum(r.c[3]);
+          } else if (u.includes('NCO/MONTH') || u.includes('NCO / MONTH') || u.includes('NCO/BULAN')) {
+            live.ncoMoToyota = getNum(r.c[2]);
+            live.ncoMoNonToyota = getNum(r.c[3]);
+          } else if (u.includes('NCO/YEAR') || u.includes('NCO / YEAR') || u.includes('NCO/TAHUN')) {
+            live.ncoYrToyota = getNum(r.c[2]);
+            live.ncoYrNonToyota = getNum(r.c[3]);
+          } else if (u.includes('NCO (NETT COST') || u.includes('NETT COST OF OWNERSHIP') || u === 'NCO') {
+            live.ncoToyota = getNum(r.c[2]);
+            live.ncoNonToyota = getNum(r.c[3]);
           }
         });
 
-        const ncoData = appData.nco_data || (window.PRELOADED_DASHBOARD_DATA && window.PRELOADED_DASHBOARD_DATA.nco_data);
-        let hasChanges = false;
+        if (live.otrToyota !== null || live.ncoToyota !== null || live.usageYear !== null) {
+          appData.nco_live_data = live;
+          window.encompareLiveData = live;
 
-        if (liveUsage && [1, 2, 3, 4, 5].includes(liveUsage)) {
-          if (window.encompareState.usageYear !== liveUsage) {
-            window.encompareState.usageYear = liveUsage;
-            hasChanges = true;
+          if (live.usageYear && [1, 2, 3, 4, 5].includes(live.usageYear)) {
+            window.encompareState.usageYear = live.usageYear;
           }
-        }
-
-        if (liveMileage && liveMileage > 0) {
-          if (window.encompareState.mileageDay !== liveMileage) {
-            window.encompareState.mileageDay = liveMileage;
-            hasChanges = true;
+          if (live.mileageDay && live.mileageDay > 0) {
+            window.encompareState.mileageDay = live.mileageDay;
           }
-        }
 
-        if (liveToyota && ncoData && ncoData.toyota_models && ncoData.toyota_models[liveToyota]) {
-          if (window.encompareState.toyotaModel !== liveToyota) {
-            window.encompareState.toyotaModel = liveToyota;
-            hasChanges = true;
-          }
-        }
-
-        if (liveNonToyota && ncoData && ncoData.non_toyota_models && ncoData.non_toyota_models[liveNonToyota]) {
-          if (window.encompareState.nonToyotaModel !== liveNonToyota) {
-            window.encompareState.nonToyotaModel = liveNonToyota;
-            hasChanges = true;
-          }
-        }
-
-        if (hasChanges) {
-          const selToyota = document.getElementById('ncoToyotaSelect');
-          const selNonToyota = document.getElementById('ncoNonToyotaSelect');
           const selUsage = document.getElementById('ncoUsageYear');
           const selMileage = document.getElementById('ncoMileageDay');
-
-          if (selUsage) selUsage.value = String(window.encompareState.usageYear);
-          if (selMileage) selMileage.value = String(window.encompareState.mileageDay);
-          if (selToyota) selToyota.value = window.encompareState.toyotaModel;
-          if (selNonToyota) selNonToyota.value = window.encompareState.nonToyotaModel;
+          if (selUsage && live.usageYear) selUsage.value = String(live.usageYear);
+          if (selMileage && live.mileageDay) selMileage.value = String(live.mileageDay);
 
           recalculateEncompare();
-          showToast('eNCOmpare: Parameter diperbarui dari Google Sheets!', 'info');
+          return true;
         }
       } catch (err) {
         console.warn('Error parsing live eNCOmpare:', err);
       }
+      return false;
     }
+
+    // Helper parse Apps Script raw grid to eNCOmpare records
+    function parseRawGridToEncompare(rawGrid) {
+      if (!rawGrid || !Array.isArray(rawGrid) || rawGrid.length === 0) return false;
+      const gvizFormatted = {
+        rows: rawGrid.map(row => ({
+          c: Array.isArray(row) ? row.map(val => ({ v: val, f: String(val) })) : []
+        }))
+      };
+      return parseGvizToEncompare(gvizFormatted);
+    }
+
+    // Direct live fetcher khusus untuk sheet eNCOmpare dengan cache-busting
+    async function fetchLiveEncompareSheet() {
+      try {
+        const encTable = await fetchGvizJsonp('eNCOmpare', '&headers=0');
+        if (encTable) {
+          const updated = parseGvizToEncompare(encTable);
+          if (updated) {
+            renderEncompareTab();
+            try {
+              const cached = JSON.parse(localStorage.getItem('tunas_live_app_data') || '{}');
+              cached.nco_live_data = appData.nco_live_data;
+              localStorage.setItem('tunas_live_app_data', JSON.stringify(cached));
+            } catch (e) {}
+          }
+        }
+      } catch (err) {
+        console.warn('Direct fetch eNCOmpare err:', err);
+      }
+    }
+
+    // Alias global agar backward-compatible
+    window.renderEncompare = renderEncompareTab;
 
     // Sinkronisasi pilihan web kembali ke Google Sheets via Apps Script Web App
     async function syncEncompareBackToSheet(usage, mileage, toyota, nonToyota) {
@@ -7576,6 +7815,9 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
             if (remote.data.dashboard_kpi) appData.dashboard_kpi = remote.data.dashboard_kpi;
             if (remote.data.trade_in && remote.data.trade_in.length > 0) appData.trade_in = remote.data.trade_in;
             if (remote.data.ar && remote.data.ar.length > 0) appData.ar_data = remote.data.ar;
+            if (remote.data.encompare && remote.data.encompare.rawGrid) {
+              parseRawGridToEncompare(remote.data.encompare.rawGrid);
+            }
             
             showToast('Live Sync Apps Script: Seluruh Data Berhasil Terupdate!', 'success');
             const badgeEl = document.getElementById('syncStatusText');
@@ -7583,6 +7825,7 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
             const timeEl = document.getElementById('syncLastTime');
             if (timeEl) timeEl.textContent = new Date().toLocaleTimeString('id-ID');
             applyFilters();
+            if (typeof renderEncompareTab === 'function') renderEncompareTab();
             if (icon) icon.classList.remove('animate-spin');
             return;
           }
@@ -7646,7 +7889,8 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
         }
 
         if (encTable) {
-          parseGvizToEncompare(encTable);
+          const encUpdated = parseGvizToEncompare(encTable);
+          if (encUpdated) hasAnyUpdate = true;
         }
 
         if (ccTable) {
@@ -7670,6 +7914,7 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
               trade_in: appData.trade_in,
               ar_data: appData.ar_data,
               nco_data: appData.nco_data,
+              nco_live_data: appData.nco_live_data,
               data_nps: appData.data_nps,
               timestamp: Date.now()
             }));
@@ -7682,7 +7927,7 @@ Kira-kira layanan mana yang ingin Bapak/Ibu ambil hari ini untuk kenyamanan berk
           const timeEl = document.getElementById('syncLastTime');
           if (timeEl) timeEl.textContent = new Date().toLocaleTimeString('id-ID');
           applyFilters();
-          if (typeof renderEncompare === 'function') renderEncompare();
+          if (typeof renderEncompareTab === 'function') renderEncompareTab();
           if (typeof updatePolregView === 'function') updatePolregView();
         } else {
           showToast('Data diperbarui menggunakan preloaded dataset lokal', 'info');

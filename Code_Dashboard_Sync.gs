@@ -31,10 +31,10 @@ function doGet(e) {
     if (action === 'update_encompare') {
       const encSheet = ss.getSheetByName('eNCOmpare') || ss.getSheetByName('encompare');
       if (encSheet) {
-        if (e.parameter.usage) encSheet.getRange('C1').setValue(Number(e.parameter.usage));
-        if (e.parameter.mileage) encSheet.getRange('C2').setValue(Number(e.parameter.mileage));
-        if (e.parameter.toyota) encSheet.getRange('C3').setValue(e.parameter.toyota);
-        if (e.parameter.non_toyota) encSheet.getRange('D3').setValue(e.parameter.non_toyota);
+        if (e.parameter.usage) encSheet.getRange('C2').setValue(Number(e.parameter.usage));
+        if (e.parameter.mileage) encSheet.getRange('C3').setValue(Number(e.parameter.mileage));
+        if (e.parameter.toyota) encSheet.getRange('C4').setValue(e.parameter.toyota);
+        if (e.parameter.non_toyota) encSheet.getRange('D4').setValue(e.parameter.non_toyota);
         return createJsonResponse({ status: 'success', message: 'eNCOmpare updated in spreadsheet successfully' });
       }
     }
@@ -73,6 +73,11 @@ function doGet(e) {
         const arRows = parseTableSheet(sheet);
         arRows.forEach(r => { r._sheetMonth = name; });
         payload.data.ar = payload.data.ar.concat(arRows);
+      }
+
+      // Ambil sheet eNCOmpare
+      if (name.toLowerCase().includes('encompare') || name.toLowerCase().includes('nco')) {
+        payload.data.encompare = parseKpiSheet(sheet);
       }
     });
 
